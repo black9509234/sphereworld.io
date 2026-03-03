@@ -11,17 +11,45 @@ const io = new Server(server);
 
 app.use(express.static(path.join(__dirname, 'public')));
 
-const DATA_DIR = path.join(__dirname, 'data');
-const DATA_FILE = path.join(DATA_DIR, 'accounts.json');
-if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR);
-if (!fs.existsSync(DATA_FILE)) fs.writeFileSync(DATA_FILE, '{}');
+// ── 계정 저장 경로 ──
+// 환경변수 DATA_PATH를 지정하면 서버 재배포 후에도 계정이 유지됩니다.
+// Railway: /data, Render: /etc/data 등 퍼시스턴트 볼륨 경로로 지정하세요.
+// 미지정 시 서버 실행 디렉토리 기준 ./data 폴더에 저장됩니다.
+const DATA_DIR   = process.env.DATA_PATH
+  ? path.resolve(process.env.DATA_PATH)
+  : path.join(process.cwd(), 'data');
+const DATA_FILE   = path.join(DATA_DIR, 'accounts.json');
+const DATA_BACKUP = path.join(DATA_DIR, 'accounts.backup.json');
+
+if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
+if (!fs.existsSync(DATA_FILE)) fs.writeFileSync(DATA_FILE, '{}', 'utf8');
+
+console.log(`[DB] 계정 파일: ${DATA_FILE}`);
 
 function loadAccounts() {
-  try { return JSON.parse(fs.readFileSync(DATA_FILE, 'utf8')); } catch { return {}; }
+  try {
+    return JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
+  } catch (e) {
+    console.error('[DB] 읽기 실패, 백업 시도:', e.message);
+    try { return JSON.parse(fs.readFileSync(DATA_BACKUP, 'utf8')); } catch { return {}; }
+  }
 }
-function saveAccounts(a) { fs.writeFileSync(DATA_FILE, JSON.stringify(a, null, 2)); }
-function hashPw(pw) { return crypto.createHash('sha256').update(pw + 'sphereio_salt_2025').digest('hex'); }
 
+function saveAccounts(accounts) {
+  try {
+    const json = JSON.stringify(accounts, null, 2);
+    if (fs.existsSync(DATA_FILE)) fs.copyFileSync(DATA_FILE, DATA_BACKUP);
+    fs.writeFileSync(DATA_FILE, json, 'utf8');
+  } catch (e) {
+    console.error('[DB] 저장 실패:', e.message);
+  }
+}
+
+function hashPw(pw) {
+  return crypto.createHash('sha256').update(pw + 'sphereio_salt_2025').digest('hex');
+}
+
+// ── 상수 ──
 const SHAPE_EVOLUTION = [
   { level: 1,  shape: 'circle',   name: '원형체',  color: '#4ecdc4' },
   { level: 5,  shape: 'triangle', name: '삼각체',  color: '#ff6b6b' },
@@ -46,217 +74,172 @@ const FIELD_MONSTERS_DEF = [
 
 const MAP_W = 2000, MAP_H = 1500;
 const TOWN_X = 250, TOWN_Y = 750;
-const DUNGEON_X = 1780, DUNGEON_Y = 750, DUNGEON_R = 70;
 
-// 몬스터 AI 설정
-const MONSTER_DETECT_RANGE = 200;  // 플레이어 감지 거리
-const MONSTER_ATTACK_RANGE = 22;   // 접촉 공격 범위 (도형 반지름 수준)
-const MONSTER_ATTACK_INTERVAL = 1200; // ms
-const MONSTER_CHASE_SPEED = 1.5;
-const MONSTER_WANDER_SPEED = 0.25; // 배회 속도 대폭 감소
-const MONSTER_WANDER_RANGE = 130;
-
-// 최대 몬스터 수
+// 몬스터 AI
+const MONSTER_DETECT_RANGE    = 200;
+const MONSTER_ATTACK_RANGE    = 22;
+const MONSTER_ATTACK_INTERVAL = 1200;
+const MONSTER_CHASE_SPEED     = 1.5;
+const MONSTER_WANDER_SPEED    = 0.25;
+const MONSTER_WANDER_RANGE    = 130;
 const MAX_MONSTERS = 20;
 const MIN_MONSTERS = 10;
 
+// MP 자동 회복
+const MP_REGEN_AMOUNT   = 5;    // 틱당 회복량
+const MP_REGEN_INTERVAL = 3000; // 3초마다
+
+// ── 런타임 상태 ──
 const onlinePlayers = {};
 let fieldMonsters = [];
 let mUid = 0;
 
+// persist 디바운스 큐
+const _persistQueue = new Set();
+let _persistTimer = null;
+
 // ── 몬스터 스폰 ──
-function createMonster(x, y) {
+function createMonster() {
   const def = FIELD_MONSTERS_DEF[Math.floor(Math.random() * FIELD_MONSTERS_DEF.length)];
+  const mx = 500 + Math.random() * 1200;
+  const my = 100 + Math.random() * 1300;
   return {
     uid: ++mUid,
     ...JSON.parse(JSON.stringify(def)),
     maxHp: def.hp,
-    x: x !== undefined ? x : 500 + Math.random() * 1200,
-    y: y !== undefined ? y : 100 + Math.random() * 1300,
-    alive: true,
-    spawnX: x !== undefined ? x : 0,
-    spawnY: y !== undefined ? y : 0,
+    x: mx, y: my, alive: true,
+    spawnX: mx, spawnY: my,
     ai: {
-      state: 'wander',      // 'wander' | 'chase'
-      wanderPhase: 'idle',  // 'move' | 'idle' — 이동/대기 교번
-      targetId: null,
-      tx: 0, ty: 0,
-      wanderTimer: 800 + Math.random() * 1200, // 첫 대기
-      lastAttack: 0,
-      aggroTimer: 0,
+      state: 'wander', wanderPhase: 'idle', targetId: null,
+      tx: mx, ty: my,
+      wanderTimer: 500 + Math.random() * 1500,
+      lastAttack: 0, aggroTimer: 0,
     },
   };
 }
 
 function spawnMonsters(count) {
-  for (let i = 0; i < count; i++) {
-    const x = 500 + Math.random() * 1200;
-    const y = 100 + Math.random() * 1300;
-    const m = createMonster(x, y);
-    m.spawnX = x;
-    m.spawnY = y;
-    m.ai.tx = x;
-    m.ai.ty = y;
-    m.ai.wanderPhase = 'idle';
-    m.ai.wanderTimer = 500 + Math.random() * 1500;
-    fieldMonsters.push(m);
-  }
+  for (let i = 0; i < count; i++) fieldMonsters.push(createMonster());
 }
 
 spawnMonsters(MAX_MONSTERS);
 
-// ── 몬스터 AI 서버 틱 ──
-const AI_TICK = 50; // ms (20 fps)
+// ── 몬스터 AI 틱 ──
 let lastAiTick = Date.now();
-
 setInterval(() => {
   const now = Date.now();
-  const dt = now - lastAiTick;
+  const dt = Math.min(now - lastAiTick, 200);
   lastAiTick = now;
-
-  const playerList = Object.values(onlinePlayers);
-
-  // 살아있는 몬스터 처리
-  const aliveMonsters = fieldMonsters.filter(m => m.alive);
-
-  for (const m of aliveMonsters) {
-    updateMonsterAI(m, playerList, dt, now);
-  }
-
-  // 죽은 몬스터 정리 + 리스폰
+  const players = Object.values(onlinePlayers);
+  for (const m of fieldMonsters) { if (m.alive) updateMonsterAI(m, players, dt, now); }
   fieldMonsters = fieldMonsters.filter(m => m.alive);
-  const aliveCount = fieldMonsters.length;
-  if (aliveCount < MIN_MONSTERS) {
-    spawnMonsters(MAX_MONSTERS - aliveCount);
-    // 새 몬스터 스폰 알림
-    io.emit('monsters spawned', fieldMonsters.filter(m => m.alive).map(serializeMonster));
+  if (fieldMonsters.length < MIN_MONSTERS) {
+    spawnMonsters(MAX_MONSTERS - fieldMonsters.length);
+    io.emit('monsters spawned', fieldMonsters.map(serializeMonster));
   }
+}, 50);
 
-  // 주기적으로 전체 상태 브로드캐스트 (500ms마다)
-}, AI_TICK);
-
-// 500ms마다 몬스터 위치 동기화
+// 위치 동기화 (100ms)
 setInterval(() => {
-  if (fieldMonsters.length === 0) return;
-  io.emit('monster positions', fieldMonsters.filter(m => m.alive).map(m => ({
-    uid: m.uid, x: m.x, y: m.y, hp: m.hp, state: m.ai.state
+  if (!fieldMonsters.length) return;
+  io.emit('monster positions', fieldMonsters.map(m => ({
+    uid: m.uid, x: m.x, y: m.y, hp: m.hp, state: m.ai.state,
   })));
 }, 100);
 
-// 25초마다 전체 필드 상태 브로드캐스트
-setInterval(() => {
-  io.emit('field state', buildFieldState());
-}, 25000);
+// 전체 상태 브로드캐스트 (25초)
+setInterval(() => io.emit('field state', buildFieldState()), 25000);
 
+// ── MP 자동 회복 ──
+setInterval(() => {
+  for (const p of Object.values(onlinePlayers)) {
+    if (p.mp >= p.maxMp) continue;
+    p.mp = Math.min(p.maxMp, p.mp + MP_REGEN_AMOUNT);
+    const sock = io.sockets.sockets.get(p.id);
+    if (sock) sock.emit('mp regen', { mp: p.mp, maxMp: p.maxMp });
+  }
+}, MP_REGEN_INTERVAL);
+
+// ── 몬스터 AI ──
 function updateMonsterAI(m, players, dt, now) {
   const ai = m.ai;
-
-  // 가장 가까운 플레이어 찾기
-  let nearest = null;
-  let nearestDist = Infinity;
+  let nearest = null, nearestDist = Infinity;
   for (const p of players) {
     if (p.hp <= 0) continue;
     const d = Math.hypot(p.x - m.x, p.y - m.y);
     if (d < nearestDist) { nearestDist = d; nearest = p; }
   }
 
-  // 상태 전환: 감지 범위 안에 플레이어 있으면 추격
   if (nearest && nearestDist < MONSTER_DETECT_RANGE) {
-    ai.state = 'chase';
-    ai.targetId = nearest.id;
-    ai.aggroTimer = 3000;
+    ai.state = 'chase'; ai.targetId = nearest.id; ai.aggroTimer = 3000;
   } else {
     ai.aggroTimer -= dt;
-    if (ai.aggroTimer <= 0) {
-      ai.state = 'wander';
-      ai.targetId = null;
-    }
+    if (ai.aggroTimer <= 0) { ai.state = 'wander'; ai.targetId = null; }
   }
 
   if (ai.state === 'chase' && nearest) {
-    const dx = nearest.x - m.x;
-    const dy = nearest.y - m.y;
+    const dx = nearest.x - m.x, dy = nearest.y - m.y;
     const dist = Math.hypot(dx, dy);
-
     if (dist > MONSTER_ATTACK_RANGE) {
-      // 플레이어에게 이동
       const spd = MONSTER_CHASE_SPEED * (dt / 16);
-      m.x += (dx / dist) * spd;
-      m.y += (dy / dist) * spd;
-      m.x = Math.max(10, Math.min(MAP_W - 10, m.x));
-      m.y = Math.max(10, Math.min(MAP_H - 10, m.y));
-    } else {
-      // 접촉 → 공격
-      if (now - ai.lastAttack > MONSTER_ATTACK_INTERVAL) {
-        ai.lastAttack = now;
-        monsterAttackPlayer(m, nearest, now);
-      }
+      m.x = Math.max(10, Math.min(MAP_W - 10, m.x + (dx / dist) * spd));
+      m.y = Math.max(10, Math.min(MAP_H - 10, m.y + (dy / dist) * spd));
+    } else if (now - ai.lastAttack > MONSTER_ATTACK_INTERVAL) {
+      ai.lastAttack = now;
+      monsterAttackPlayer(m, nearest);
     }
   } else {
-    // ── 배회: move → idle(1초) → move → idle ... ──
     ai.wanderTimer -= dt;
-
     if (ai.wanderPhase === 'idle') {
-      // 대기 중: 타이머 끝나면 새 목표 지점 설정 후 이동 시작
       if (ai.wanderTimer <= 0) {
         const angle = Math.random() * Math.PI * 2;
         const r = 40 + Math.random() * MONSTER_WANDER_RANGE;
         ai.tx = Math.max(50, Math.min(MAP_W - 50, m.spawnX + Math.cos(angle) * r));
         ai.ty = Math.max(50, Math.min(MAP_H - 50, m.spawnY + Math.sin(angle) * r));
         ai.wanderPhase = 'move';
-        ai.wanderTimer = 0;
       }
-      // 대기 중엔 이동 없음
     } else {
-      // 이동 중: 목표 지점까지 천천히 이동
-      const dx = ai.tx - m.x;
-      const dy = ai.ty - m.y;
-      const dist = Math.hypot(dx, dy);
-
+      const dx = ai.tx - m.x, dy = ai.ty - m.y, dist = Math.hypot(dx, dy);
       if (dist > 6) {
         const spd = MONSTER_WANDER_SPEED * (dt / 16);
-        m.x += (dx / dist) * spd;
-        m.y += (dy / dist) * spd;
+        m.x += (dx / dist) * spd; m.y += (dy / dist) * spd;
       } else {
-        // 목표 도착 → idle 1초 대기
-        m.x = ai.tx;
-        m.y = ai.ty;
+        m.x = ai.tx; m.y = ai.ty;
         ai.wanderPhase = 'idle';
-        ai.wanderTimer = 800 + Math.random() * 600; // 0.8~1.4초 대기
+        ai.wanderTimer = 800 + Math.random() * 600;
       }
     }
   }
 }
 
-function monsterAttackPlayer(m, p, now) {
-  if (!onlinePlayers[p.id]) return;
+function monsterAttackPlayer(m, p) {
+  const sock = io.sockets.sockets.get(p.id);
+  if (!sock || !onlinePlayers[p.id]) return;
   const dmg = Math.max(1, m.atk - p.def + Math.floor(Math.random() * 4));
   p.hp = Math.max(0, p.hp - dmg);
+  sock.emit('monster attack', { monsterUid: m.uid, monsterName: m.name, dmg, playerHp: p.hp, playerMaxHp: p.maxHp });
+  if (p.hp <= 0) handleDeath(sock, p);
+  else persist(p);
+}
 
-  // 소켓으로 데미지 전달
-  const socket = io.sockets.sockets.get(p.id);
-  if (socket) {
-    socket.emit('monster attack', {
-      monsterUid: m.uid,
-      monsterName: m.name,
-      dmg,
-      playerHp: p.hp,
-      playerMaxHp: p.maxHp,
-    });
-  }
-
-  if (p.hp <= 0) {
-    handleDeath(socket, p);
-  }
+function handleDeath(sock, p) {
+  io.emit('system message', `[전사] ${p.nickname}이(가) 쓰러졌습니다.`);
+  p.gold = Math.floor(p.gold * 0.9);
   persist(p);
+  setTimeout(() => {
+    if (!onlinePlayers[sock.id]) return;
+    p.hp = Math.floor(p.maxHp * 0.3);
+    p.mp = p.maxMp; // 부활 시 MP 완충
+    p.x = TOWN_X + (Math.random() - 0.5) * 80;
+    p.y = TOWN_Y + (Math.random() - 0.5) * 80;
+    sock.emit('revive', { hp: p.hp, mp: p.mp, x: p.x, y: p.y, gold: p.gold });
+    io.emit('system message', `${p.nickname}이(가) 마을에서 부활했습니다.`);
+    persist(p);
+  }, 4000);
 }
 
 function serializeMonster(m) {
-  return {
-    uid: m.uid, name: m.name, shape: m.shape, color: m.color,
-    x: m.x, y: m.y, hp: m.hp, maxHp: m.maxHp, alive: m.alive,
-    state: m.ai ? m.ai.state : 'wander',
-  };
+  return { uid: m.uid, name: m.name, shape: m.shape, color: m.color, x: m.x, y: m.y, hp: m.hp, maxHp: m.maxHp, alive: m.alive, state: m.ai.state };
 }
 
 function expForLevel(lv) { return lv * 100 + (lv - 1) * 50; }
@@ -272,11 +255,46 @@ function buildFieldState() {
     monsters: fieldMonsters.filter(m => m.alive).map(serializeMonster),
     players: Object.values(onlinePlayers).map(p => ({
       id: p.id, nickname: p.nickname, shape: p.shape, color: p.color,
-      x: p.x, y: p.y, level: p.level, hp: p.hp, maxHp: p.maxHp, className: p.className || null
-    }))
+      x: p.x, y: p.y, level: p.level, hp: p.hp, maxHp: p.maxHp, className: p.className || null,
+    })),
   };
 }
 
+function sanitize(p) {
+  return {
+    nickname: p.nickname, level: p.level, exp: p.exp, gold: p.gold,
+    kills: p.kills, dungeonClears: p.dungeonClears, firstStrikes: p.firstStrikes,
+    hp: p.hp, maxHp: p.maxHp, mp: p.mp, maxMp: p.maxMp,
+    atk: p.atk, def: p.def, shape: p.shape, color: p.color, className: p.className,
+    x: p.x, y: p.y,
+  };
+}
+
+// persist: 디바운스로 묶어서 저장 (I/O 경쟁 방지)
+function persist(p) {
+  _persistQueue.add(p.nickname);
+  if (_persistTimer) return;
+  _persistTimer = setTimeout(() => {
+    _persistTimer = null;
+    const accounts = loadAccounts();
+    for (const nickname of _persistQueue) {
+      const pl = Object.values(onlinePlayers).find(x => x.nickname === nickname);
+      if (pl && accounts[nickname]) {
+        Object.assign(accounts[nickname], {
+          level: pl.level, exp: pl.exp, gold: pl.gold, kills: pl.kills,
+          dungeonClears: pl.dungeonClears, firstStrikes: pl.firstStrikes,
+          maxHp: pl.maxHp, maxMp: pl.maxMp, atk: pl.atk, def: pl.def,
+          shape: pl.shape, color: pl.color, className: pl.className,
+          x: pl.x, y: pl.y,
+        });
+      }
+    }
+    _persistQueue.clear();
+    saveAccounts(accounts);
+  }, 500);
+}
+
+// ── 소켓 핸들러 ──
 io.on('connection', (socket) => {
 
   socket.on('register', ({ nickname, password }) => {
@@ -289,7 +307,7 @@ io.on('connection', (socket) => {
       level: 1, exp: 0, gold: 0, kills: 0, dungeonClears: 0, firstStrikes: 0,
       maxHp: 100, maxMp: 100, atk: 8, def: 4,
       shape: 'circle', color: '#4ecdc4', className: null,
-      x: TOWN_X, y: TOWN_Y, createdAt: Date.now()
+      x: TOWN_X, y: TOWN_Y, createdAt: Date.now(),
     };
     accounts[nickname] = acc;
     saveAccounts(accounts);
@@ -328,14 +346,12 @@ io.on('connection', (socket) => {
     socket.broadcast.emit('player moved', { id: socket.id, x: p.x, y: p.y });
   });
 
-  // 플레이어 → 몬스터 공격 (클라이언트가 근접 시 자동 트리거)
   socket.on('attack monster', ({ uid, action }) => {
     const p = onlinePlayers[socket.id];
     if (!p || p.hp <= 0) return;
     const m = fieldMonsters.find(m => m.uid === uid && m.alive);
     if (!m) return;
-    const dist = Math.hypot(p.x - m.x, p.y - m.y);
-    if (dist > 130) { socket.emit('system message', '[경고] 너무 멀어요! 가까이 가세요.'); return; }
+    if (Math.hypot(p.x - m.x, p.y - m.y) > 130) { socket.emit('system message', '[경고] 너무 멀어요! 가까이 가세요.'); return; }
 
     let dmg, skillName = '';
     if (action === 'skill') {
@@ -348,11 +364,9 @@ io.on('connection', (socket) => {
     }
 
     m.hp -= dmg;
-
-    io.emit('combat result', {
+    socket.emit('combat result', {
       attackerId: socket.id, attackerNickname: p.nickname,
       monsterUid: uid, dmg,
-      counterDmg: 0, // 몬스터 반격은 AI 틱에서 별도 처리
       monsterHp: Math.max(0, m.hp), monsterMaxHp: m.maxHp,
       playerHp: p.hp, playerMaxHp: p.maxHp,
       playerMp: p.mp, playerMaxMp: p.maxMp,
@@ -360,10 +374,7 @@ io.on('connection', (socket) => {
     });
 
     if (m.hp <= 0) {
-      m.alive = false;
-      p.kills++;
-      p.exp += m.exp;
-      p.gold += m.gold;
+      m.alive = false; p.kills++; p.exp += m.exp; p.gold += m.gold;
       io.emit('monster killed', { uid, killerNickname: p.nickname, exp: m.exp, gold: m.gold });
       checkLevelUp(socket, p);
       checkClassUnlock(socket, p);
@@ -392,11 +403,9 @@ io.on('connection', (socket) => {
     if (r.dungeonClears && p.dungeonClears < r.dungeonClears) { socket.emit('system message', '던전 클리어 횟수가 부족합니다.'); return; }
     if (r.kills && p.kills < r.kills) { socket.emit('system message', '처치 수가 부족합니다.'); return; }
     if (r.firstStrikes && p.firstStrikes < r.firstStrikes) { socket.emit('system message', '선제공격 횟수가 부족합니다.'); return; }
-    p.className = cls.name;
-    p.color = cls.color;
-    p.shape = cls.shape;
-    if (cls.bonus.maxHp) { p.maxHp += cls.bonus.maxHp; p.hp += cls.bonus.maxHp; }
-    if (cls.bonus.maxMp) { p.maxMp += cls.bonus.maxMp; }
+    p.className = cls.name; p.color = cls.color; p.shape = cls.shape;
+    if (cls.bonus.maxHp) { p.maxHp += cls.bonus.maxHp; p.hp = Math.min(p.hp + cls.bonus.maxHp, p.maxHp); }
+    if (cls.bonus.maxMp) { p.maxMp += cls.bonus.maxMp; p.mp = Math.min(p.mp + cls.bonus.maxMp, p.maxMp); }
     if (cls.bonus.atk) p.atk += cls.bonus.atk;
     if (cls.bonus.def) p.def += cls.bonus.def;
     socket.emit('class chosen', sanitize(p));
@@ -407,11 +416,11 @@ io.on('connection', (socket) => {
 
   socket.on('chat message', ({ message }) => {
     const p = onlinePlayers[socket.id];
-    if (!p || !message.trim()) return;
+    if (!p || !message || !message.trim()) return;
     io.emit('chat message', {
       nickname: p.nickname, message: message.trim().slice(0, 100),
       color: p.color, id: socket.id,
-      time: new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })
+      time: new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' }),
     });
   });
 
@@ -430,6 +439,7 @@ io.on('connection', (socket) => {
       p.exp -= expForLevel(p.level);
       p.level++;
       p.maxHp += 15; p.hp = p.maxHp;
+      p.maxMp += 5;  p.mp = p.maxMp;
       p.atk += 2; p.def += 1;
       const evo = getEvo(p.level);
       let evolved = false;
@@ -438,7 +448,12 @@ io.on('connection', (socket) => {
         p.shape = evo.shape; p.color = evo.color;
         evolved = p.shape !== prev;
       }
-      socket.emit('level up', { level: p.level, exp: p.exp, maxHp: p.maxHp, hp: p.hp, atk: p.atk, def: p.def, shape: p.shape, color: p.color, evolved, evolvedName: evo.name });
+      socket.emit('level up', {
+        level: p.level, exp: p.exp,
+        maxHp: p.maxHp, hp: p.hp, maxMp: p.maxMp, mp: p.mp,
+        atk: p.atk, def: p.def, shape: p.shape, color: p.color,
+        evolved, evolvedName: evo.name,
+      });
       io.emit('system message', `[레벨업] ${p.nickname} → Lv.${p.level}${evolved ? ` / ${evo.name}으로 진화` : ''}`);
       io.emit('player shape update', { id: socket.id, shape: p.shape, color: p.color, level: p.level });
     }
@@ -450,37 +465,13 @@ io.on('connection', (socket) => {
       const r = c.req;
       return p.level >= r.level
         && (!r.dungeonClears || p.dungeonClears >= r.dungeonClears)
-        && (!r.kills || p.kills >= r.kills)
-        && (!r.firstStrikes || p.firstStrikes >= r.firstStrikes);
+        && (!r.kills        || p.kills >= r.kills)
+        && (!r.firstStrikes  || p.firstStrikes >= r.firstStrikes);
     });
-    if (unlockable.length > 0) socket.emit('class unlock available', unlockable.map(c => ({ id: c.id, name: c.name, condition: c.condition, shape: c.shape, color: c.color })));
+    if (unlockable.length > 0)
+      socket.emit('class unlock available', unlockable.map(c => ({ id: c.id, name: c.name, condition: c.condition, shape: c.shape, color: c.color })));
   }
 });
 
-function handleDeath(socket, p) {
-  if (!socket) return;
-  io.emit('system message', `[전사] ${p.nickname}이(가) 쓰러졌습니다.`);
-  p.gold = Math.floor(p.gold * 0.9);
-  setTimeout(() => {
-    if (!onlinePlayers[socket.id]) return;
-    p.hp = Math.floor(p.maxHp * 0.3);
-    p.x = TOWN_X + (Math.random() - 0.5) * 80;
-    p.y = TOWN_Y + (Math.random() - 0.5) * 80;
-    socket.emit('revive', { hp: p.hp, x: p.x, y: p.y, gold: p.gold });
-    io.emit('system message', `${p.nickname}이(가) 마을에서 부활했습니다.`);
-  }, 4000);
-}
-
-function sanitize(p) {
-  return { nickname: p.nickname, level: p.level, exp: p.exp, gold: p.gold, kills: p.kills, dungeonClears: p.dungeonClears, firstStrikes: p.firstStrikes, hp: p.hp, maxHp: p.maxHp, mp: p.mp, maxMp: p.maxMp, atk: p.atk, def: p.def, shape: p.shape, color: p.color, className: p.className, x: p.x, y: p.y };
-}
-
-function persist(p) {
-  const accounts = loadAccounts();
-  if (!accounts[p.nickname]) return;
-  Object.assign(accounts[p.nickname], { level: p.level, exp: p.exp, gold: p.gold, kills: p.kills, dungeonClears: p.dungeonClears, firstStrikes: p.firstStrikes, maxHp: p.maxHp, maxMp: p.maxMp, atk: p.atk, def: p.def, shape: p.shape, color: p.color, className: p.className, x: p.x, y: p.y });
-  saveAccounts(accounts);
-}
-
 const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => console.log(`sphere.io running: http://localhost:${PORT}`));
+server.listen(PORT, () => console.log(`sphere.io running on port ${PORT}`));

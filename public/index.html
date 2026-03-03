@@ -489,12 +489,6 @@ function drawStar(ctx, cx, cy, outerR, innerR, points) {
 }
 
 // ── 몬스터 AI 업데이트 (클라이언트 시뮬레이션) ──
-const WANDER_SPEED = 0.6;
-const CHASE_SPEED = 1.4;
-const DETECT_RANGE = 200;  // 플레이어 감지 거리
-const WANDER_RANGE = 120;  // 스폰 주변 배회 범위
-const MOB_ATTACK_RANGE = 50;
-const MOB_ATTACK_INTERVAL = 1500; // ms
 
 function updateMonsterAI(dt) {
   if (!me || me.hp <= 0) return;
@@ -568,16 +562,6 @@ function updateMonsterAI(dt) {
   }
 }
 
-function showMobAttackEffect(m) {
-  if (!m || !me) return;
-  // 몬스터가 플레이어를 공격하는 시각 효과
-  const sx = (m.x - camX);
-  const sy = (m.y - camY);
-  if (sx < -100 || sx > canvas.width + 100 || sy < -100 || sy > canvas.height + 100) return;
-
-  // 서버로 공격 알림 전송 (서버가 실제 데미지 처리)
-  // 단, 이미 서버의 combat result가 처리하므로 여기서는 시각 효과만
-}
 
 // ── 클릭: 몬스터 공격 ──
 canvas.addEventListener('click', e => {
@@ -817,7 +801,7 @@ function render() {
       ctx.globalAlpha = 0.04;
       ctx.fillStyle = me.color;
       ctx.beginPath();
-      ctx.arc(px, py, AUTO_ATTACK_RANGE, 0, Math.PI*2);
+      ctx.arc(px, py, ATTACK_RANGE * 0.75, 0, Math.PI*2);
       ctx.fill();
       ctx.restore();
     }
@@ -997,19 +981,27 @@ socket.on('healed', ({ hp, maxHp, mp, maxMp, amt }) => {
   showDmgPopupAt('+' + amt, '#3dffaa', px, py - 30);
 });
 
+// MP 자동 회복
+socket.on('mp regen', ({ mp, maxMp }) => {
+  if (!me) return;
+  me.mp = mp; me.maxMp = maxMp;
+  updateHUD();
+});
+
 socket.on('level up', data => {
   if (!me) return;
   me.level = data.level; me.exp = data.exp;
   me.maxHp = data.maxHp; me.hp = data.hp;
+  me.maxMp = data.maxMp; me.mp = data.mp;
   me.atk = data.atk; me.def = data.def;
   me.shape = data.shape; me.color = data.color;
   updateHUD();
   showLevelUp(data.level, data.evolved ? data.evolvedName : null);
 });
 
-socket.on('revive', ({ hp, x, y, gold }) => {
+socket.on('revive', ({ hp, mp, x, y, gold }) => {
   if (!me) return;
-  me.hp = hp; me.x = x; me.y = y; me.gold = gold;
+  me.hp = hp; me.mp = mp; me.x = x; me.y = y; me.gold = gold;
   updateHUD();
   document.getElementById('death-overlay').classList.remove('show');
   addSysMsg('[부활] 마을에서 되살아났습니다.');
