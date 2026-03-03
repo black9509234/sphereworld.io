@@ -87,94 +87,91 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 #map-wrap{flex:1;position:relative;overflow:hidden;background:var(--bg);cursor:crosshair;}
 #map-canvas{display:block;}
 
-/* 전투 오버레이 */
-#combat-overlay{
-  position:absolute;bottom:16px;left:50%;transform:translateX(-50%);
-  display:none;flex-direction:column;align-items:center;gap:10px;
+/* ══ 채팅 UI (왼쪽 상단 고정) ══ */
+#chat-panel{
+  position:absolute;
+  top:12px;left:12px;
+  width:280px;
+  z-index:50;
+  display:flex;flex-direction:column;
+  background:rgba(7,9,13,0.82);
+  border:1px solid var(--border);
+  border-radius:3px;
+  backdrop-filter:blur(6px);
   pointer-events:auto;
+  max-height:320px;
 }
-.combat-target{
-  background:rgba(13,16,24,0.92);border:1px solid var(--border);
-  padding:10px 20px;border-radius:2px;
-  display:flex;flex-direction:column;gap:6px;align-items:center;
-  min-width:200px;
+#chat-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:7px 10px;
+  border-bottom:1px solid var(--border);
+  flex-shrink:0;
 }
-.ct-name{font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:600;}
-.ct-hpbar{width:180px;height:7px;background:rgba(255,255,255,0.07);border-radius:1px;overflow:hidden;}
-.ct-hpfill{height:100%;background:linear-gradient(90deg,#ff4455,#ff6644);transition:width 0.3s;}
-.ct-hptext{font-size:11px;color:var(--dim);}
-.combat-btns{display:flex;gap:8px;}
-.cbtn{
-  background:var(--surface);border:1.5px solid var(--border);color:var(--text);
-  border-radius:2px;padding:8px 16px;
-  font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:600;letter-spacing:1px;
-  cursor:pointer;transition:all 0.15s;
+#chat-header-title{
+  font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:600;
+  letter-spacing:2px;text-transform:uppercase;color:var(--accent);
 }
-.cbtn:hover{transform:translateY(-1px);}
-.cbtn-atk{border-color:var(--danger);color:var(--danger);}
-.cbtn-atk:hover{background:var(--danger);color:#fff;}
-.cbtn-skl{border-color:var(--mp);color:var(--mp);}
-.cbtn-skl:hover{background:var(--mp);color:#fff;}
-.cbtn-heal{border-color:var(--heal);color:var(--heal);}
-.cbtn-heal:hover{background:var(--heal);color:#000;}
-
-/* 오른쪽 패널 */
-#right-panel{
-  width:220px;flex-shrink:0;
-  background:var(--surface);border-left:1px solid var(--border);
-  display:flex;flex-direction:column;overflow:hidden;
+#chat-online{font-size:10px;color:var(--dim);}
+#messages{
+  flex:1;overflow-y:auto;
+  padding:8px 10px;
+  display:flex;flex-direction:column;gap:4px;
+  scroll-behavior:smooth;
+  min-height:140px;
+  max-height:200px;
 }
-.panel-tab{
-  display:flex;border-bottom:1px solid var(--border);
-}
-.ptab{
-  flex:1;padding:9px;font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:600;
-  letter-spacing:1.5px;text-transform:uppercase;color:var(--dim);
-  background:transparent;border:none;cursor:pointer;transition:all 0.2s;border-bottom:2px solid transparent;
-}
-.ptab.active{color:var(--accent);border-bottom-color:var(--accent);}
-.panel-content{flex:1;overflow-y:auto;display:none;}
-.panel-content.active{display:flex;flex-direction:column;}
-.panel-content::-webkit-scrollbar{width:2px;}
-.panel-content::-webkit-scrollbar-thumb{background:var(--border);}
-
-/* 플레이어 목록 */
-#tab-players{padding:8px;gap:4px;}
-.player-row{
-  padding:9px 10px;background:var(--surface2);border:1px solid var(--border);border-radius:2px;
-  display:flex;flex-direction:column;gap:5px;
-}
-.player-row.is-me{border-color:rgba(0,200,240,0.25);}
-.pr-top{display:flex;align-items:center;gap:7px;}
-.pr-shape{width:22px;height:22px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-.pr-nick{font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.pr-lv{font-size:10px;color:var(--dim);}
-.pr-hpbar{height:3px;background:rgba(255,255,255,0.06);border-radius:1px;overflow:hidden;}
-.pr-hpfill{height:100%;background:linear-gradient(90deg,#ff4455,#ff7788);transition:width 0.3s;}
-
-/* 채팅 */
-#tab-chat{flex-direction:column;}
-#messages{flex:1;overflow-y:auto;padding:10px;display:flex;flex-direction:column;gap:6px;scroll-behavior:smooth;}
 #messages::-webkit-scrollbar{width:2px;}
 #messages::-webkit-scrollbar-thumb{background:var(--border);}
 .chat-msg{font-size:12px;line-height:1.5;word-break:break-all;}
 .chat-nick{font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:600;}
-.chat-sys{font-size:11px;color:var(--sys);padding:3px 6px;background:rgba(255,153,68,0.05);border-radius:2px;text-align:center;}
+.chat-sys{font-size:11px;color:var(--sys);padding:2px 5px;background:rgba(255,153,68,0.05);border-radius:2px;}
 #chat-input-wrap{
-  border-top:1px solid var(--border);padding:8px;display:flex;gap:6px;flex-shrink:0;
+  border-top:1px solid var(--border);padding:7px 8px;
+  display:flex;gap:6px;flex-shrink:0;
 }
 #chat-input{
   flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:2px;
-  padding:7px 10px;font-size:12px;color:var(--text);
+  padding:6px 9px;font-size:12px;color:var(--text);
   font-family:'Noto Sans KR',sans-serif;outline:none;
 }
 #chat-input:focus{border-color:var(--accent);}
 #chat-send{
   background:transparent;border:1px solid var(--accent);color:var(--accent);
-  border-radius:2px;width:30px;height:30px;cursor:pointer;font-size:14px;
+  border-radius:2px;width:28px;height:28px;cursor:pointer;font-size:14px;
   display:flex;align-items:center;justify-content:center;transition:all 0.2s;flex-shrink:0;
 }
 #chat-send:hover{background:var(--accent);color:#000;}
+
+/* 전투 타겟 표시 (화면 하단 중앙) */
+#combat-info{
+  position:absolute;bottom:16px;left:50%;transform:translateX(-50%);
+  display:none;
+  background:rgba(13,16,24,0.90);border:1px solid var(--border);
+  padding:8px 18px;border-radius:2px;
+  flex-direction:column;align-items:center;gap:5px;
+  min-width:180px;pointer-events:none;
+}
+.ci-name{font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:600;}
+.ci-hpbar{width:160px;height:6px;background:rgba(255,255,255,0.07);border-radius:1px;overflow:hidden;}
+.ci-hpfill{height:100%;background:linear-gradient(90deg,#ff4455,#ff6644);transition:width 0.3s;}
+.ci-hptext{font-size:10px;color:var(--dim);}
+
+/* 스킬 힌트 바 */
+#skill-bar{
+  position:absolute;bottom:16px;right:16px;
+  display:flex;flex-direction:column;gap:6px;
+  pointer-events:none;
+}
+.skill-hint{
+  font-family:'Rajdhani',sans-serif;font-size:11px;
+  color:var(--dim);letter-spacing:1px;text-align:right;
+}
+.skill-key{
+  display:inline-block;
+  background:var(--surface2);border:1px solid var(--border);
+  padding:1px 5px;border-radius:2px;font-size:10px;color:var(--accent);
+  margin-right:4px;
+}
 
 /* 직업 선택 모달 */
 #class-modal{
@@ -228,14 +225,22 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 
 /* 미니맵 */
 #minimap{
-  position:absolute;bottom:16px;right:16px;
+  position:absolute;bottom:16px;right:130px;
   width:120px;height:90px;
   background:rgba(13,16,24,0.85);
   border:1px solid var(--border);
-  border-radius:2px;
-  overflow:hidden;
+  border-radius:2px;overflow:hidden;
 }
 #minimap-canvas{display:block;}
+
+/* 사망 오버레이 */
+#death-overlay{
+  display:none;position:absolute;inset:0;
+  background:rgba(255,68,85,0.07);
+  pointer-events:none;z-index:10;
+  border:2px solid rgba(255,68,85,0.3);
+}
+#death-overlay.show{display:block;}
 </style>
 </head>
 <body>
@@ -299,38 +304,38 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
     <div id="map-wrap">
       <canvas id="map-canvas"></canvas>
 
-      <!-- 전투 오버레이 -->
-      <div id="combat-overlay">
-        <div class="combat-target">
-          <div class="ct-name" id="ct-name">-</div>
-          <div class="ct-hpbar"><div class="ct-hpfill" id="ct-hpfill" style="width:100%"></div></div>
-          <div class="ct-hptext" id="ct-hptext">-</div>
+      <!-- 채팅 패널 (왼쪽 상단 고정) -->
+      <div id="chat-panel">
+        <div id="chat-header">
+          <span id="chat-header-title">CHAT</span>
+          <span id="chat-online">● 0 online</span>
         </div>
-        <div class="combat-btns">
-          <button class="cbtn cbtn-atk" onclick="doAttack('attack')">공격</button>
-          <button class="cbtn cbtn-skl" onclick="doAttack('skill')">스킬</button>
-          <button class="cbtn cbtn-heal" onclick="doHeal()">회복</button>
+        <div id="messages"></div>
+        <div id="chat-input-wrap">
+          <input id="chat-input" type="text" placeholder="메시지 입력..." maxlength="80"/>
+          <button id="chat-send" onclick="sendChat()">↑</button>
         </div>
+      </div>
+
+      <!-- 전투 타겟 정보 -->
+      <div id="combat-info">
+        <div class="ci-name" id="ci-name">-</div>
+        <div class="ci-hpbar"><div class="ci-hpfill" id="ci-hpfill" style="width:100%"></div></div>
+        <div class="ci-hptext" id="ci-hptext">-</div>
+      </div>
+
+      <!-- 스킬 힌트 -->
+      <div id="skill-bar">
+        <div class="skill-hint"><span class="skill-key">F</span> 스킬 사용</div>
+        <div class="skill-hint"><span class="skill-key">H</span> 힐 (HP회복)</div>
+        <div class="skill-hint"><span class="skill-key">WASD</span> 이동</div>
       </div>
 
       <!-- 미니맵 -->
       <div id="minimap"><canvas id="minimap-canvas" width="120" height="90"></canvas></div>
-    </div>
 
-    <!-- 오른쪽 패널 -->
-    <div id="right-panel">
-      <div class="panel-tab">
-        <button class="ptab active" onclick="switchPanelTab('players')">플레이어</button>
-        <button class="ptab" onclick="switchPanelTab('chat')">채팅</button>
-      </div>
-      <div id="tab-players" class="panel-content active"></div>
-      <div id="tab-chat" class="panel-content">
-        <div id="messages"></div>
-        <div id="chat-input-wrap">
-          <input id="chat-input" type="text" placeholder="메시지..." maxlength="80"/>
-          <button id="chat-send" onclick="sendChat()">↑</button>
-        </div>
-      </div>
+      <!-- 사망 오버레이 -->
+      <div id="death-overlay"></div>
     </div>
   </div>
 </div>
@@ -361,13 +366,29 @@ let me = null;
 let authMode = 'login';
 let allPlayers = {};    // id -> player data
 let allMonsters = {};   // uid -> monster data
-let selectedMonster = null;
+let nearestMonster = null;  // 현재 가장 가까운 몹 (전투 타겟)
 let camX = 0, camY = 0;
 let keysDown = {};
 const SPEED = 3;
 const MAP_W = 2000, MAP_H = 1500;
 const TOWN_X = 250, TOWN_Y = 750;
 const DUNGEON_X = 1780, DUNGEON_Y = 750, DUNGEON_R = 70;
+const ATTACK_RANGE = 120;     // 공격 가능 거리
+const AUTO_ATTACK_RANGE = 100; // 자동 공격 트리거 거리
+const SKILL_COOLDOWN = 2000;
+let lastSkillTime = 0;
+let lastAttackTime = 0;
+const ATTACK_COOLDOWN = 700; // ms
+
+// 몹 클라이언트 AI 상태
+// monsterAI[uid] = { wander: {tx,ty,timer}, state: 'wander'|'chase' }
+let monsterAI = {};
+
+// 뷰포트 컬링 마진 (px)
+const CULL_MARGIN = 80;
+
+// 온라인 플레이어 수
+let onlineCount = 0;
 
 // ── 캔버스 ──
 const canvas = document.getElementById('map-canvas');
@@ -460,12 +481,147 @@ function drawStar(ctx, cx, cy, outerR, innerR, points) {
   ctx.closePath();
 }
 
+// ── 몬스터 AI 업데이트 (클라이언트 시뮬레이션) ──
+const WANDER_SPEED = 0.6;
+const CHASE_SPEED = 1.4;
+const DETECT_RANGE = 200;  // 플레이어 감지 거리
+const WANDER_RANGE = 120;  // 스폰 주변 배회 범위
+const MOB_ATTACK_RANGE = 50;
+const MOB_ATTACK_INTERVAL = 1500; // ms
+
+function updateMonsterAI(dt) {
+  if (!me || me.hp <= 0) return;
+  const now = Date.now();
+
+  for (const m of Object.values(allMonsters)) {
+    if (!m.alive) continue;
+
+    // AI 초기화
+    if (!monsterAI[m.uid]) {
+      monsterAI[m.uid] = {
+        state: 'wander',
+        spawnX: m.x, spawnY: m.y,
+        tx: m.x, ty: m.y,
+        wanderTimer: 0,
+        lastAttack: 0,
+        aggroTimer: 0,
+      };
+    }
+    const ai = monsterAI[m.uid];
+
+    const distToPlayer = Math.hypot(me.x - m.x, me.y - m.y);
+
+    // 상태 전환
+    if (distToPlayer < DETECT_RANGE && me.hp > 0) {
+      ai.state = 'chase';
+      ai.aggroTimer = 3000; // 3초 유지
+    } else {
+      ai.aggroTimer -= dt;
+      if (ai.aggroTimer <= 0) {
+        ai.state = 'wander';
+      }
+    }
+
+    if (ai.state === 'chase') {
+      // 플레이어 추적
+      const dx = me.x - m.x;
+      const dy = me.y - m.y;
+      const dist = Math.hypot(dx, dy);
+      if (dist > MOB_ATTACK_RANGE) {
+        const spd = CHASE_SPEED * (dt / 16);
+        m.x += (dx / dist) * spd;
+        m.y += (dy / dist) * spd;
+      }
+
+      // 몬스터 공격 (클라이언트 시각 효과용)
+      if (dist < MOB_ATTACK_RANGE + 20 && now - ai.lastAttack > MOB_ATTACK_INTERVAL) {
+        ai.lastAttack = now;
+        // 시각 효과만 (실제 데미지는 서버에서)
+        showMobAttackEffect(m);
+      }
+    } else {
+      // 배회
+      ai.wanderTimer -= dt;
+      const spawnX = ai.spawnX, spawnY = ai.spawnY;
+      if (ai.wanderTimer <= 0 || Math.hypot(m.x - ai.tx, m.y - ai.ty) < 8) {
+        // 새 목표 지점 (스폰 주변)
+        const angle = Math.random() * Math.PI * 2;
+        const r = Math.random() * WANDER_RANGE;
+        ai.tx = Math.max(50, Math.min(MAP_W-50, spawnX + Math.cos(angle) * r));
+        ai.ty = Math.max(50, Math.min(MAP_H-50, spawnY + Math.sin(angle) * r));
+        ai.wanderTimer = 2000 + Math.random() * 3000;
+      }
+      const dx = ai.tx - m.x;
+      const dy = ai.ty - m.y;
+      const dist = Math.hypot(dx, dy);
+      if (dist > 5) {
+        const spd = WANDER_SPEED * (dt / 16);
+        m.x += (dx / dist) * spd;
+        m.y += (dy / dist) * spd;
+      }
+    }
+  }
+}
+
+function showMobAttackEffect(m) {
+  if (!m || !me) return;
+  // 몬스터가 플레이어를 공격하는 시각 효과
+  const sx = (m.x - camX);
+  const sy = (m.y - camY);
+  if (sx < -100 || sx > canvas.width + 100 || sy < -100 || sy > canvas.height + 100) return;
+
+  // 서버로 공격 알림 전송 (서버가 실제 데미지 처리)
+  // 단, 이미 서버의 combat result가 처리하므로 여기서는 시각 효과만
+}
+
+// ── 자동 전투 (가장 가까운 몹 자동 공격) ──
+function updateAutoAttack(dt) {
+  if (!me || me.hp <= 0) return;
+  const now = Date.now();
+
+  // 가장 가까운 몹 찾기
+  let closest = null;
+  let closestDist = Infinity;
+  for (const m of Object.values(allMonsters)) {
+    if (!m.alive) continue;
+    const d = Math.hypot(me.x - m.x, me.y - m.y);
+    if (d < closestDist) {
+      closestDist = d;
+      closest = m;
+    }
+  }
+
+  nearestMonster = closest;
+
+  // 타겟 UI 업데이트
+  if (closest && closestDist < ATTACK_RANGE * 1.5) {
+    const ci = document.getElementById('combat-info');
+    ci.style.display = 'flex';
+    document.getElementById('ci-name').textContent = closest.name;
+    document.getElementById('ci-hpfill').style.width = (closest.hp / closest.maxHp * 100) + '%';
+    document.getElementById('ci-hptext').textContent = `${closest.hp} / ${closest.maxHp}`;
+    const ai = monsterAI[closest.uid];
+    document.getElementById('ci-name').style.color = (ai && ai.state === 'chase') ? 'var(--danger)' : 'var(--text)';
+  } else {
+    document.getElementById('combat-info').style.display = 'none';
+  }
+
+  // 범위 안에 있으면 자동 공격
+  if (closest && closestDist < AUTO_ATTACK_RANGE && now - lastAttackTime > ATTACK_COOLDOWN) {
+    lastAttackTime = now;
+    socket.emit('attack monster', { uid: closest.uid, action: 'attack' });
+  }
+}
+
 // ── 게임 루프 ──
 let lastTime = 0;
 function gameLoop(ts) {
   if (!me) return;
-  const dt = ts - lastTime; lastTime = ts;
+  const dt = Math.min(ts - lastTime, 50); // max 50ms cap
+  lastTime = ts;
   handleMovement(dt);
+  updateMonsterAI(dt);
+  updateAutoAttack(dt);
   render();
   renderMinimap();
   requestAnimationFrame(gameLoop);
@@ -483,13 +639,20 @@ function handleMovement(dt) {
     me.x = Math.max(20, Math.min(MAP_W - 20, me.x + dx));
     me.y = Math.max(20, Math.min(MAP_H - 20, me.y + dy));
     socket.emit('move', { x: me.x, y: me.y });
-    // 던전 근처 체크
     const dDist = Math.hypot(me.x - DUNGEON_X, me.y - DUNGEON_Y);
     if (dDist < DUNGEON_R + 10) addSysMsg('[던전 입구] 던전 시스템은 다음 업데이트 예정입니다!');
   }
-  // 카메라
+  // 부드러운 카메라
   camX += (me.x - canvas.width/2 - camX) * 0.1;
   camY += (me.y - canvas.height/2 - camY) * 0.1;
+}
+
+// ── 렌더링 (뷰포트 컬링 적용) ──
+function isInViewport(wx, wy, margin) {
+  const sx = wx - camX;
+  const sy = wy - camY;
+  return sx > -margin && sx < canvas.width + margin &&
+         sy > -margin && sy < canvas.height + margin;
 }
 
 function render() {
@@ -531,13 +694,12 @@ function render() {
   ctx.stroke();
   ctx.setLineDash([]);
   ctx.restore();
-  // 마을 라벨
   ctx.fillStyle = 'rgba(78,205,196,0.5)';
   ctx.font = '11px Rajdhani, sans-serif';
   ctx.textAlign = 'center';
   ctx.fillText('TOWN', TOWN_X - camX, TOWN_Y - camY - 210);
 
-  // 던전 입구
+  // 던전
   const dungX = DUNGEON_X - camX, dungY = DUNGEON_Y - camY;
   ctx.save();
   ctx.globalAlpha = 0.1;
@@ -561,33 +723,66 @@ function render() {
   ctx.font = 'bold 12px Rajdhani, sans-serif';
   ctx.textAlign = 'center';
   ctx.fillText('DUNGEON', dungX, dungY - DUNGEON_R - 8);
-  // 던전 도형
   drawShape(ctx, 'hexagon', dungX, dungY, 36, '#ff4455', 0.6);
 
-  // 몬스터
+  // ── 몬스터 렌더링 (뷰포트 컬링) ──
   for (const m of Object.values(allMonsters)) {
     const mx = m.x - camX, my = m.y - camY;
-    if (mx < -60 || mx > W+60 || my < -60 || my > H+60) continue;
-    const sel = selectedMonster && selectedMonster.uid === m.uid;
-    drawShape(ctx, m.shape, mx, my, sel ? 30 : 26, m.color, sel ? 1 : 0.85);
+
+    // 뷰포트 컬링 - 화면 밖 몹 스킵
+    if (!isInViewport(m.x, m.y, CULL_MARGIN)) continue;
+
+    const ai = monsterAI[m.uid];
+    const isChasing = ai && ai.state === 'chase';
+    const isNearest = nearestMonster && nearestMonster.uid === m.uid;
+
+    // 어그로 상태 글로우
+    if (isChasing) {
+      ctx.save();
+      ctx.globalAlpha = 0.15;
+      ctx.fillStyle = '#ff4455';
+      ctx.beginPath();
+      ctx.arc(mx, my, 32, 0, Math.PI*2);
+      ctx.fill();
+      ctx.restore();
+    }
+
+    // 가장 가까운 몹 선택 표시
+    if (isNearest && Math.hypot(me.x - m.x, me.y - m.y) < ATTACK_RANGE * 1.5) {
+      ctx.save();
+      ctx.globalAlpha = 0.25 + Math.sin(Date.now() / 300) * 0.1;
+      ctx.strokeStyle = isChasing ? '#ff4455' : '#00c8f0';
+      ctx.lineWidth = 1.5;
+      ctx.setLineDash([3, 4]);
+      ctx.beginPath();
+      ctx.arc(mx, my, 20, 0, Math.PI*2);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.restore();
+    }
+
+    drawShape(ctx, m.shape, mx, my, isChasing ? 28 : 24, isChasing ? '#ff6644' : m.color, isChasing ? 1 : 0.85);
+
     // HP바
     const bw = 34, bh = 4, bx = mx - bw/2, by = my - 22;
     ctx.fillStyle = 'rgba(0,0,0,0.5)';
     ctx.fillRect(bx, by, bw, bh);
-    ctx.fillStyle = m.color;
-    ctx.fillRect(bx, by, bw * (m.hp/m.maxHp), bh);
+    const hpRatio = m.hp / m.maxHp;
+    ctx.fillStyle = hpRatio > 0.5 ? m.color : hpRatio > 0.25 ? '#ffd93d' : '#ff4455';
+    ctx.fillRect(bx, by, bw * hpRatio, bh);
+
     // 이름
-    ctx.fillStyle = m.color + 'aa';
+    ctx.fillStyle = isChasing ? '#ff8877aa' : m.color + 'aa';
     ctx.font = '10px Noto Sans KR, sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText(m.name, mx, my + 24);
+    ctx.fillText(isChasing ? `⚔ ${m.name}` : m.name, mx, my + 22);
   }
 
-  // 다른 플레이어
+  // ── 다른 플레이어 (뷰포트 컬링) ──
   for (const [id, p] of Object.entries(allPlayers)) {
     if (id === socket.id) continue;
+    if (!isInViewport(p.x, p.y, CULL_MARGIN)) continue;
     const px = p.x - camX, py = p.y - camY;
-    if (px < -60 || px > W+60 || py < -60 || py > H+60) continue;
     drawShape(ctx, p.shape, px, py, 24, p.color, 0.9, true);
     ctx.fillStyle = p.color + 'cc';
     ctx.font = '11px Rajdhani, sans-serif';
@@ -598,16 +793,27 @@ function render() {
     ctx.fillText(`Lv.${p.level}`, px, py + 22);
   }
 
-  // 내 캐릭터
+  // ── 내 캐릭터 ──
   if (me) {
     const px = me.x - camX, py = me.y - camY;
+
+    // 공격 범위 표시 (투명)
+    if (nearestMonster && Math.hypot(me.x - nearestMonster.x, me.y - nearestMonster.y) < ATTACK_RANGE * 1.5) {
+      ctx.save();
+      ctx.globalAlpha = 0.04;
+      ctx.fillStyle = me.color;
+      ctx.beginPath();
+      ctx.arc(px, py, AUTO_ATTACK_RANGE, 0, Math.PI*2);
+      ctx.fill();
+      ctx.restore();
+    }
+
     drawShape(ctx, me.shape, px, py, 28, me.color, 1, true);
-    // 내 이름
     ctx.fillStyle = '#fff';
     ctx.font = 'bold 12px Rajdhani, sans-serif';
     ctx.textAlign = 'center';
     ctx.fillText(me.nickname, px, py - 20);
-    // 사망 상태
+
     if (me.hp <= 0) {
       ctx.save();
       ctx.globalAlpha = 0.5;
@@ -626,137 +832,153 @@ function renderMinimap() {
   mmCtx.fillStyle = 'rgba(7,9,13,0.9)';
   mmCtx.fillRect(0, 0, mw, mh);
   const scaleX = mw / MAP_W, scaleY = mh / MAP_H;
-  // 마을
   mmCtx.fillStyle = 'rgba(78,205,196,0.25)';
   mmCtx.beginPath();
   mmCtx.arc(TOWN_X*scaleX, TOWN_Y*scaleY, 10, 0, Math.PI*2);
   mmCtx.fill();
-  // 던전
   mmCtx.fillStyle = 'rgba(255,68,85,0.25)';
   mmCtx.beginPath();
   mmCtx.arc(DUNGEON_X*scaleX, DUNGEON_Y*scaleY, 5, 0, Math.PI*2);
   mmCtx.fill();
-  // 몬스터
-  mmCtx.fillStyle = 'rgba(255,100,100,0.5)';
+  // 몬스터 (미니맵은 전체 표시 - 점이라 비용 저렴)
   for (const m of Object.values(allMonsters)) {
+    const ai = monsterAI[m.uid];
+    mmCtx.fillStyle = (ai && ai.state === 'chase') ? 'rgba(255,68,85,0.8)' : 'rgba(255,100,100,0.4)';
     mmCtx.fillRect(m.x*scaleX - 1, m.y*scaleY - 1, 2, 2);
   }
-  // 다른 플레이어
   for (const [id, p] of Object.entries(allPlayers)) {
     if (id === socket.id) continue;
     mmCtx.fillStyle = p.color + 'aa';
     mmCtx.fillRect(p.x*scaleX - 2, p.y*scaleY - 2, 4, 4);
   }
-  // 나
   if (me) {
     mmCtx.fillStyle = '#fff';
     mmCtx.fillRect(me.x*scaleX - 2.5, me.y*scaleY - 2.5, 5, 5);
   }
-  // 카메라 뷰 영역
   mmCtx.strokeStyle = 'rgba(0,200,240,0.3)';
   mmCtx.lineWidth = 1;
   mmCtx.strokeRect(camX*scaleX, camY*scaleY, canvas.width*scaleX, canvas.height*scaleY);
 }
 
 // ── 키보드 ──
-window.addEventListener('keydown', e => { keysDown[e.key] = true; });
-window.addEventListener('keyup', e => { keysDown[e.key] = false; });
+window.addEventListener('keydown', e => {
+  keysDown[e.key] = true;
 
-// ── 클릭: 몬스터 선택 ──
-canvas.addEventListener('click', e => {
-  if (!me || me.hp <= 0) return;
-  const rect = canvas.getBoundingClientRect();
-  const mx = e.clientX - rect.left + camX;
-  const my = e.clientY - rect.top + camY;
-  // 몬스터 클릭 체크
-  let clicked = null;
-  for (const m of Object.values(allMonsters)) {
-    if (Math.hypot(mx - m.x, my - m.y) < 22) { clicked = m; break; }
+  // 스킬 (F)
+  if (e.key === 'f' || e.key === 'F') {
+    const now = Date.now();
+    if (nearestMonster && now - lastSkillTime > SKILL_COOLDOWN) {
+      const dist = Math.hypot(me.x - nearestMonster.x, me.y - nearestMonster.y);
+      if (dist < ATTACK_RANGE) {
+        lastSkillTime = now;
+        socket.emit('attack monster', { uid: nearestMonster.uid, action: 'skill' });
+      } else {
+        addSysMsg('[스킬] 몬스터에게 더 가까이 가세요!');
+      }
+    }
   }
-  selectedMonster = clicked;
-  const overlay = document.getElementById('combat-overlay');
-  if (clicked) {
-    overlay.style.display = 'flex';
-    updateCombatUI(clicked);
-  } else {
-    overlay.style.display = 'none';
+
+  // 힐 (H)
+  if (e.key === 'h' || e.key === 'H') {
+    socket.emit('heal');
+  }
+
+  // 채팅창 포커스 방지
+  if (e.key === 'Enter' && document.activeElement !== document.getElementById('chat-input')) {
+    document.getElementById('chat-input').focus();
+    e.preventDefault();
   }
 });
-
-function updateCombatUI(m) {
-  document.getElementById('ct-name').textContent = m.name;
-  const pct = m.maxHp > 0 ? (m.hp / m.maxHp * 100) : 0;
-  document.getElementById('ct-hpfill').style.width = pct + '%';
-  document.getElementById('ct-hptext').textContent = `${m.hp} / ${m.maxHp}`;
-}
-
-// ── 전투 ──
-function doAttack(action) {
-  if (!selectedMonster || !me || me.hp <= 0) return;
-  socket.emit('attack monster', { uid: selectedMonster.uid, action });
-}
-function doHeal() {
-  if (!me) return;
-  socket.emit('heal');
-}
+window.addEventListener('keyup', e => { keysDown[e.key] = false; });
 
 // ── 소켓 이벤트 ──
 socket.on('field state', ({ monsters, players }) => {
+  const prevMonsters = allMonsters;
   allMonsters = {};
-  monsters.forEach(m => allMonsters[m.uid] = m);
+  monsters.forEach(m => {
+    allMonsters[m.uid] = m;
+    m.alive = true;
+    // AI 초기화 (새 몬스터만)
+    if (!monsterAI[m.uid]) {
+      monsterAI[m.uid] = {
+        state: 'wander',
+        spawnX: m.x, spawnY: m.y,
+        tx: m.x, ty: m.y,
+        wanderTimer: Math.random() * 2000,
+        lastAttack: 0,
+        aggroTimer: 0,
+      };
+    }
+  });
+  // 죽은 몹 AI 정리
+  for (const uid of Object.keys(monsterAI)) {
+    if (!allMonsters[uid]) delete monsterAI[uid];
+  }
   allPlayers = {};
   players.forEach(p => allPlayers[p.id] = p);
-  updatePlayerPanel();
+  updateOnlineCount();
 });
 
-socket.on('player joined', p => { allPlayers[p.id] = p; updatePlayerPanel(); });
-socket.on('player left', id => { delete allPlayers[id]; updatePlayerPanel(); });
-socket.on('player moved', ({ id, x, y }) => { if (allPlayers[id]) { allPlayers[id].x = x; allPlayers[id].y = y; } });
+socket.on('player joined', p => {
+  allPlayers[p.id] = p;
+  updateOnlineCount();
+});
+socket.on('player left', id => {
+  delete allPlayers[id];
+  updateOnlineCount();
+});
+socket.on('player moved', ({ id, x, y }) => {
+  if (allPlayers[id]) { allPlayers[id].x = x; allPlayers[id].y = y; }
+});
 socket.on('player shape update', ({ id, shape, color, level }) => {
   if (allPlayers[id]) { allPlayers[id].shape = shape; allPlayers[id].color = color; if(level) allPlayers[id].level = level; }
   if (id === socket.id && me) { me.shape = shape; me.color = color; if(level) me.level = level; updateHUD(); }
-  updatePlayerPanel();
 });
 
 socket.on('combat result', data => {
-  // 몬스터 HP 업데이트
   if (allMonsters[data.monsterUid]) {
     allMonsters[data.monsterUid].hp = data.monsterHp;
-    if (selectedMonster && selectedMonster.uid === data.monsterUid) {
-      selectedMonster.hp = data.monsterHp;
-      updateCombatUI(selectedMonster);
+    if (nearestMonster && nearestMonster.uid === data.monsterUid) {
+      nearestMonster.hp = data.monsterHp;
     }
   }
-  // 내 HP 업데이트
   if (data.attackerId === socket.id && me) {
     me.hp = data.playerHp;
     me.mp = data.playerMp;
     updateHUD();
+    if (me.hp <= 0) {
+      document.getElementById('death-overlay').classList.add('show');
+    }
   }
   // 데미지 팝업
-  showDmgPopup(data.dmg, data.action === 'skill' ? '#8866ff' : '#ff7788');
-  // 로그
+  const m = allMonsters[data.monsterUid];
+  if (m && isInViewport(m.x, m.y, 100)) {
+    const sx = m.x - camX;
+    const sy = m.y - camY;
+    showDmgPopupAt(data.dmg, data.action === 'skill' ? '#8866ff' : '#ff7788', sx, sy - 20);
+  }
+  // 내 캐릭터 반격 팝업
   if (data.attackerId === socket.id) {
-    const msg = data.action === 'skill'
-      ? `[${data.skillName}] → ${data.dmg}! 반격 ${data.counterDmg}`
-      : `공격 → ${data.dmg}  반격 ${data.counterDmg}`;
-    addSysMsg(msg);
+    const px = me.x - camX, py = me.y - camY;
+    showDmgPopupAt('-' + data.counterDmg, '#ff4455', px, py - 20);
   }
 });
 
 socket.on('monster killed', ({ uid, killerNickname, exp, gold }) => {
-  if (allMonsters[uid]) delete allMonsters[uid];
-  if (selectedMonster && selectedMonster.uid === uid) {
-    selectedMonster = null;
-    document.getElementById('combat-overlay').style.display = 'none';
+  if (allMonsters[uid]) {
+    // 사라지는 효과를 위해 잠깐 유지
+    allMonsters[uid].alive = false;
+    setTimeout(() => { delete allMonsters[uid]; delete monsterAI[uid]; }, 300);
   }
+  if (nearestMonster && nearestMonster.uid === uid) nearestMonster = null;
   addSysMsg(`[처치] ${killerNickname}이(가) 처치! +${exp}EXP +${gold}G`);
   if (me && killerNickname === me.nickname) { me.exp += exp; me.gold += gold; me.kills++; updateHUD(); }
 });
 
 socket.on('healed', ({ hp, maxHp, mp, maxMp, amt }) => {
   if (me) { me.hp = hp; me.maxHp = maxHp; me.mp = mp; me.maxMp = maxMp; updateHUD(); }
-  showDmgPopup('+' + amt, '#3dffaa');
+  const px = me.x - camX, py = me.y - camY;
+  showDmgPopupAt('+' + amt, '#3dffaa', px, py - 30);
 });
 
 socket.on('level up', data => {
@@ -773,6 +995,7 @@ socket.on('revive', ({ hp, x, y, gold }) => {
   if (!me) return;
   me.hp = hp; me.x = x; me.y = y; me.gold = gold;
   updateHUD();
+  document.getElementById('death-overlay').classList.remove('show');
   addSysMsg('[부활] 마을에서 되살아났습니다.');
 });
 
@@ -785,13 +1008,58 @@ socket.on('chat message', ({ nickname, message, color, time }) => {
   el.innerHTML = `<span class="chat-nick" style="color:${color}">${esc(nickname)}</span> <span style="color:var(--dim)">${time}</span><br>${esc(message)}`;
   msgs.appendChild(el);
   msgs.scrollTop = msgs.scrollHeight;
-  // 채팅 탭으로 자동 전환 표시 (선택사항)
 });
 
-socket.on('class unlock available', classes => {
-  openClassModal(classes);
+// 몬스터 AI 위치 동기화 (서버 → 클라이언트)
+socket.on('monster positions', (positions) => {
+  for (const pos of positions) {
+    if (allMonsters[pos.uid]) {
+      // 서버 위치로 부드럽게 보간 (클라이언트 AI와 혼합)
+      const m = allMonsters[pos.uid];
+      m.x = m.x + (pos.x - m.x) * 0.3;
+      m.y = m.y + (pos.y - m.y) * 0.3;
+      m.hp = pos.hp;
+      // AI 상태 동기화
+      if (monsterAI[pos.uid]) {
+        monsterAI[pos.uid].state = pos.state;
+      }
+    }
+  }
 });
 
+// 새 몬스터 스폰
+socket.on('monsters spawned', (monsters) => {
+  for (const m of monsters) {
+    if (!allMonsters[m.uid]) {
+      allMonsters[m.uid] = { ...m, alive: true };
+      monsterAI[m.uid] = {
+        state: 'wander',
+        spawnX: m.x, spawnY: m.y,
+        tx: m.x, ty: m.y,
+        wanderTimer: Math.random() * 2000,
+        lastAttack: 0,
+        aggroTimer: 0,
+      };
+    }
+  }
+});
+
+// 몬스터 공격 수신 (서버 AI가 직접 플레이어 공격)
+socket.on('monster attack', ({ monsterUid, monsterName, dmg, playerHp, playerMaxHp }) => {
+  if (!me) return;
+  me.hp = playerHp;
+  me.maxHp = playerMaxHp;
+  updateHUD();
+  if (me.hp <= 0) {
+    document.getElementById('death-overlay').classList.add('show');
+  }
+  // 피격 팝업 (내 캐릭터 위치)
+  const px = me.x - camX, py = me.y - camY;
+  showDmgPopupAt('-' + dmg, '#ff4455', px, py - 20);
+  addSysMsg(`[피격] ${monsterName}이(가) ${dmg} 데미지!`);
+});
+
+socket.on('class unlock available', classes => { openClassModal(classes); });
 socket.on('class chosen', data => {
   if (!me) return;
   Object.assign(me, data);
@@ -800,6 +1068,12 @@ socket.on('class chosen', data => {
 });
 
 // ── UI 업데이트 ──
+function updateOnlineCount() {
+  const count = Object.keys(allPlayers).length;
+  onlineCount = count;
+  document.getElementById('chat-online').textContent = `● ${count} online`;
+}
+
 function updateHUD() {
   if (!me) return;
   const classLabel = me.className ? `[${me.className}] ` : '';
@@ -828,31 +1102,6 @@ function getEvoName(level, cls) {
   let n = '원형체';
   for (const e of EVO_TABLE) { if(level >= e.level) n = e.name; else break; }
   return n;
-}
-
-function updatePlayerPanel() {
-  const list = document.getElementById('tab-players');
-  list.innerHTML = '';
-  const entries = [
-    me ? { id: socket.id, nickname: me.nickname, shape: me.shape, color: me.color, level: me.level, hp: me.hp, maxHp: me.maxHp, className: me.className } : null,
-    ...Object.entries(allPlayers).filter(([id]) => id !== socket.id).map(([id, p]) => ({ id, ...p }))
-  ].filter(Boolean);
-  entries.forEach(p => {
-    const isMe = p.id === socket.id;
-    const el = document.createElement('div');
-    el.className = 'player-row' + (isMe ? ' is-me' : '');
-    el.innerHTML = `
-      <div class="pr-top">
-        <div class="pr-shape">${makeShapeSVG(p.shape, 22, p.color)}</div>
-        <div style="flex:1;min-width:0">
-          <div class="pr-nick" style="color:${p.color}">${esc(p.nickname)}${isMe?' (나)':''}</div>
-          <div class="pr-lv">Lv.${p.level}${p.className ? ' · '+p.className : ''}</div>
-        </div>
-      </div>
-      <div class="pr-hpbar"><div class="pr-hpfill" style="width:${p.maxHp>0?p.hp/p.maxHp*100:0}%"></div></div>
-    `;
-    list.appendChild(el);
-  });
 }
 
 // ── 직업 모달 ──
@@ -884,13 +1133,12 @@ function showLevelUp(level, evolvedName) {
   setTimeout(() => pop.classList.remove('show'), 2500);
 }
 
-// ── 데미지 팝업 ──
-function showDmgPopup(val, color) {
+// ── 데미지 팝업 (위치 기반) ──
+function showDmgPopupAt(val, color, screenX, screenY) {
   const el = document.createElement('div');
   el.className = 'dmg-float';
-  const cx = canvas.getBoundingClientRect().left + canvas.width/2;
-  const cy = canvas.getBoundingClientRect().top + canvas.height/2;
-  el.style.cssText = `left:${cx - 40 + Math.random()*80}px;top:${cy - 60 + Math.random()*40}px;color:${color};`;
+  const rect = canvas.getBoundingClientRect();
+  el.style.cssText = `left:${rect.left + screenX + (Math.random()-0.5)*30}px;top:${rect.top + screenY}px;color:${color};`;
   el.textContent = val;
   document.body.appendChild(el);
   setTimeout(() => el.remove(), 1000);
@@ -904,7 +1152,12 @@ function sendChat() {
   socket.emit('chat message', { message: msg });
   input.value = '';
 }
-document.getElementById('chat-input').addEventListener('keydown', e => { if(e.key==='Enter') sendChat(); });
+document.getElementById('chat-input').addEventListener('keydown', e => {
+  if(e.key==='Enter') { sendChat(); e.stopPropagation(); }
+  e.stopPropagation(); // 채팅 중 이동키 방지
+});
+// 채팅창 포커스 중 이동 방지
+document.getElementById('chat-input').addEventListener('keyup', e => e.stopPropagation());
 
 function addSysMsg(msg) {
   const msgs = document.getElementById('messages');
@@ -913,13 +1166,8 @@ function addSysMsg(msg) {
   el.textContent = msg;
   msgs.appendChild(el);
   msgs.scrollTop = msgs.scrollHeight;
-}
-
-// ── 패널 탭 ──
-function switchPanelTab(tab) {
-  document.querySelectorAll('.ptab').forEach((t,i) => t.classList.toggle('active', (i===0&&tab==='players')||(i===1&&tab==='chat')));
-  document.getElementById('tab-players').classList.toggle('active', tab==='players');
-  document.getElementById('tab-chat').classList.toggle('active', tab==='chat');
+  // 메시지 최대 100개 유지
+  while (msgs.children.length > 100) msgs.removeChild(msgs.firstChild);
 }
 
 // ── SVG 도형 헬퍼 ──
