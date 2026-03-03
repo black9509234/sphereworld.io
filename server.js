@@ -50,10 +50,10 @@ const DUNGEON_X = 1780, DUNGEON_Y = 750, DUNGEON_R = 70;
 
 // 몬스터 AI 설정
 const MONSTER_DETECT_RANGE = 200;  // 플레이어 감지 거리
-const MONSTER_ATTACK_RANGE = 60;   // 공격 가능 거리
-const MONSTER_ATTACK_INTERVAL = 1500; // ms
+const MONSTER_ATTACK_RANGE = 22;   // 접촉 공격 범위 (도형 반지름 수준)
+const MONSTER_ATTACK_INTERVAL = 1200; // ms
 const MONSTER_CHASE_SPEED = 1.5;
-const MONSTER_WANDER_SPEED = 0.6;
+const MONSTER_WANDER_SPEED = 0.25; // 배회 속도 대폭 감소
 const MONSTER_WANDER_RANGE = 130;
 
 // 최대 몬스터 수
@@ -74,14 +74,14 @@ function createMonster(x, y) {
     x: x !== undefined ? x : 500 + Math.random() * 1200,
     y: y !== undefined ? y : 100 + Math.random() * 1300,
     alive: true,
-    // AI 상태
     spawnX: x !== undefined ? x : 0,
     spawnY: y !== undefined ? y : 0,
     ai: {
       state: 'wander',      // 'wander' | 'chase'
-      targetId: null,       // 추격 중인 플레이어 소켓 ID
-      tx: 0, ty: 0,         // 배회 목표 지점
-      wanderTimer: Math.random() * 3000,
+      wanderPhase: 'idle',  // 'move' | 'idle' — 이동/대기 교번
+      targetId: null,
+      tx: 0, ty: 0,
+      wanderTimer: 800 + Math.random() * 1200, // 첫 대기
       lastAttack: 0,
       aggroTimer: 0,
     },
@@ -97,6 +97,8 @@ function spawnMonsters(count) {
     m.spawnY = y;
     m.ai.tx = x;
     m.ai.ty = y;
+    m.ai.wanderPhase = 'idle';
+    m.ai.wanderTimer = 500 + Math.random() * 1500;
     fieldMonsters.push(m);
   }
 }
@@ -158,7 +160,7 @@ function updateMonsterAI(m, players, dt, now) {
     if (d < nearestDist) { nearestDist = d; nearest = p; }
   }
 
-  // 상태 전환
+  // 상태 전환: 감지 범위 안에 플레이어 있으면 추격
   if (nearest && nearestDist < MONSTER_DETECT_RANGE) {
     ai.state = 'chase';
     ai.targetId = nearest.id;
@@ -177,36 +179,51 @@ function updateMonsterAI(m, players, dt, now) {
     const dist = Math.hypot(dx, dy);
 
     if (dist > MONSTER_ATTACK_RANGE) {
-      // 이동
+      // 플레이어에게 이동
       const spd = MONSTER_CHASE_SPEED * (dt / 16);
       m.x += (dx / dist) * spd;
       m.y += (dy / dist) * spd;
       m.x = Math.max(10, Math.min(MAP_W - 10, m.x));
       m.y = Math.max(10, Math.min(MAP_H - 10, m.y));
     } else {
-      // 공격
+      // 접촉 → 공격
       if (now - ai.lastAttack > MONSTER_ATTACK_INTERVAL) {
         ai.lastAttack = now;
         monsterAttackPlayer(m, nearest, now);
       }
     }
   } else {
-    // 배회
+    // ── 배회: move → idle(1초) → move → idle ... ──
     ai.wanderTimer -= dt;
-    if (ai.wanderTimer <= 0 || Math.hypot(m.x - ai.tx, m.y - ai.ty) < 8) {
-      const angle = Math.random() * Math.PI * 2;
-      const r = Math.random() * MONSTER_WANDER_RANGE;
-      ai.tx = Math.max(50, Math.min(MAP_W - 50, m.spawnX + Math.cos(angle) * r));
-      ai.ty = Math.max(50, Math.min(MAP_H - 50, m.spawnY + Math.sin(angle) * r));
-      ai.wanderTimer = 2000 + Math.random() * 3000;
-    }
-    const dx = ai.tx - m.x;
-    const dy = ai.ty - m.y;
-    const dist = Math.hypot(dx, dy);
-    if (dist > 5) {
-      const spd = MONSTER_WANDER_SPEED * (dt / 16);
-      m.x += (dx / dist) * spd;
-      m.y += (dy / dist) * spd;
+
+    if (ai.wanderPhase === 'idle') {
+      // 대기 중: 타이머 끝나면 새 목표 지점 설정 후 이동 시작
+      if (ai.wanderTimer <= 0) {
+        const angle = Math.random() * Math.PI * 2;
+        const r = 40 + Math.random() * MONSTER_WANDER_RANGE;
+        ai.tx = Math.max(50, Math.min(MAP_W - 50, m.spawnX + Math.cos(angle) * r));
+        ai.ty = Math.max(50, Math.min(MAP_H - 50, m.spawnY + Math.sin(angle) * r));
+        ai.wanderPhase = 'move';
+        ai.wanderTimer = 0;
+      }
+      // 대기 중엔 이동 없음
+    } else {
+      // 이동 중: 목표 지점까지 천천히 이동
+      const dx = ai.tx - m.x;
+      const dy = ai.ty - m.y;
+      const dist = Math.hypot(dx, dy);
+
+      if (dist > 6) {
+        const spd = MONSTER_WANDER_SPEED * (dt / 16);
+        m.x += (dx / dist) * spd;
+        m.y += (dy / dist) * spd;
+      } else {
+        // 목표 도착 → idle 1초 대기
+        m.x = ai.tx;
+        m.y = ai.ty;
+        ai.wanderPhase = 'idle';
+        ai.wanderTimer = 800 + Math.random() * 600; // 0.8~1.4초 대기
+      }
     }
   }
 }
