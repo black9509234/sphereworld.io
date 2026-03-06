@@ -5,245 +5,506 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>sphere.io</title>
 <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700;800&display=swap" rel="stylesheet">
 <style>
+:root {
+  --bg:      #0a0a0a;
+  --surface: #0e0e0e;
+  --border:  #1a1a1a;
+  --green:   #00ff88;
+  --green2:  #00cc6a;
+  --green3:  #001f10;
+  --dim:     #2a4a35;
+  --text:    #c8ffd9;
+  --muted:   #3a6648;
+  --red:     #ff4466;
+  --yellow:  #ffdd00;
+}
 * { margin: 0; padding: 0; box-sizing: border-box; }
-body { background: #f0f0f0; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
+body {
+  background: var(--bg);
+  font-family: 'JetBrains Mono', 'Courier New', monospace;
+  overflow: hidden;
+  color: var(--text);
+}
+/* scanlines */
+body::after {
+  content: '';
+  position: fixed; inset: 0; z-index: 9999;
+  background: repeating-linear-gradient(
+    0deg, transparent, transparent 2px,
+    rgba(0,0,0,0.06) 2px, rgba(0,0,0,0.06) 4px
+  );
+  pointer-events: none;
+}
 
-/* ── Login ── */
-#login {
-  position: fixed; inset: 0;
+/* ── AUTH ── */
+#auth-screen {
+  position: fixed; inset: 0; z-index: 100;
   display: flex; align-items: center; justify-content: center;
-  background: #fff; z-index: 10;
+  background: var(--bg);
 }
-.login-box {
-  text-align: center;
+.tw {
+  width: 460px;
+  border: 1px solid var(--green);
+  background: var(--surface);
+  box-shadow: 0 0 48px rgba(0,255,136,0.08), inset 0 0 60px rgba(0,255,136,0.02);
 }
-.login-box h1 {
-  font-size: 48px; font-weight: 900; letter-spacing: -2px;
-  color: #1a6fff; margin-bottom: 6px;
+.tw-bar {
+  background: var(--green3);
+  border-bottom: 1px solid var(--dim);
+  padding: 8px 14px;
+  display: flex; align-items: center; gap: 8px;
+  font-size: 11px; color: var(--muted); letter-spacing: .08em;
 }
-.login-box p {
-  color: #888; font-size: 14px; margin-bottom: 32px;
+.tw-bar .d { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.tw-body { padding: 22px 26px 26px; }
+.ascii {
+  font-size: 8.5px; line-height: 1.15; color: var(--green);
+  margin-bottom: 18px; white-space: pre;
+  text-shadow: 0 0 12px rgba(0,255,136,0.5);
 }
-.login-box input {
-  display: block; width: 280px; padding: 12px 16px;
-  border: 2px solid #ddd; border-radius: 40px;
-  font-size: 16px; outline: none; text-align: center;
-  transition: border-color .2s; margin: 0 auto 14px;
+.mode-row { display: flex; gap: 8px; margin-bottom: 18px; }
+.tbtn {
+  flex: 1; padding: 8px 0;
+  background: transparent; border: 1px solid var(--muted);
+  color: var(--muted); font-family: inherit; font-size: 11px;
+  font-weight: 700; letter-spacing: .1em; cursor: pointer;
+  transition: all .15s;
 }
-.login-box input:focus { border-color: #1a6fff; }
-.login-box button {
-  width: 280px; padding: 13px;
-  background: #1a6fff; border: none; border-radius: 40px;
-  color: #fff; font-size: 16px; font-weight: 700;
-  cursor: pointer; transition: background .2s;
+.tbtn:hover, .tbtn.on {
+  background: var(--green); border-color: var(--green);
+  color: #000; box-shadow: 0 0 14px rgba(0,255,136,0.25);
 }
-.login-box button:hover { background: #0050dd; }
+.field { margin-bottom: 14px; }
+.field-label {
+  font-size: 10px; color: var(--muted); margin-bottom: 5px;
+  display: flex; align-items: center; gap: 5px;
+}
+.field-label .arr { color: var(--green); }
+.irow {
+  display: flex; align-items: center;
+  border: 1px solid var(--dim); background: #070707;
+  padding: 0 12px; transition: border-color .15s, box-shadow .15s;
+}
+.irow:focus-within {
+  border-color: var(--green);
+  box-shadow: 0 0 10px rgba(0,255,136,0.1);
+}
+.ipfx { color: var(--green); font-size: 13px; margin-right: 8px; user-select: none; }
+.irow input {
+  flex: 1; background: transparent; border: none; outline: none;
+  color: var(--text); font-family: inherit; font-size: 13px;
+  padding: 10px 0; caret-color: var(--green);
+}
+.irow input::placeholder { color: var(--dim); }
+hr.sep { border: none; border-top: 1px solid var(--border); margin: 18px 0; }
+.sbtn {
+  width: 100%; padding: 11px;
+  background: transparent; border: 1px solid var(--green);
+  color: var(--green); font-family: inherit; font-size: 12px;
+  font-weight: 700; letter-spacing: .12em; cursor: pointer;
+  transition: all .15s;
+}
+.sbtn:hover {
+  background: var(--green); color: #000;
+  box-shadow: 0 0 20px rgba(0,255,136,0.3);
+}
+.msg { font-size: 11px; margin-top: 12px; min-height: 15px; letter-spacing: .03em; }
+.msg.err  { color: var(--red); }
+.msg.ok   { color: var(--green); }
+.msg.info { color: var(--yellow); }
 
-/* ── Canvas ── */
-#canvas { display: block; }
-
-/* ── HUD ── */
+/* ── GAME HUD ── */
 #hud {
-  position: fixed; top: 16px; left: 16px;
-  font-size: 13px; color: #444; pointer-events: none;
-  line-height: 1.7;
+  position: fixed; top: 0; left: 0; right: 0;
+  padding: 8px 16px;
+  background: rgba(10,10,10,0.9);
+  border-bottom: 1px solid var(--dim);
+  display: none; align-items: center; gap: 20px;
+  font-size: 11px; pointer-events: none;
+  backdrop-filter: blur(6px);
 }
-#hud strong { color: #1a6fff; }
-#player-count {
-  position: fixed; top: 16px; right: 16px;
-  font-size: 13px; color: #888;
+.brand { color: var(--green); font-weight: 800; font-size: 13px; letter-spacing: .05em; text-shadow: 0 0 12px var(--green); }
+.hsep  { color: var(--border); }
+.hi    { color: var(--muted); }
+.hi span { color: var(--text); }
+#logout-btn {
+  position: fixed; top: 8px; right: 14px;
+  background: transparent; border: 1px solid var(--dim);
+  color: var(--muted); font-family: inherit; font-size: 11px;
+  padding: 4px 12px; cursor: pointer; transition: all .15s;
+  display: none;
+}
+#logout-btn:hover { border-color: var(--red); color: var(--red); }
+.axis-lbl {
+  position: fixed; font-family: inherit; font-size: 10px;
+  color: var(--dim); pointer-events: none; display: none;
+  letter-spacing: .05em;
 }
 </style>
 </head>
 <body>
 
-<!-- Login -->
-<div id="login">
-  <div class="login-box">
-    <h1>sphere.io</h1>
-    <p>기하학의 세계에 오신 걸 환영합니다</p>
-    <input id="inp-name" type="text" placeholder="닉네임 입력" maxlength="16" autocomplete="off" />
-    <button id="play-btn">Play</button>
+<!-- ══ AUTH ══ -->
+<div id="auth-screen">
+  <div class="tw">
+    <div class="tw-bar">
+      <span class="d" style="background:#ff5f56"></span>
+      <span class="d" style="background:#ffbd2e"></span>
+      <span class="d" style="background:#27c93f"></span>
+      <span style="margin-left:6px">sphere.io — auth terminal</span>
+    </div>
+    <div class="tw-body">
+      <div class="ascii"> ███████╗██████╗ ██╗  ██╗███████╗██████╗ ███████╗
+ ██╔════╝██╔══██╗██║  ██║██╔════╝██╔══██╗██╔════╝
+ ███████╗██████╔╝███████║█████╗  ██████╔╝█████╗  
+ ╚════██║██╔═══╝ ██╔══██║██╔══╝  ██╔══██╗██╔══╝  
+ ███████║██║     ██║  ██║███████╗██║  ██║███████╗
+ ╚══════╝╚═╝     ╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚══════╝</div>
+
+      <div class="mode-row">
+        <button class="tbtn on" id="btn-ln" onclick="setMode('login')">[ LOGIN ]</button>
+        <button class="tbtn"    id="btn-su" onclick="setMode('signup')">[ REGISTER ]</button>
+      </div>
+
+      <div class="field">
+        <div class="field-label"><span class="arr">▶</span> USER_ID</div>
+        <div class="irow"><span class="ipfx">$</span><input id="i-user" type="text" placeholder="username" maxlength="16" autocomplete="off"/></div>
+      </div>
+      <div class="field">
+        <div class="field-label"><span class="arr">▶</span> PASSWORD</div>
+        <div class="irow"><span class="ipfx">$</span><input id="i-pass" type="password" placeholder="••••••••" maxlength="32"/></div>
+      </div>
+      <div class="field" id="cfm-row" style="display:none">
+        <div class="field-label"><span class="arr">▶</span> CONFIRM_PASSWORD</div>
+        <div class="irow"><span class="ipfx">$</span><input id="i-cfm" type="password" placeholder="••••••••" maxlength="32"/></div>
+      </div>
+
+      <hr class="sep"/>
+      <button class="sbtn" onclick="handleAuth()"><span id="sbtn-lbl">[ CONNECT ]</span></button>
+      <div class="msg" id="auth-msg"></div>
+    </div>
   </div>
 </div>
 
+<!-- ══ GAME ══ -->
 <canvas id="canvas"></canvas>
+
 <div id="hud">
-  <div>위치: <strong id="pos-text">—</strong></div>
-  <div>WASD / 방향키로 이동</div>
+  <span class="brand">sphere.io</span>
+  <span class="hsep">│</span>
+  <span class="hi">USER: <span id="h-user">—</span></span>
+  <span class="hsep">│</span>
+  <span class="hi">COORD: <span id="h-pos">(0, 0)</span></span>
+  <span class="hsep">│</span>
+  <span class="hi">ONLINE: <span id="h-cnt">0</span></span>
+  <span class="hsep">│</span>
+  <span class="hi" style="color:var(--dim)">WASD / ARROWS</span>
 </div>
-<div id="player-count">플레이어: <strong id="cnt">0</strong></div>
+<button id="logout-btn" onclick="doLogout()">[ LOGOUT ]</button>
+
+<div class="axis-lbl" id="al-xp" style="bottom:12px;right:16px">+X →</div>
+<div class="axis-lbl" id="al-xn" style="bottom:12px;left:16px">← −X</div>
+<div class="axis-lbl" id="al-yp" style="top:46px;left:50%;transform:translateX(-50%)">↑ +Y</div>
+<div class="axis-lbl" id="al-yn" style="bottom:12px;left:50%;transform:translateX(-50%)">↓ −Y</div>
 
 <script>
-const canvas = document.getElementById('canvas');
-const ctx = canvas.getContext('2d');
+// ═══ AUTH (localStorage-backed) ═══
+const UKEY = 'sphere_users_v1';
+const getDB = () => { try { return JSON.parse(localStorage.getItem(UKEY))||{}; } catch { return {}; } };
+const saveDB = d => localStorage.setItem(UKEY, JSON.stringify(d));
 
-// ── Resize ────────────────────────────────────────────────────────────────────
+let authMode = 'login';
+
+function setMode(m) {
+  authMode = m;
+  const su = m === 'signup';
+  document.getElementById('cfm-row').style.display   = su ? '' : 'none';
+  document.getElementById('sbtn-lbl').textContent     = su ? '[ CREATE ACCOUNT ]' : '[ CONNECT ]';
+  document.getElementById('btn-ln').className = 'tbtn' + (su ? '' : ' on');
+  document.getElementById('btn-su').className = 'tbtn' + (su ? ' on' : '');
+  msg('','');
+}
+
+function msg(txt, cls) {
+  const el = document.getElementById('auth-msg');
+  el.textContent = txt ? `> ${txt}` : '';
+  el.className = 'msg ' + (cls||'');
+}
+
+function handleAuth() {
+  const u = document.getElementById('i-user').value.trim();
+  const p = document.getElementById('i-pass').value;
+  const c = document.getElementById('i-cfm').value;
+  if (!u) { msg('ERR :: username required','err'); return; }
+  if (!p) { msg('ERR :: password required','err'); return; }
+  const db = getDB();
+  if (authMode === 'signup') {
+    if (p !== c)       { msg('ERR :: passwords do not match','err'); return; }
+    if (p.length < 4)  { msg('ERR :: password min 4 chars','err'); return; }
+    if (db[u])         { msg(`ERR :: user "${u}" already exists`,'err'); return; }
+    db[u] = { pw: p, ts: Date.now() };
+    saveDB(db);
+    msg(`OK :: account created — welcome, ${u}`, 'ok');
+    setTimeout(() => startGame(u), 700);
+  } else {
+    if (!db[u])          { msg('ERR :: user not found','err'); return; }
+    if (db[u].pw !== p)  { msg('ERR :: wrong password','err'); return; }
+    msg(`OK :: authenticated as ${u} — connecting...`, 'ok');
+    setTimeout(() => startGame(u), 500);
+  }
+}
+
+['i-user','i-pass','i-cfm'].forEach(id =>
+  document.getElementById(id).addEventListener('keydown', e => { if(e.key==='Enter') handleAuth(); })
+);
+
+// ═══ GAME ENGINE ═══
+const canvas = document.getElementById('canvas');
+const ctx    = canvas.getContext('2d');
+
 function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
 resize();
 window.addEventListener('resize', resize);
 
-// ── State ─────────────────────────────────────────────────────────────────────
-let socket;
-let myId = null;
-let worldW = 3000, worldH = 3000;
-let snapshot = [];
+let socket, myId = null, worldW = 3000, worldH = 3000, snapshot = [];
 const TILE = 60;
+const keys = { up:false, down:false, left:false, right:false };
+let lastKeys = {}, gameRunning = false, myName = '';
 
-const keys = { up: false, down: false, left: false, right: false };
-let lastKeys = {};
-
-// ── Input ─────────────────────────────────────────────────────────────────────
-function keyState(e, val) {
-  if (e.key === 'ArrowUp'    || e.key === 'w' || e.key === 'W') keys.up    = val;
-  if (e.key === 'ArrowDown'  || e.key === 's' || e.key === 'S') keys.down  = val;
-  if (e.key === 'ArrowLeft'  || e.key === 'a' || e.key === 'A') keys.left  = val;
-  if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') keys.right = val;
+window.addEventListener('keydown', e => { applyKey(e,true);  sendKeys(); });
+window.addEventListener('keyup',   e => { applyKey(e,false); sendKeys(); });
+function applyKey(e, v) {
+  if (e.key==='ArrowUp'   ||e.key==='w'||e.key==='W') keys.up    = v;
+  if (e.key==='ArrowDown' ||e.key==='s'||e.key==='S') keys.down  = v;
+  if (e.key==='ArrowLeft' ||e.key==='a'||e.key==='A') keys.left  = v;
+  if (e.key==='ArrowRight'||e.key==='d'||e.key==='D') keys.right = v;
 }
-window.addEventListener('keydown', e => { keyState(e, true);  sendKeys(); });
-window.addEventListener('keyup',   e => { keyState(e, false); sendKeys(); });
-
 function sendKeys() {
   if (!socket) return;
-  const changed =
-    keys.up !== lastKeys.up || keys.down !== lastKeys.down ||
-    keys.left !== lastKeys.left || keys.right !== lastKeys.right;
-  if (changed) {
-    socket.emit('keys', { ...keys });
-    lastKeys = { ...keys };
-  }
+  const ch = keys.up!==lastKeys.up||keys.down!==lastKeys.down||keys.left!==lastKeys.left||keys.right!==lastKeys.right;
+  if (ch) { socket.emit('keys',{...keys}); lastKeys={...keys}; }
 }
 
-// ── Login ─────────────────────────────────────────────────────────────────────
-document.getElementById('play-btn').onclick = startGame;
-document.getElementById('inp-name').addEventListener('keydown', e => { if (e.key === 'Enter') startGame(); });
+function startGame(username) {
+  if (gameRunning) return;
+  gameRunning = true;
+  myName = username;
+  document.getElementById('auth-screen').style.display = 'none';
+  document.getElementById('hud').style.display = 'flex';
+  document.getElementById('logout-btn').style.display = 'block';
+  ['al-xp','al-xn','al-yp','al-yn'].forEach(id => document.getElementById(id).style.display='block');
+  document.getElementById('h-user').textContent = username.toUpperCase();
 
-let gameStarted = false;
-function startGame() {
-  // [BUG FIX #3] 버튼 연타 또는 Enter 중복 입력 시 게임이 두 번 시작되는 문제 방지
-  if (gameStarted) return;
-  gameStarted = true;
-  const name = document.getElementById('inp-name').value.trim() || 'Player';
-  document.getElementById('login').style.display = 'none';
-  connectSocket(name);
+  socket = io();
+  socket.on('connect', () => socket.emit('join', { name: username }));
+  socket.on('welcome', d => { myId=d.id; worldW=d.worldW; worldH=d.worldH; });
+  socket.on('state',   d => { snapshot=d; document.getElementById('h-cnt').textContent=d.length; });
+
   requestAnimationFrame(loop);
 }
 
-// ── Socket ────────────────────────────────────────────────────────────────────
-function connectSocket(name) {
-  socket = io();
-
-  // [BUG FIX #1] 'welcome' 핸들러가 두 번 등록되어 있었고,
-  // 'connect' + 'welcome' 양쪽에서 join을 emit해 중복 join이 발생하던 문제 수정.
-  // 올바른 흐름: connect → join emit → 서버가 welcome 응답 → myId/world 세팅
-  socket.on('connect', () => {
-    socket.emit('join', { name });
-  });
-
-  socket.on('welcome', (data) => {
-    myId = data.id;
-    worldW = data.worldW;
-    worldH = data.worldH;
-  });
-
-  socket.on('state', (data) => {
-    snapshot = data;
-    document.getElementById('cnt').textContent = data.length;
-  });
+function doLogout() {
+  gameRunning = false; myId = null; snapshot = []; myName = '';
+  if (socket) { socket.disconnect(); socket = null; }
+  document.getElementById('hud').style.display = 'none';
+  document.getElementById('logout-btn').style.display = 'none';
+  ['al-xp','al-xn','al-yp','al-yn'].forEach(id => document.getElementById(id).style.display='none');
+  document.getElementById('auth-screen').style.display = 'flex';
+  document.getElementById('i-pass').value = '';
+  document.getElementById('i-cfm').value = '';
+  msg('SESSION_TERMINATED :: reconnect to re-enter','info');
+  // allow re-entry
+  gameRunning = false;
 }
 
-// ── Camera ────────────────────────────────────────────────────────────────────
+// ═══ CAMERA ═══
 let camX = 0, camY = 0;
-
-function updateCamera(me) {
-  const tx = me.x - canvas.width  / 2;
-  const ty = me.y - canvas.height / 2;
+function updateCam(me) {
+  const tx = me.x - canvas.width/2, ty = me.y - canvas.height/2;
   camX += (tx - camX) * 0.12;
   camY += (ty - camY) * 0.12;
-  // [BUG FIX #2] 캔버스가 월드보다 클 경우 Math.min이 음수를 반환해 카메라가 튀는 문제 수정
   camX = Math.max(0, Math.min(Math.max(0, worldW - canvas.width),  camX));
   camY = Math.max(0, Math.min(Math.max(0, worldH - canvas.height), camY));
 }
 
-// ── Draw ──────────────────────────────────────────────────────────────────────
+// ═══ MATH COORDS ═══
+// Server: origin top-left, Y down
+// Display: origin center of world, Y up (standard math plane)
+function toMath(sx, sy) {
+  return {
+    mx: Math.round(sx - worldW/2),
+    my: Math.round(worldH/2 - sy),  // flip Y axis
+  };
+}
+
+// ═══ RENDER ═══
+const C = { // color palette
+  bg:     '#0a0a0a',
+  grid1:  '#0c1c12',
+  grid2:  '#0f2517',
+  axis:   '#1a4228',
+  border: '#0d2918',
+  green:  '#00ff88',
+  gm:     '#00cc6a',
+  gd:     '#003d20',
+  muted:  '#2d5a3d',
+  text:   '#c8ffd9',
+};
+
+function drawBg() {
+  ctx.fillStyle = C.bg;
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+}
+
 function drawGrid() {
-  ctx.strokeStyle = '#ddd';
-  ctx.lineWidth = 1;
-
-  const startX = Math.floor(camX / TILE) * TILE;
-  const startY = Math.floor(camY / TILE) * TILE;
-  const endX = camX + canvas.width  + TILE;
-  const endY = camY + canvas.height + TILE;
-
+  // minor
+  ctx.strokeStyle = C.grid1; ctx.lineWidth = 1;
+  let sx0 = Math.floor(camX/TILE)*TILE, sy0 = Math.floor(camY/TILE)*TILE;
   ctx.beginPath();
-  for (let x = startX; x < endX; x += TILE) {
-    const sx = x - camX;
-    ctx.moveTo(sx, 0);
-    ctx.lineTo(sx, canvas.height);
-  }
-  for (let y = startY; y < endY; y += TILE) {
-    const sy = y - camY;
-    ctx.moveTo(0, sy);
-    ctx.lineTo(canvas.width, sy);
-  }
+  for (let x=sx0; x<camX+canvas.width+TILE; x+=TILE) { ctx.moveTo(x-camX,0); ctx.lineTo(x-camX,canvas.height); }
+  for (let y=sy0; y<camY+canvas.height+TILE; y+=TILE) { ctx.moveTo(0,y-camY); ctx.lineTo(canvas.width,y-camY); }
   ctx.stroke();
+
+  // major (5x)
+  const M = TILE*5;
+  ctx.strokeStyle = C.grid2;
+  sx0 = Math.floor(camX/M)*M; sy0 = Math.floor(camY/M)*M;
+  ctx.beginPath();
+  for (let x=sx0; x<camX+canvas.width+M; x+=M) { ctx.moveTo(x-camX,0); ctx.lineTo(x-camX,canvas.height); }
+  for (let y=sy0; y<camY+canvas.height+M; y+=M) { ctx.moveTo(0,y-camY); ctx.lineTo(canvas.width,y-camY); }
+  ctx.stroke();
+
+  // math axes
+  const axX = worldW/2 - camX; // screen x of Y-axis
+  const axY = worldH/2 - camY; // screen y of X-axis
+  ctx.strokeStyle = C.axis; ctx.lineWidth = 1.5;
+  ctx.setLineDash([5,4]);
+  ctx.beginPath();
+  ctx.moveTo(0, axY); ctx.lineTo(canvas.width, axY);   // X-axis
+  ctx.moveTo(axX, 0); ctx.lineTo(axX, canvas.height);  // Y-axis
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  // tick labels
+  ctx.fillStyle = C.muted; ctx.font = '9px JetBrains Mono,monospace';
+  const step = M;
+  ctx.textAlign = 'center';
+  let txs = Math.floor(camX/step)*step;
+  for (let x=txs; x<camX+canvas.width+step; x+=step) {
+    const v = Math.round(x - worldW/2);
+    if (v===0) continue;
+    ctx.fillText(v, x-camX, axY+13);
+  }
+  ctx.textAlign = 'right';
+  let tys = Math.floor(camY/step)*step;
+  for (let y=tys; y<camY+canvas.height+step; y+=step) {
+    const v = Math.round(worldH/2 - y);
+    if (v===0) continue;
+    ctx.fillText(v, axX-4, y-camY+3);
+  }
+
+  // origin
+  ctx.fillStyle = C.gm; ctx.font = 'bold 10px JetBrains Mono,monospace';
+  ctx.textAlign = 'left';
+  ctx.fillText('O', axX+4, axY-5);
+
+  // axis arrows
+  ctx.fillStyle = C.axis;
+  // +X arrow (right end of screen)
+  _arrow(canvas.width-8, axY, 1, 0);
+  // +Y arrow (top of screen — math +Y is up, screen up)
+  _arrow(axX, 8, 0, -1);
+}
+
+function _arrow(x, y, dx, dy) {
+  const s = 7;
+  ctx.beginPath();
+  ctx.moveTo(x, y);
+  ctx.lineTo(x - dy*s - dx*s, y - dx*s + dy*s*0 - dy*s);
+  // simple triangle
+  ctx.save();
+  ctx.fillStyle = C.axis;
+  ctx.translate(x, y);
+  ctx.rotate(Math.atan2(dy, dx));
+  ctx.beginPath();
+  ctx.moveTo(0, 0); ctx.lineTo(-s, -s/2); ctx.lineTo(-s, s/2);
+  ctx.closePath(); ctx.fill();
+  ctx.restore();
 }
 
 function drawBorder() {
-  ctx.strokeStyle = '#aaa';
-  ctx.lineWidth = 3;
+  ctx.strokeStyle = C.border; ctx.lineWidth = 2;
   ctx.strokeRect(-camX, -camY, worldW, worldH);
+  const hw=worldW/2, hh=worldH/2;
+  ctx.fillStyle = C.gd; ctx.font = '9px JetBrains Mono,monospace';
+  [
+    { sx:-camX+4,       sy:-camY+12,         t:`(−${hw},+${hh})`, a:'left'  },
+    { sx:-camX+worldW-4,sy:-camY+12,         t:`(+${hw},+${hh})`, a:'right' },
+    { sx:-camX+4,       sy:-camY+worldH-5,   t:`(−${hw},−${hh})`, a:'left'  },
+    { sx:-camX+worldW-4,sy:-camY+worldH-5,   t:`(+${hw},−${hh})`, a:'right' },
+  ].forEach(c => { ctx.textAlign=c.a; ctx.fillText(c.t, c.sx, c.sy); });
 }
 
 function drawPlayer(p, isMe) {
-  const sx = p.x - camX;
-  const sy = p.y - camY;
+  const sx = p.x - camX, sy = p.y - camY;
 
-  // Shadow
-  ctx.beginPath();
-  ctx.arc(sx, sy + 4, p.r, 0, Math.PI * 2);
-  ctx.fillStyle = 'rgba(0,0,0,0.08)';
-  ctx.fill();
+  // glow for self
+  if (isMe) {
+    const g = ctx.createRadialGradient(sx,sy,0,sx,sy,p.r*3);
+    g.addColorStop(0,'rgba(0,255,136,0.12)');
+    g.addColorStop(1,'rgba(0,255,136,0)');
+    ctx.beginPath(); ctx.arc(sx,sy,p.r*3,0,Math.PI*2);
+    ctx.fillStyle=g; ctx.fill();
+  }
 
-  // Circle
-  ctx.beginPath();
-  ctx.arc(sx, sy, p.r, 0, Math.PI * 2);
-  ctx.fillStyle = isMe ? '#1a6fff' : '#5599ff';
-  ctx.fill();
+  // shadow
+  ctx.beginPath(); ctx.arc(sx+2,sy+3,p.r,0,Math.PI*2);
+  ctx.fillStyle='rgba(0,0,0,0.5)'; ctx.fill();
 
-  // Stroke
-  ctx.beginPath();
-  ctx.arc(sx, sy, p.r, 0, Math.PI * 2);
-  ctx.strokeStyle = isMe ? '#003fbb' : '#2266cc';
-  ctx.lineWidth = isMe ? 3 : 2;
-  ctx.stroke();
+  // body
+  ctx.beginPath(); ctx.arc(sx,sy,p.r,0,Math.PI*2);
+  ctx.fillStyle = isMe ? '#001208' : '#000c05'; ctx.fill();
+  ctx.strokeStyle = isMe ? C.green : C.gm; ctx.lineWidth = isMe?2.5:1.5; ctx.stroke();
 
-  // Name
-  ctx.fillStyle = '#333';
-  ctx.font = `bold 12px 'Segoe UI', sans-serif`;
+  // center dot
+  ctx.beginPath(); ctx.arc(sx,sy,3,0,Math.PI*2);
+  ctx.fillStyle = isMe ? C.green : C.gm; ctx.fill();
+
+  // crosshair lines (only for self)
+  if (isMe) {
+    ctx.strokeStyle = 'rgba(0,255,136,0.2)'; ctx.lineWidth = 1;
+    ctx.setLineDash([3,3]);
+    ctx.beginPath();
+    ctx.moveTo(sx-p.r*1.8, sy); ctx.lineTo(sx+p.r*1.8, sy);
+    ctx.moveTo(sx, sy-p.r*1.8); ctx.lineTo(sx, sy+p.r*1.8);
+    ctx.stroke(); ctx.setLineDash([]);
+  }
+
+  // label
+  const {mx,my} = toMath(p.x,p.y);
   ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillText(p.name, sx, sy - p.r - 10);
+  ctx.font = `bold 10px JetBrains Mono,monospace`;
+  ctx.fillStyle = isMe ? C.green : C.gm;
+  ctx.fillText(isMe ? p.name.toUpperCase() : p.name, sx, sy - p.r - 13);
+  ctx.font = `9px JetBrains Mono,monospace`;
+  ctx.fillStyle = C.muted;
+  ctx.fillText(`(${mx}, ${my})`, sx, sy - p.r - 3);
 }
 
 function loop() {
-  // Background
-  ctx.fillStyle = '#fff';
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-
+  if (!gameRunning) return;
+  drawBg();
   const me = snapshot.find(p => p.id === myId);
   if (me) {
-    updateCamera(me);
-    document.getElementById('pos-text').textContent =
-      `${Math.round(me.x)}, ${Math.round(me.y)}`;
+    updateCam(me);
+    const {mx,my} = toMath(me.x, me.y);
+    document.getElementById('h-pos').textContent = `(${mx}, ${my})`;
   }
-
   drawGrid();
   drawBorder();
-
-  snapshot.forEach(p => drawPlayer(p, p.id === myId));
-
+  snapshot.forEach(p => drawPlayer(p, p.id===myId));
   requestAnimationFrame(loop);
 }
 </script>
