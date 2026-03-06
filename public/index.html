@@ -5,142 +5,140 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>sphere.io</title>
 <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700;800&display=swap" rel="stylesheet">
 <style>
-:root {
-  --bg:      #0a0a0a;
-  --surface: #0e0e0e;
-  --border:  #1a1a1a;
-  --green:   #00ff88;
-  --green2:  #00cc6a;
-  --green3:  #001f10;
-  --dim:     #2a4a35;
-  --text:    #c8ffd9;
-  --muted:   #3a6648;
-  --red:     #ff4466;
-  --yellow:  #ffdd00;
-}
 * { margin: 0; padding: 0; box-sizing: border-box; }
+
 body {
-  background: var(--bg);
-  font-family: 'JetBrains Mono', 'Courier New', monospace;
+  background: #fff;
+  font-family: 'Segoe UI', sans-serif;
   overflow: hidden;
-  color: var(--text);
-}
-/* scanlines */
-body::after {
-  content: '';
-  position: fixed; inset: 0; z-index: 9999;
-  background: repeating-linear-gradient(
-    0deg, transparent, transparent 2px,
-    rgba(0,0,0,0.06) 2px, rgba(0,0,0,0.06) 4px
-  );
-  pointer-events: none;
+  color: #222;
 }
 
 /* ── AUTH ── */
 #auth-screen {
   position: fixed; inset: 0; z-index: 100;
   display: flex; align-items: center; justify-content: center;
-  background: var(--bg);
+  background: #fff;
 }
-.tw {
-  width: 460px;
-  border: 1px solid var(--green);
-  background: var(--surface);
-  box-shadow: 0 0 48px rgba(0,255,136,0.08), inset 0 0 60px rgba(0,255,136,0.02);
+
+.auth-box {
+  width: 340px;
+  border: 1.5px solid #ddd;
+  background: #fafafa;
 }
-.tw-bar {
-  background: var(--green3);
-  border-bottom: 1px solid var(--dim);
+
+.auth-titlebar {
+  background: #f0f0f0;
+  border-bottom: 1.5px solid #ddd;
   padding: 8px 14px;
-  display: flex; align-items: center; gap: 8px;
-  font-size: 11px; color: var(--muted); letter-spacing: .08em;
+  display: flex; align-items: center; gap: 7px;
+  font-size: 11px; color: #888; font-family: 'Courier New', monospace;
+  letter-spacing: .04em;
 }
-.tw-bar .d { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-.tw-body { padding: 22px 26px 26px; }
-.ascii {
-  font-size: 8.5px; line-height: 1.15; color: var(--green);
-  margin-bottom: 18px; white-space: pre;
-  text-shadow: 0 0 12px rgba(0,255,136,0.5);
+.auth-titlebar .dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+
+.auth-body { padding: 22px 22px 24px; }
+
+.auth-title {
+  font-family: 'Courier New', monospace;
+  font-size: 22px; font-weight: 900; letter-spacing: -1px;
+  color: #1a6fff; margin-bottom: 4px;
 }
+.auth-sub {
+  font-family: 'Courier New', monospace;
+  font-size: 10px; color: #aaa; letter-spacing: .08em;
+  margin-bottom: 20px;
+}
+
 .mode-row { display: flex; gap: 8px; margin-bottom: 18px; }
-.tbtn {
-  flex: 1; padding: 8px 0;
-  background: transparent; border: 1px solid var(--muted);
-  color: var(--muted); font-family: inherit; font-size: 11px;
-  font-weight: 700; letter-spacing: .1em; cursor: pointer;
-  transition: all .15s;
+.mbtn {
+  flex: 1; padding: 7px 0;
+  background: #fff; border: 1.5px solid #ddd;
+  color: #888; font-family: 'Courier New', monospace;
+  font-size: 11px; font-weight: 700; letter-spacing: .08em;
+  cursor: pointer; transition: all .12s;
 }
-.tbtn:hover, .tbtn.on {
-  background: var(--green); border-color: var(--green);
-  color: #000; box-shadow: 0 0 14px rgba(0,255,136,0.25);
+.mbtn.on  { background: #1a6fff; border-color: #1a6fff; color: #fff; }
+.mbtn:hover:not(.on) { border-color: #1a6fff; color: #1a6fff; }
+
+.field { margin-bottom: 12px; }
+.field-lbl {
+  font-family: 'Courier New', monospace;
+  font-size: 10px; color: #aaa; letter-spacing: .08em;
+  margin-bottom: 5px;
 }
-.field { margin-bottom: 14px; }
-.field-label {
-  font-size: 10px; color: var(--muted); margin-bottom: 5px;
-  display: flex; align-items: center; gap: 5px;
-}
-.field-label .arr { color: var(--green); }
 .irow {
   display: flex; align-items: center;
-  border: 1px solid var(--dim); background: #070707;
-  padding: 0 12px; transition: border-color .15s, box-shadow .15s;
+  border: 1.5px solid #ddd; background: #fff;
+  padding: 0 10px; transition: border-color .12s;
 }
-.irow:focus-within {
-  border-color: var(--green);
-  box-shadow: 0 0 10px rgba(0,255,136,0.1);
+.irow:focus-within { border-color: #1a6fff; }
+.ipfx {
+  font-family: 'Courier New', monospace;
+  font-size: 13px; color: #bbb; margin-right: 7px;
+  user-select: none; flex-shrink: 0;
 }
-.ipfx { color: var(--green); font-size: 13px; margin-right: 8px; user-select: none; }
 .irow input {
   flex: 1; background: transparent; border: none; outline: none;
-  color: var(--text); font-family: inherit; font-size: 13px;
-  padding: 10px 0; caret-color: var(--green);
+  color: #222; font-family: 'Courier New', monospace;
+  font-size: 13px; padding: 9px 0;
+  caret-color: #1a6fff;
 }
-.irow input::placeholder { color: var(--dim); }
-hr.sep { border: none; border-top: 1px solid var(--border); margin: 18px 0; }
+.irow input::placeholder { color: #ccc; }
+
+.sep { border: none; border-top: 1.5px solid #eee; margin: 16px 0; }
+
 .sbtn {
-  width: 100%; padding: 11px;
-  background: transparent; border: 1px solid var(--green);
-  color: var(--green); font-family: inherit; font-size: 12px;
-  font-weight: 700; letter-spacing: .12em; cursor: pointer;
-  transition: all .15s;
+  width: 100%; padding: 10px;
+  background: #1a6fff; border: none; color: #fff;
+  font-family: 'Courier New', monospace; font-size: 12px;
+  font-weight: 700; letter-spacing: .1em; cursor: pointer;
+  transition: background .12s;
 }
-.sbtn:hover {
-  background: var(--green); color: #000;
-  box-shadow: 0 0 20px rgba(0,255,136,0.3);
+.sbtn:hover { background: #0050dd; }
+
+.auth-msg {
+  font-family: 'Courier New', monospace;
+  font-size: 11px; margin-top: 11px; min-height: 14px;
+  letter-spacing: .03em;
 }
-.msg { font-size: 11px; margin-top: 12px; min-height: 15px; letter-spacing: .03em; }
-.msg.err  { color: var(--red); }
-.msg.ok   { color: var(--green); }
-.msg.info { color: var(--yellow); }
+.auth-msg.err  { color: #e02020; }
+.auth-msg.ok   { color: #1a8c4e; }
+.auth-msg.info { color: #888; }
 
 /* ── GAME HUD ── */
 #hud {
   position: fixed; top: 0; left: 0; right: 0;
   padding: 8px 16px;
-  background: rgba(10,10,10,0.9);
-  border-bottom: 1px solid var(--dim);
-  display: none; align-items: center; gap: 20px;
-  font-size: 11px; pointer-events: none;
-  backdrop-filter: blur(6px);
+  background: rgba(255,255,255,0.95);
+  border-bottom: 1px solid #e8e8e8;
+  display: none; align-items: center; gap: 18px;
+  font-size: 12px; pointer-events: none;
 }
-.brand { color: var(--green); font-weight: 800; font-size: 13px; letter-spacing: .05em; text-shadow: 0 0 12px var(--green); }
-.hsep  { color: var(--border); }
-.hi    { color: var(--muted); }
-.hi span { color: var(--text); }
+.hbrand {
+  font-family: 'Courier New', monospace;
+  font-weight: 900; font-size: 14px;
+  color: #1a6fff; letter-spacing: -.5px;
+}
+.hsep { color: #ddd; }
+.hi   { color: #aaa; font-size: 11px; font-family: 'Courier New', monospace; }
+.hi b { color: #222; font-weight: 600; }
+
 #logout-btn {
   position: fixed; top: 8px; right: 14px;
-  background: transparent; border: 1px solid var(--dim);
-  color: var(--muted); font-family: inherit; font-size: 11px;
-  padding: 4px 12px; cursor: pointer; transition: all .15s;
-  display: none;
+  background: #fff; border: 1px solid #ddd; color: #888;
+  font-family: 'Courier New', monospace; font-size: 11px;
+  padding: 4px 12px; cursor: pointer; transition: all .12s;
+  display: none; letter-spacing: .06em;
 }
-#logout-btn:hover { border-color: var(--red); color: var(--red); }
-.axis-lbl {
-  position: fixed; font-family: inherit; font-size: 10px;
-  color: var(--dim); pointer-events: none; display: none;
-  letter-spacing: .05em;
+#logout-btn:hover { border-color: #e02020; color: #e02020; }
+
+/* axis corner labels */
+.ax {
+  position: fixed; font-family: 'Courier New', monospace;
+  font-size: 10px; color: #ccc; pointer-events: none;
+  display: none; letter-spacing: .04em;
 }
 </style>
 </head>
@@ -148,42 +146,47 @@ hr.sep { border: none; border-top: 1px solid var(--border); margin: 18px 0; }
 
 <!-- ══ AUTH ══ -->
 <div id="auth-screen">
-  <div class="tw">
-    <div class="tw-bar">
-      <span class="d" style="background:#ff5f56"></span>
-      <span class="d" style="background:#ffbd2e"></span>
-      <span class="d" style="background:#27c93f"></span>
-      <span style="margin-left:6px">sphere.io — auth terminal</span>
+  <div class="auth-box">
+    <div class="auth-titlebar">
+      <span class="dot" style="background:#ff5f56"></span>
+      <span class="dot" style="background:#ffbd2e"></span>
+      <span class="dot" style="background:#27c93f"></span>
+      <span style="margin-left:4px">sphere.io</span>
     </div>
-    <div class="tw-body">
-      <div class="ascii"> ███████╗██████╗ ██╗  ██╗███████╗██████╗ ███████╗
- ██╔════╝██╔══██╗██║  ██║██╔════╝██╔══██╗██╔════╝
- ███████╗██████╔╝███████║█████╗  ██████╔╝█████╗  
- ╚════██║██╔═══╝ ██╔══██║██╔══╝  ██╔══██╗██╔══╝  
- ███████║██║     ██║  ██║███████╗██║  ██║███████╗
- ╚══════╝╚═╝     ╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚══════╝</div>
+    <div class="auth-body">
+      <div class="auth-title">sphere.io</div>
+      <div class="auth-sub">MATH COORDINATE MULTIPLAYER</div>
 
       <div class="mode-row">
-        <button class="tbtn on" id="btn-ln" onclick="setMode('login')">[ LOGIN ]</button>
-        <button class="tbtn"    id="btn-su" onclick="setMode('signup')">[ REGISTER ]</button>
+        <button class="mbtn on" id="btn-ln" onclick="setMode('login')">LOGIN</button>
+        <button class="mbtn"    id="btn-su" onclick="setMode('signup')">REGISTER</button>
       </div>
 
       <div class="field">
-        <div class="field-label"><span class="arr">▶</span> USER_ID</div>
-        <div class="irow"><span class="ipfx">$</span><input id="i-user" type="text" placeholder="username" maxlength="16" autocomplete="off"/></div>
+        <div class="field-lbl">USER_ID</div>
+        <div class="irow">
+          <span class="ipfx">&gt;</span>
+          <input id="i-user" type="text" placeholder="username" maxlength="16" autocomplete="off"/>
+        </div>
       </div>
       <div class="field">
-        <div class="field-label"><span class="arr">▶</span> PASSWORD</div>
-        <div class="irow"><span class="ipfx">$</span><input id="i-pass" type="password" placeholder="••••••••" maxlength="32"/></div>
+        <div class="field-lbl">PASSWORD</div>
+        <div class="irow">
+          <span class="ipfx">&gt;</span>
+          <input id="i-pass" type="password" placeholder="••••••••" maxlength="32"/>
+        </div>
       </div>
       <div class="field" id="cfm-row" style="display:none">
-        <div class="field-label"><span class="arr">▶</span> CONFIRM_PASSWORD</div>
-        <div class="irow"><span class="ipfx">$</span><input id="i-cfm" type="password" placeholder="••••••••" maxlength="32"/></div>
+        <div class="field-lbl">CONFIRM_PASSWORD</div>
+        <div class="irow">
+          <span class="ipfx">&gt;</span>
+          <input id="i-cfm" type="password" placeholder="••••••••" maxlength="32"/>
+        </div>
       </div>
 
       <hr class="sep"/>
-      <button class="sbtn" onclick="handleAuth()"><span id="sbtn-lbl">[ CONNECT ]</span></button>
-      <div class="msg" id="auth-msg"></div>
+      <button class="sbtn" onclick="handleAuth()"><span id="sbtn-lbl">CONNECT</span></button>
+      <div class="auth-msg" id="auth-msg"></div>
     </div>
   </div>
 </div>
@@ -192,27 +195,29 @@ hr.sep { border: none; border-top: 1px solid var(--border); margin: 18px 0; }
 <canvas id="canvas"></canvas>
 
 <div id="hud">
-  <span class="brand">sphere.io</span>
-  <span class="hsep">│</span>
-  <span class="hi">USER: <span id="h-user">—</span></span>
-  <span class="hsep">│</span>
-  <span class="hi">COORD: <span id="h-pos">(0, 0)</span></span>
-  <span class="hsep">│</span>
-  <span class="hi">ONLINE: <span id="h-cnt">0</span></span>
-  <span class="hsep">│</span>
-  <span class="hi" style="color:var(--dim)">WASD / ARROWS</span>
+  <span class="hbrand">sphere.io</span>
+  <span class="hsep">|</span>
+  <span class="hi">USER: <b id="h-user">—</b></span>
+  <span class="hsep">|</span>
+  <span class="hi">COORD: <b id="h-pos">(0, 0)</b></span>
+  <span class="hsep">|</span>
+  <span class="hi">ONLINE: <b id="h-cnt">0</b></span>
+  <span class="hsep">|</span>
+  <span class="hi">WASD / ARROWS</span>
 </div>
-<button id="logout-btn" onclick="doLogout()">[ LOGOUT ]</button>
+<button id="logout-btn" onclick="doLogout()">LOGOUT</button>
 
-<div class="axis-lbl" id="al-xp" style="bottom:12px;right:16px">+X →</div>
-<div class="axis-lbl" id="al-xn" style="bottom:12px;left:16px">← −X</div>
-<div class="axis-lbl" id="al-yp" style="top:46px;left:50%;transform:translateX(-50%)">↑ +Y</div>
-<div class="axis-lbl" id="al-yn" style="bottom:12px;left:50%;transform:translateX(-50%)">↓ −Y</div>
+<div class="ax" id="al-xp" style="bottom:10px;right:14px">+X →</div>
+<div class="ax" id="al-xn" style="bottom:10px;left:14px">← −X</div>
+<div class="ax" id="al-yp" style="top:44px;left:50%;transform:translateX(-50%)">↑ +Y</div>
+<div class="ax" id="al-yn" style="bottom:10px;left:50%;transform:translateX(-50%)">−Y ↓</div>
 
 <script>
-// ═══ AUTH (localStorage-backed) ═══
-const UKEY = 'sphere_users_v1';
-const getDB = () => { try { return JSON.parse(localStorage.getItem(UKEY))||{}; } catch { return {}; } };
+// ════════════════════════════════════
+//  AUTH  (localStorage)
+// ════════════════════════════════════
+const UKEY  = 'sphere_users_v1';
+const getDB = () => { try { return JSON.parse(localStorage.getItem(UKEY)) || {}; } catch { return {}; } };
 const saveDB = d => localStorage.setItem(UKEY, JSON.stringify(d));
 
 let authMode = 'login';
@@ -220,47 +225,53 @@ let authMode = 'login';
 function setMode(m) {
   authMode = m;
   const su = m === 'signup';
-  document.getElementById('cfm-row').style.display   = su ? '' : 'none';
-  document.getElementById('sbtn-lbl').textContent     = su ? '[ CREATE ACCOUNT ]' : '[ CONNECT ]';
-  document.getElementById('btn-ln').className = 'tbtn' + (su ? '' : ' on');
-  document.getElementById('btn-su').className = 'tbtn' + (su ? ' on' : '');
-  msg('','');
+  document.getElementById('cfm-row').style.display = su ? '' : 'none';
+  document.getElementById('sbtn-lbl').textContent  = su ? 'CREATE ACCOUNT' : 'CONNECT';
+  document.getElementById('btn-ln').className = 'mbtn' + (su ? '' : ' on');
+  document.getElementById('btn-su').className = 'mbtn' + (su ? ' on' : '');
+  setMsg('', '');
 }
 
-function msg(txt, cls) {
-  const el = document.getElementById('auth-msg');
-  el.textContent = txt ? `> ${txt}` : '';
-  el.className = 'msg ' + (cls||'');
+// ── Cache DOM refs used repeatedly ──
+const elMsg  = document.getElementById('auth-msg');
+const elPos  = document.getElementById('h-pos');   // updated in loop — cached once
+const elCnt  = document.getElementById('h-cnt');
+
+function setMsg(txt, cls) {
+  elMsg.textContent = txt ? `> ${txt}` : '';
+  elMsg.className   = 'auth-msg ' + (cls || '');
 }
 
 function handleAuth() {
   const u = document.getElementById('i-user').value.trim();
   const p = document.getElementById('i-pass').value;
   const c = document.getElementById('i-cfm').value;
-  if (!u) { msg('ERR :: username required','err'); return; }
-  if (!p) { msg('ERR :: password required','err'); return; }
+  if (!u) { setMsg('ERR :: username required', 'err'); return; }
+  if (!p) { setMsg('ERR :: password required', 'err');  return; }
   const db = getDB();
   if (authMode === 'signup') {
-    if (p !== c)       { msg('ERR :: passwords do not match','err'); return; }
-    if (p.length < 4)  { msg('ERR :: password min 4 chars','err'); return; }
-    if (db[u])         { msg(`ERR :: user "${u}" already exists`,'err'); return; }
+    if (p !== c)      { setMsg('ERR :: passwords do not match', 'err'); return; }
+    if (p.length < 4) { setMsg('ERR :: password min 4 chars',   'err'); return; }
+    if (db[u])        { setMsg(`ERR :: "${u}" already exists`,   'err'); return; }
     db[u] = { pw: p, ts: Date.now() };
     saveDB(db);
-    msg(`OK :: account created — welcome, ${u}`, 'ok');
-    setTimeout(() => startGame(u), 700);
+    setMsg(`OK :: welcome, ${u}`, 'ok');
+    setTimeout(() => startGame(u), 600);
   } else {
-    if (!db[u])          { msg('ERR :: user not found','err'); return; }
-    if (db[u].pw !== p)  { msg('ERR :: wrong password','err'); return; }
-    msg(`OK :: authenticated as ${u} — connecting...`, 'ok');
-    setTimeout(() => startGame(u), 500);
+    if (!db[u])        { setMsg('ERR :: user not found',    'err'); return; }
+    if (db[u].pw !== p){ setMsg('ERR :: wrong password',    'err'); return; }
+    setMsg(`OK :: connecting as ${u}...`, 'ok');
+    setTimeout(() => startGame(u), 400);
   }
 }
 
 ['i-user','i-pass','i-cfm'].forEach(id =>
-  document.getElementById(id).addEventListener('keydown', e => { if(e.key==='Enter') handleAuth(); })
+  document.getElementById(id).addEventListener('keydown', e => { if (e.key === 'Enter') handleAuth(); })
 );
 
-// ═══ GAME ENGINE ═══
+// ════════════════════════════════════
+//  ENGINE
+// ════════════════════════════════════
 const canvas = document.getElementById('canvas');
 const ctx    = canvas.getContext('2d');
 
@@ -270,242 +281,265 @@ window.addEventListener('resize', resize);
 
 let socket, myId = null, worldW = 3000, worldH = 3000, snapshot = [];
 const TILE = 60;
-const keys = { up:false, down:false, left:false, right:false };
-let lastKeys = {}, gameRunning = false, myName = '';
+const keys = { up: false, down: false, left: false, right: false };
+let lastKeys = {}, gameRunning = false, rafId = null;
 
-window.addEventListener('keydown', e => { applyKey(e,true);  sendKeys(); });
-window.addEventListener('keyup',   e => { applyKey(e,false); sendKeys(); });
+// ── Input ──
+window.addEventListener('keydown', e => { applyKey(e, true);  sendKeys(); });
+window.addEventListener('keyup',   e => { applyKey(e, false); sendKeys(); });
 function applyKey(e, v) {
-  if (e.key==='ArrowUp'   ||e.key==='w'||e.key==='W') keys.up    = v;
-  if (e.key==='ArrowDown' ||e.key==='s'||e.key==='S') keys.down  = v;
-  if (e.key==='ArrowLeft' ||e.key==='a'||e.key==='A') keys.left  = v;
-  if (e.key==='ArrowRight'||e.key==='d'||e.key==='D') keys.right = v;
+  if (e.key === 'ArrowUp'    || e.key === 'w' || e.key === 'W') keys.up    = v;
+  if (e.key === 'ArrowDown'  || e.key === 's' || e.key === 'S') keys.down  = v;
+  if (e.key === 'ArrowLeft'  || e.key === 'a' || e.key === 'A') keys.left  = v;
+  if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') keys.right = v;
 }
 function sendKeys() {
   if (!socket) return;
-  const ch = keys.up!==lastKeys.up||keys.down!==lastKeys.down||keys.left!==lastKeys.left||keys.right!==lastKeys.right;
-  if (ch) { socket.emit('keys',{...keys}); lastKeys={...keys}; }
+  const ch = keys.up !== lastKeys.up || keys.down !== lastKeys.down ||
+             keys.left !== lastKeys.left || keys.right !== lastKeys.right;
+  if (ch) { socket.emit('keys', { ...keys }); lastKeys = { ...keys }; }
 }
 
+// ── Start / Stop ──
 function startGame(username) {
   if (gameRunning) return;
   gameRunning = true;
-  myName = username;
+
   document.getElementById('auth-screen').style.display = 'none';
-  document.getElementById('hud').style.display = 'flex';
-  document.getElementById('logout-btn').style.display = 'block';
-  ['al-xp','al-xn','al-yp','al-yn'].forEach(id => document.getElementById(id).style.display='block');
-  document.getElementById('h-user').textContent = username.toUpperCase();
+  document.getElementById('hud').style.display         = 'flex';
+  document.getElementById('logout-btn').style.display  = 'block';
+  ['al-xp','al-xn','al-yp','al-yn'].forEach(id => document.getElementById(id).style.display = 'block');
+  document.getElementById('h-user').textContent = username;
 
   socket = io();
   socket.on('connect', () => socket.emit('join', { name: username }));
-  socket.on('welcome', d => { myId=d.id; worldW=d.worldW; worldH=d.worldH; });
-  socket.on('state',   d => { snapshot=d; document.getElementById('h-cnt').textContent=d.length; });
+  socket.on('welcome', d  => { myId = d.id; worldW = d.worldW; worldH = d.worldH; });
+  socket.on('state',   d  => {
+    snapshot = d;
+    // [PERF FIX] DOM write only on change, not tied to rAF loop
+    elCnt.textContent = d.length;
+  });
 
-  requestAnimationFrame(loop);
+  rafId = requestAnimationFrame(loop);
 }
 
 function doLogout() {
-  gameRunning = false; myId = null; snapshot = []; myName = '';
+  gameRunning = false;
+  if (rafId) { cancelAnimationFrame(rafId); rafId = null; }  // [PERF FIX] cancel pending frame
+  myId = null; snapshot = [];
   if (socket) { socket.disconnect(); socket = null; }
-  document.getElementById('hud').style.display = 'none';
+  document.getElementById('hud').style.display        = 'none';
   document.getElementById('logout-btn').style.display = 'none';
-  ['al-xp','al-xn','al-yp','al-yn'].forEach(id => document.getElementById(id).style.display='none');
+  ['al-xp','al-xn','al-yp','al-yn'].forEach(id => document.getElementById(id).style.display = 'none');
   document.getElementById('auth-screen').style.display = 'flex';
   document.getElementById('i-pass').value = '';
-  document.getElementById('i-cfm').value = '';
-  msg('SESSION_TERMINATED :: reconnect to re-enter','info');
-  // allow re-entry
-  gameRunning = false;
+  document.getElementById('i-cfm').value  = '';
+  setMsg('DISCONNECTED', 'info');
 }
 
-// ═══ CAMERA ═══
+// ── Camera ──
 let camX = 0, camY = 0;
 function updateCam(me) {
-  const tx = me.x - canvas.width/2, ty = me.y - canvas.height/2;
+  const tx = me.x - canvas.width  / 2;
+  const ty = me.y - canvas.height / 2;
   camX += (tx - camX) * 0.12;
   camY += (ty - camY) * 0.12;
   camX = Math.max(0, Math.min(Math.max(0, worldW - canvas.width),  camX));
   camY = Math.max(0, Math.min(Math.max(0, worldH - canvas.height), camY));
 }
 
-// ═══ MATH COORDS ═══
-// Server: origin top-left, Y down
-// Display: origin center of world, Y up (standard math plane)
+// ── Math coords (server Y-down → display Y-up) ──
 function toMath(sx, sy) {
   return {
-    mx: Math.round(sx - worldW/2),
-    my: Math.round(worldH/2 - sy),  // flip Y axis
+    mx: Math.round(sx - worldW / 2),
+    my: Math.round(worldH / 2 - sy),
   };
 }
 
-// ═══ RENDER ═══
-const C = { // color palette
-  bg:     '#0a0a0a',
-  grid1:  '#0c1c12',
-  grid2:  '#0f2517',
-  axis:   '#1a4228',
-  border: '#0d2918',
-  green:  '#00ff88',
-  gm:     '#00cc6a',
-  gd:     '#003d20',
-  muted:  '#2d5a3d',
-  text:   '#c8ffd9',
+// ── [PERF FIX] Cache HUD position string, update only when value changes ──
+let lastPosStr = '';
+function updateHudPos(me) {
+  const { mx, my } = toMath(me.x, me.y);
+  const s = `(${mx}, ${my})`;
+  if (s !== lastPosStr) { elPos.textContent = lastPosStr = s; }
+}
+
+// ════════════════════════════════════
+//  RENDER
+// ════════════════════════════════════
+const C = {
+  bg:      '#ffffff',
+  grid:    '#eeeeee',
+  gridMaj: '#e0e0e0',
+  axis:    '#cccccc',
+  border:  '#aaaaaa',
+  blue:    '#1a6fff',
+  blueDim: '#5599ff',
+  muted:   '#aaaaaa',
+  shadow:  'rgba(0,0,0,0.08)',
 };
 
 function drawBg() {
   ctx.fillStyle = C.bg;
-  ctx.fillRect(0,0,canvas.width,canvas.height);
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
 }
 
 function drawGrid() {
-  // minor
-  ctx.strokeStyle = C.grid1; ctx.lineWidth = 1;
-  let sx0 = Math.floor(camX/TILE)*TILE, sy0 = Math.floor(camY/TILE)*TILE;
+  // ── minor grid ──
+  ctx.strokeStyle = C.grid;
+  ctx.lineWidth   = 1;
+  let sx0 = Math.floor(camX / TILE) * TILE;
+  let sy0 = Math.floor(camY / TILE) * TILE;
   ctx.beginPath();
-  for (let x=sx0; x<camX+canvas.width+TILE; x+=TILE) { ctx.moveTo(x-camX,0); ctx.lineTo(x-camX,canvas.height); }
-  for (let y=sy0; y<camY+canvas.height+TILE; y+=TILE) { ctx.moveTo(0,y-camY); ctx.lineTo(canvas.width,y-camY); }
+  for (let x = sx0; x < camX + canvas.width + TILE; x += TILE) {
+    ctx.moveTo(x - camX, 0); ctx.lineTo(x - camX, canvas.height);
+  }
+  for (let y = sy0; y < camY + canvas.height + TILE; y += TILE) {
+    ctx.moveTo(0, y - camY); ctx.lineTo(canvas.width, y - camY);
+  }
   ctx.stroke();
 
-  // major (5x)
-  const M = TILE*5;
-  ctx.strokeStyle = C.grid2;
-  sx0 = Math.floor(camX/M)*M; sy0 = Math.floor(camY/M)*M;
+  // ── major grid (every 5 tiles = 300px) ──
+  const M = TILE * 5;
+  ctx.strokeStyle = C.gridMaj;
+  sx0 = Math.floor(camX / M) * M;
+  sy0 = Math.floor(camY / M) * M;
   ctx.beginPath();
-  for (let x=sx0; x<camX+canvas.width+M; x+=M) { ctx.moveTo(x-camX,0); ctx.lineTo(x-camX,canvas.height); }
-  for (let y=sy0; y<camY+canvas.height+M; y+=M) { ctx.moveTo(0,y-camY); ctx.lineTo(canvas.width,y-camY); }
+  for (let x = sx0; x < camX + canvas.width + M; x += M) {
+    ctx.moveTo(x - camX, 0); ctx.lineTo(x - camX, canvas.height);
+  }
+  for (let y = sy0; y < camY + canvas.height + M; y += M) {
+    ctx.moveTo(0, y - camY); ctx.lineTo(canvas.width, y - camY);
+  }
   ctx.stroke();
 
-  // math axes
-  const axX = worldW/2 - camX; // screen x of Y-axis
-  const axY = worldH/2 - camY; // screen y of X-axis
-  ctx.strokeStyle = C.axis; ctx.lineWidth = 1.5;
-  ctx.setLineDash([5,4]);
-  ctx.beginPath();
-  ctx.moveTo(0, axY); ctx.lineTo(canvas.width, axY);   // X-axis
-  ctx.moveTo(axX, 0); ctx.lineTo(axX, canvas.height);  // Y-axis
-  ctx.stroke();
-  ctx.setLineDash([]);
+  // ── math axes ──
+  const axX = worldW / 2 - camX;   // screen X of math Y-axis
+  const axY = worldH / 2 - camY;   // screen Y of math X-axis
 
-  // tick labels
-  ctx.fillStyle = C.muted; ctx.font = '9px JetBrains Mono,monospace';
+  ctx.strokeStyle = C.axis;
+  ctx.lineWidth   = 1.5;
+  ctx.setLineDash([6, 4]);
+  ctx.beginPath();
+  ctx.moveTo(0, axY); ctx.lineTo(canvas.width, axY);
+  ctx.moveTo(axX, 0); ctx.lineTo(axX, canvas.height);
+  ctx.stroke();
+  ctx.setLineDash([]);   // [BUG FIX] always reset dash
+
+  // ── axis tick labels ──
+  ctx.fillStyle  = C.muted;
+  ctx.font       = '9px Courier New, monospace';
+  ctx.textAlign  = 'center';
   const step = M;
-  ctx.textAlign = 'center';
-  let txs = Math.floor(camX/step)*step;
-  for (let x=txs; x<camX+canvas.width+step; x+=step) {
-    const v = Math.round(x - worldW/2);
-    if (v===0) continue;
-    ctx.fillText(v, x-camX, axY+13);
+  let txs = Math.floor(camX / step) * step;
+  for (let x = txs; x < camX + canvas.width + step; x += step) {
+    const v = Math.round(x - worldW / 2);
+    if (v === 0) continue;
+    ctx.fillText(v, x - camX, axY + 12);
   }
   ctx.textAlign = 'right';
-  let tys = Math.floor(camY/step)*step;
-  for (let y=tys; y<camY+canvas.height+step; y+=step) {
-    const v = Math.round(worldH/2 - y);
-    if (v===0) continue;
-    ctx.fillText(v, axX-4, y-camY+3);
+  let tys = Math.floor(camY / step) * step;
+  for (let y = tys; y < camY + canvas.height + step; y += step) {
+    const v = Math.round(worldH / 2 - y);
+    if (v === 0) continue;
+    ctx.fillText(v, axX - 4, y - camY + 3);
   }
 
-  // origin
-  ctx.fillStyle = C.gm; ctx.font = 'bold 10px JetBrains Mono,monospace';
-  ctx.textAlign = 'left';
-  ctx.fillText('O', axX+4, axY-5);
+  // origin label
+  ctx.fillStyle  = C.blue;
+  ctx.font       = 'bold 10px Courier New, monospace';
+  ctx.textAlign  = 'left';
+  ctx.fillText('O', axX + 4, axY - 5);
 
   // axis arrows
-  ctx.fillStyle = C.axis;
-  // +X arrow (right end of screen)
-  _arrow(canvas.width-8, axY, 1, 0);
-  // +Y arrow (top of screen — math +Y is up, screen up)
-  _arrow(axX, 8, 0, -1);
+  drawArrow(canvas.width - 8, axY, 1, 0);   // +X
+  drawArrow(axX, 44, 0, -1);               // +Y (below HUD)
 }
 
-function _arrow(x, y, dx, dy) {
-  const s = 7;
-  ctx.beginPath();
-  ctx.moveTo(x, y);
-  ctx.lineTo(x - dy*s - dx*s, y - dx*s + dy*s*0 - dy*s);
-  // simple triangle
+function drawArrow(x, y, dx, dy) {
+  const s = 6;
   ctx.save();
   ctx.fillStyle = C.axis;
   ctx.translate(x, y);
   ctx.rotate(Math.atan2(dy, dx));
   ctx.beginPath();
-  ctx.moveTo(0, 0); ctx.lineTo(-s, -s/2); ctx.lineTo(-s, s/2);
+  ctx.moveTo(0, 0); ctx.lineTo(-s, -s / 2); ctx.lineTo(-s, s / 2);
   ctx.closePath(); ctx.fill();
   ctx.restore();
 }
 
 function drawBorder() {
-  ctx.strokeStyle = C.border; ctx.lineWidth = 2;
+  ctx.strokeStyle = C.border;
+  ctx.lineWidth   = 2;
   ctx.strokeRect(-camX, -camY, worldW, worldH);
-  const hw=worldW/2, hh=worldH/2;
-  ctx.fillStyle = C.gd; ctx.font = '9px JetBrains Mono,monospace';
+
+  const hw = worldW / 2, hh = worldH / 2;
+  ctx.fillStyle = '#ccc';
+  ctx.font      = '9px Courier New, monospace';
   [
-    { sx:-camX+4,       sy:-camY+12,         t:`(−${hw},+${hh})`, a:'left'  },
-    { sx:-camX+worldW-4,sy:-camY+12,         t:`(+${hw},+${hh})`, a:'right' },
-    { sx:-camX+4,       sy:-camY+worldH-5,   t:`(−${hw},−${hh})`, a:'left'  },
-    { sx:-camX+worldW-4,sy:-camY+worldH-5,   t:`(+${hw},−${hh})`, a:'right' },
-  ].forEach(c => { ctx.textAlign=c.a; ctx.fillText(c.t, c.sx, c.sy); });
+    { sx: -camX + 4,          sy: -camY + 12,         t: `(−${hw}, +${hh})`, a: 'left'  },
+    { sx: -camX + worldW - 4, sy: -camY + 12,         t: `(+${hw}, +${hh})`, a: 'right' },
+    { sx: -camX + 4,          sy: -camY + worldH - 5, t: `(−${hw}, −${hh})`, a: 'left'  },
+    { sx: -camX + worldW - 4, sy: -camY + worldH - 5, t: `(+${hw}, −${hh})`, a: 'right' },
+  ].forEach(c => { ctx.textAlign = c.a; ctx.fillText(c.t, c.sx, c.sy); });
 }
 
 function drawPlayer(p, isMe) {
-  const sx = p.x - camX, sy = p.y - camY;
-
-  // glow for self
-  if (isMe) {
-    const g = ctx.createRadialGradient(sx,sy,0,sx,sy,p.r*3);
-    g.addColorStop(0,'rgba(0,255,136,0.12)');
-    g.addColorStop(1,'rgba(0,255,136,0)');
-    ctx.beginPath(); ctx.arc(sx,sy,p.r*3,0,Math.PI*2);
-    ctx.fillStyle=g; ctx.fill();
-  }
+  const sx = p.x - camX;
+  const sy = p.y - camY;
 
   // shadow
-  ctx.beginPath(); ctx.arc(sx+2,sy+3,p.r,0,Math.PI*2);
-  ctx.fillStyle='rgba(0,0,0,0.5)'; ctx.fill();
+  ctx.beginPath();
+  ctx.arc(sx + 2, sy + 3, p.r, 0, Math.PI * 2);
+  ctx.fillStyle = C.shadow;
+  ctx.fill();
 
-  // body
-  ctx.beginPath(); ctx.arc(sx,sy,p.r,0,Math.PI*2);
-  ctx.fillStyle = isMe ? '#001208' : '#000c05'; ctx.fill();
-  ctx.strokeStyle = isMe ? C.green : C.gm; ctx.lineWidth = isMe?2.5:1.5; ctx.stroke();
+  // body fill
+  ctx.beginPath();
+  ctx.arc(sx, sy, p.r, 0, Math.PI * 2);
+  ctx.fillStyle = isMe ? '#1a6fff' : '#5599ff';
+  ctx.fill();
 
-  // center dot
-  ctx.beginPath(); ctx.arc(sx,sy,3,0,Math.PI*2);
-  ctx.fillStyle = isMe ? C.green : C.gm; ctx.fill();
+  // border stroke
+  ctx.beginPath();
+  ctx.arc(sx, sy, p.r, 0, Math.PI * 2);
+  ctx.strokeStyle = isMe ? '#003fbb' : '#2266cc';
+  ctx.lineWidth   = isMe ? 3 : 2;
+  ctx.stroke();
 
-  // crosshair lines (only for self)
-  if (isMe) {
-    ctx.strokeStyle = 'rgba(0,255,136,0.2)'; ctx.lineWidth = 1;
-    ctx.setLineDash([3,3]);
-    ctx.beginPath();
-    ctx.moveTo(sx-p.r*1.8, sy); ctx.lineTo(sx+p.r*1.8, sy);
-    ctx.moveTo(sx, sy-p.r*1.8); ctx.lineTo(sx, sy+p.r*1.8);
-    ctx.stroke(); ctx.setLineDash([]);
-  }
+  // name
+  ctx.fillStyle     = '#333';
+  ctx.font          = 'bold 12px Segoe UI, sans-serif';
+  ctx.textAlign     = 'center';
+  ctx.textBaseline  = 'middle';
+  ctx.fillText(p.name, sx, sy - p.r - 14);
 
-  // label
-  const {mx,my} = toMath(p.x,p.y);
-  ctx.textAlign = 'center';
-  ctx.font = `bold 10px JetBrains Mono,monospace`;
-  ctx.fillStyle = isMe ? C.green : C.gm;
-  ctx.fillText(isMe ? p.name.toUpperCase() : p.name, sx, sy - p.r - 13);
-  ctx.font = `9px JetBrains Mono,monospace`;
+  // math coords under name
+  const { mx, my } = toMath(p.x, p.y);
+  ctx.font      = '10px Courier New, monospace';
   ctx.fillStyle = C.muted;
   ctx.fillText(`(${mx}, ${my})`, sx, sy - p.r - 3);
+
+  ctx.textBaseline = 'alphabetic'; // reset
 }
 
+// ── Main loop ──
 function loop() {
   if (!gameRunning) return;
+
   drawBg();
+
   const me = snapshot.find(p => p.id === myId);
   if (me) {
     updateCam(me);
-    const {mx,my} = toMath(me.x, me.y);
-    document.getElementById('h-pos').textContent = `(${mx}, ${my})`;
+    updateHudPos(me);   // [PERF FIX] throttled DOM write
   }
+
   drawGrid();
   drawBorder();
-  snapshot.forEach(p => drawPlayer(p, p.id===myId));
-  requestAnimationFrame(loop);
+  snapshot.forEach(p => drawPlayer(p, p.id === myId));
+
+  rafId = requestAnimationFrame(loop);
 }
 </script>
 </body>
