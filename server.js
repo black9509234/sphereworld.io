@@ -57,6 +57,8 @@ io.on('connection', (socket) => {
   console.log('[+]', socket.id);
 
   socket.on('join', ({ name }) => {
+    // [BUG FIX #4] 이미 join한 플레이어가 재접속 시 중복 join으로 위치가 리셋되는 문제 방지
+    if (players[socket.id]) return;
     const trimmed = (name || 'Player').trim().slice(0, 16) || 'Player';
     const pos = randomPos();
     players[socket.id] = {
@@ -69,7 +71,14 @@ io.on('connection', (socket) => {
   });
 
   socket.on('keys', (keys) => {
-    if (players[socket.id]) players[socket.id].keys = keys;
+    if (!players[socket.id]) return;
+    // [BUG FIX #5] 클라이언트에서 임의 값을 keys로 보낼 경우 boolean으로 강제 변환
+    players[socket.id].keys = {
+      up:    !!keys.up,
+      down:  !!keys.down,
+      left:  !!keys.left,
+      right: !!keys.right,
+    };
   });
 
   socket.on('disconnect', () => {

@@ -119,7 +119,11 @@ function sendKeys() {
 document.getElementById('play-btn').onclick = startGame;
 document.getElementById('inp-name').addEventListener('keydown', e => { if (e.key === 'Enter') startGame(); });
 
+let gameStarted = false;
 function startGame() {
+  // [BUG FIX #3] 버튼 연타 또는 Enter 중복 입력 시 게임이 두 번 시작되는 문제 방지
+  if (gameStarted) return;
+  gameStarted = true;
   const name = document.getElementById('inp-name').value.trim() || 'Player';
   document.getElementById('login').style.display = 'none';
   connectSocket(name);
@@ -130,14 +134,9 @@ function startGame() {
 function connectSocket(name) {
   socket = io();
 
-  socket.on('welcome', (data) => {
-    myId = data.id;
-    worldW = data.worldW;
-    worldH = data.worldH;
-    socket.emit('join', { name });
-  });
-
-  // welcome comes before join ack — re-order: emit join on connect
+  // [BUG FIX #1] 'welcome' 핸들러가 두 번 등록되어 있었고,
+  // 'connect' + 'welcome' 양쪽에서 join을 emit해 중복 join이 발생하던 문제 수정.
+  // 올바른 흐름: connect → join emit → 서버가 welcome 응답 → myId/world 세팅
   socket.on('connect', () => {
     socket.emit('join', { name });
   });
@@ -162,8 +161,9 @@ function updateCamera(me) {
   const ty = me.y - canvas.height / 2;
   camX += (tx - camX) * 0.12;
   camY += (ty - camY) * 0.12;
-  camX = Math.max(0, Math.min(worldW - canvas.width,  camX));
-  camY = Math.max(0, Math.min(worldH - canvas.height, camY));
+  // [BUG FIX #2] 캔버스가 월드보다 클 경우 Math.min이 음수를 반환해 카메라가 튀는 문제 수정
+  camX = Math.max(0, Math.min(Math.max(0, worldW - canvas.width),  camX));
+  camY = Math.max(0, Math.min(Math.max(0, worldH - canvas.height), camY));
 }
 
 // ── Draw ──────────────────────────────────────────────────────────────────────
