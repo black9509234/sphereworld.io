@@ -53,6 +53,14 @@ function loadProfiles() {
 let savedProfiles = loadProfiles();
 let saveTimer = null;
 
+function normalizePlayerName(raw) {
+  return (raw || 'Player').trim().slice(0, 16) || 'Player';
+}
+
+function playerNameKey(name) {
+  return normalizePlayerName(name).toLowerCase();
+}
+
 function scheduleSaveProfiles() {
   if (saveTimer) return;
   saveTimer = setTimeout(() => {
@@ -114,11 +122,21 @@ function serializePlayerProfile(p) {
     stats: p.stats,
   };
 }
+function readSavedProfile(name) {
+  const normalized = normalizePlayerName(name);
+  const key = playerNameKey(normalized);
+  return savedProfiles[key] || savedProfiles[normalized] || null;
+}
 function persistPlayerProfile(p) {
-  savedProfiles[p.name] = serializePlayerProfile(p);
+  const profile = serializePlayerProfile(p);
+  const normalized = normalizePlayerName(p.name);
+  const key = playerNameKey(normalized);
+  savedProfiles[key] = profile;
+  if (normalized !== key) savedProfiles[normalized] = profile;
   scheduleSaveProfiles();
 }
 function makePlayerState(socketId, name, saved = {}) {
+  const normalizedName = normalizePlayerName(name);
   const stats = normalizeStats(saved.stats || DEFAULT_STATS);
   const level = clamp(Number(saved.level) || 1, 1, MAX_LEVEL);
   const r = radiusForLevel(level);
@@ -129,7 +147,7 @@ function makePlayerState(socketId, name, saved = {}) {
   };
   const p = {
     id: socketId,
-    name,
+    name: normalizedName,
     x: pos.x,
     y: pos.y,
     level,
@@ -169,7 +187,8 @@ function removePlayer(socketId, { save = true } = {}) {
   const p = players[socketId];
   if (!p) return;
   if (save) persistPlayerProfile(p);
-  if (activePlayersByName[p.name] === socketId) delete activePlayersByName[p.name];
+  const key = playerNameKey(p.name);
+  if (activePlayersByName[key] === socketId) delete activePlayersByName[key];
   delete players[socketId];
 }
 
@@ -327,9 +346,12 @@ io.on('connection', (socket) => {
 
   socket.on('join', ({ name }) => {
     if (players[socket.id]) return;
-    const trimmed = (name || 'Player').trim().slice(0, 16) || 'Player';
-    const activeId = activePlayersByName[trimmed];
+    const trimmed = normalizePlayerName(name);
+    const nameKey = playerNameKey(trimmed);
+    const activeId = activePlayersByName[nameKey];
+    let handoffProfile = readSavedProfile(trimmed) || {};
     if (activeId && activeId !== socket.id) {
+      if (players[activeId]) handoffProfile = serializePlayerProfile(players[activeId]);
       const oldSocket = io.sockets.sockets.get(activeId);
       if (oldSocket) {
         oldSocket.emit('sessionReplaced');
@@ -337,8 +359,8 @@ io.on('connection', (socket) => {
       }
       removePlayer(activeId, { save: true });
     }
-    players[socket.id] = makePlayerState(socket.id, trimmed, savedProfiles[trimmed]);
-    activePlayersByName[trimmed] = socket.id;
+    players[socket.id] = makePlayerState(socket.id, trimmed, handoffProfile);
+    activePlayersByName[nameKey] = socket.id;
     persistPlayerProfile(players[socket.id]);
     socket.emit('welcome', { id: socket.id, worldW: WORLD_W, worldH: WORLD_H });
   });
