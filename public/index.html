@@ -883,7 +883,9 @@
             worldH = 3000,
             playerMap = {},
             orbMap = {},
-            monsterMap = {};
+            monsterMap = {},
+            renderPlayers = {},
+            renderMonsters = {};
         const TILE = 60,
             keys = { up: false, down: false, left: false, right: false };
         let lastKeys = {},
@@ -949,6 +951,38 @@
             socket.emit("attack", { monsterId: nearest.id });
             attackCooldown = true;
             setTimeout(() => attackCooldown = false, 400);
+        }
+
+        function syncRenderEntities(nextMap, renderMap, snapDistance = 220) {
+            for (const id in renderMap) {
+                if (!nextMap[id]) delete renderMap[id];
+            }
+            for (const id in nextMap) {
+                const next = nextMap[id];
+                const current = renderMap[id];
+                if (!current) {
+                    renderMap[id] = { ...next, x: next.x, y: next.y, tx: next.x, ty: next.y };
+                    continue;
+                }
+                const jumped = Math.hypot(next.x - current.x, next.y - current.y) > snapDistance;
+                current.tx = next.x;
+                current.ty = next.y;
+                if (jumped) {
+                    current.x = next.x;
+                    current.y = next.y;
+                }
+                for (const key in next) {
+                    if (key !== "x" && key !== "y") current[key] = next[key];
+                }
+            }
+        }
+
+        function stepRenderEntities(renderMap, dt, speed) {
+            const blend = 1 - Math.exp(-speed * dt);
+            for (const entity of Object.values(renderMap)) {
+                entity.x += (entity.tx - entity.x) * blend;
+                entity.y += (entity.ty - entity.y) * blend;
+            }
         }
 
         const bubbles = {},
@@ -1041,6 +1075,8 @@
                 (d.monsters || []).forEach(m => monsterMap[m.id] = m);
                 orbMap = {};
                 (d.orbs || []).forEach(o => orbMap[o.id] = o);
+                syncRenderEntities(playerMap, renderPlayers, 260);
+                syncRenderEntities(monsterMap, renderMonsters, 180);
                 elCnt.textContent = d.players.length;
                 const me = playerMap[myId];
                 if (!me) return;
@@ -1064,6 +1100,7 @@
             });
             socket.on("monsterDied", ({ monsterId, killerId, xp }) => {
                 delete monsterMap[monsterId];
+                delete renderMonsters[monsterId];
                 if (killerId === myId) addChatLine(`<span class="ct">TARGET DOWN :: +${xp} XP</span>`, "sys");
             });
             socket.on("levelUp", ({ id, level, name }) => {
@@ -1091,6 +1128,8 @@
             playerMap = {};
             orbMap = {};
             monsterMap = {};
+            renderPlayers = {};
+            renderMonsters = {};
             dmgNums.length = 0;
             if (socket) {
                 socket.disconnect();
@@ -1116,6 +1155,8 @@
             lastPosStr = "",
             lastTime = 0;
         const CAM_SPEED = 8,
+            PLAYER_RENDER_SPEED = 14,
+            MONSTER_RENDER_SPEED = 12,
             C = {
                 bgTop: "#fcfcfa",
                 bgBottom: "#efefea",
@@ -1445,17 +1486,22 @@
             }
             const dt = Math.min((timestamp - lastTime) / 1000, .1);
             lastTime = timestamp;
+            stepRenderEntities(renderPlayers, dt, PLAYER_RENDER_SPEED);
+            stepRenderEntities(renderMonsters, dt, MONSTER_RENDER_SPEED);
             drawBg();
             const me = playerMap[myId];
+            const renderMe = renderPlayers[myId];
+            if (renderMe) {
+                updateCam(renderMe, dt);
+            }
             if (me) {
-                updateCam(me, dt);
                 updateHudPos(me);
             }
             drawGrid();
             drawBorder();
             drawOrbs();
-            Object.values(monsterMap).forEach(drawMonster);
-            Object.values(playerMap).forEach(player => drawPlayer(player, player.id === myId));
+            Object.values(renderMonsters).forEach(drawMonster);
+            Object.values(renderPlayers).forEach(player => drawPlayer(player, player.id === myId));
             drawDmgNums(dt);
             rafId = requestAnimationFrame(loop);
         }
