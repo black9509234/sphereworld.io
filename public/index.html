@@ -179,37 +179,6 @@
             line-height: 1.6;
         }
 
-        .mode-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-bottom: 22px;
-        }
-
-        .mbtn {
-            padding: 12px 0;
-            border: 1px solid rgba(17, 17, 17, .1);
-            border-radius: 2px;
-            background: rgba(255, 255, 255, .72);
-            color: var(--muted);
-            font: 700 12px var(--mono);
-            letter-spacing: .12em;
-            text-transform: uppercase;
-            transition: .16s;
-        }
-
-        .mbtn.on {
-            border-color: rgba(17, 17, 17, .18);
-            background: rgba(17, 17, 17, .06);
-            color: var(--accent);
-            box-shadow: inset 0 0 0 1px rgba(17, 17, 17, .04), 0 10px 20px rgba(17, 17, 17, .04);
-        }
-
-        .mbtn:hover:not(.on) {
-            border-color: rgba(17, 17, 17, .16);
-            color: var(--accent);
-        }
-
         .field {
             margin-bottom: 14px;
         }
@@ -1188,21 +1157,9 @@
                 </div>
                 <div class="auth-sub" data-i18n="auth_sub">Compact terminal overlays. Lower visual weight, sharper hierarchy, less screen
                     coverage.</div>
-                <div class="mode-row"><button class="mbtn on" id="btn-ln"
-                        onclick="setMode('login')" data-i18n="btn_login">LOGIN</button><button class="mbtn" id="btn-su"
-                        onclick="setMode('signup')" data-i18n="btn_register">REGISTER</button></div>
                 <div class="field"><label class="field-lbl" data-i18n="field_user">USER_ID</label>
                     <div class="irow"><span class="ipfx">&gt;</span><input id="i-user" type="text"
                             placeholder="username" data-i18n-placeholder="ph_user" maxlength="16" autocomplete="off" /></div>
-                </div>
-                <div class="field"><label class="field-lbl" data-i18n="field_pass">PASSWORD</label>
-                    <div class="irow"><span class="ipfx">&gt;</span><input id="i-pass" type="password"
-                            placeholder="password" data-i18n-placeholder="ph_pass" maxlength="32" /></div>
-                </div>
-                <div class="field" id="cfm-row" style="display:none"><label
-                        class="field-lbl" data-i18n="field_confirm">CONFIRM_PASSWORD</label>
-                    <div class="irow"><span class="ipfx">&gt;</span><input id="i-cfm" type="password"
-                            placeholder="confirm password" data-i18n-placeholder="ph_confirm" maxlength="32" /></div>
                 </div>
                 <hr class="sep" /><button class="sbtn" onclick="handleAuth()"><span
                         id="sbtn-lbl">CONNECT</span></button>
@@ -1389,10 +1346,7 @@
     </div>
     <div id="levelup-flash"></div>
     <script>
-        const UKEY = "sphere_users_v1",
-            LANG_KEY = "sphere_lang_v1",
-            getDB = () => { try { return JSON.parse(localStorage.getItem(UKEY)) || {} } catch { return {} } },
-            saveDB = db => localStorage.setItem(UKEY, JSON.stringify(db));
+        const LANG_KEY = "sphere_lang_v1";
 
         const I18N = {
             ko: {
@@ -1708,13 +1662,11 @@
                 },
             },
         };
-        const DEV_CHEAT_SEQUENCE = ["arrowup", "arrowup", "arrowdown", "arrowdown", "arrowleft", "arrowright", "arrowleft", "arrowright", "a", "b"];
         const DECOR_PORTAL_OFFSET_X = 96;
         const PANEL_STATE_KEY = "sphere_panel_state_v1";
         const PERSISTENT_PANELS = new Set(["hud", "controls", "chat"]);
 
-        let authMode = "login",
-            currentLang = localStorage.getItem(LANG_KEY) === "en" ? "en" : "ko";
+        let currentLang = localStorage.getItem(LANG_KEY) === "en" ? "en" : "ko";
 
         const t = (key, vars = {}) => {
             const source = (I18N[currentLang] && I18N[currentLang][key]) || I18N.en[key] || key;
@@ -1869,11 +1821,6 @@
             return t(key, extra) === key ? String(code || "bad_class") : t(key, extra);
         }
 
-        function devCheatErrorMessage(code) {
-            const key = `sys_dev_cheat_error_${code || "not_joined"}`;
-            return t(key) === key ? String(code || "not_joined") : t(key);
-        }
-
         function renderClassOptions() {
             if (!classOptions) return;
             const selectedClass = currentClassKey();
@@ -1961,14 +1908,12 @@
 
         function selectClass(classKey) {
             const blockedReason = !socket ? "no_socket" : classSelectionPending ? "pending" : currentClassKey() ? "already_selected" : "";
-            console.log("[class/select] click", { classKey, blockedReason, classSelectionPending, currentClassKey: currentClassKey(), currentSelf, me: playerMap[myId] || null });
             if (blockedReason) return;
             lastClassAttemptError = "";
             classSelectionPending = true;
             renderClassOptions();
             socket.emit("selectClass", { classKey }, res => {
                 classSelectionPending = false;
-                console.log("[class/select] ack", res);
                 if (!res?.ok) {
                     lastClassAttemptError = classErrorMessage(res?.error, { level: res?.unlockLevel || CLASS_UNLOCK_LEVEL });
                     if (res?.error === "class_taken" && res.classKey) {
@@ -1993,19 +1938,6 @@
             });
         }
 
-        function activateDevCheat() {
-            if (!socket) return;
-            socket.emit("devCheat", res => {
-                if (!res?.ok) {
-                    addChatLine(`<span class="ct">${escHtml(devCheatErrorMessage(res?.error))}</span>`, "sys");
-                    return;
-                }
-                applySelfState(res.self || currentSelf);
-                if (res.levelsGranted > 0) showLevelUpFlash(res.level);
-                addChatLine(`<span class="ct">${escHtml(t("sys_dev_cheat", { level: res.level, points: res.statPointsGranted || 0 }))}</span>`, "lvlup");
-            });
-        }
-
         function renderStaticI18n() {
             document.documentElement.lang = currentLang;
             document.querySelectorAll("[data-i18n]").forEach(node => {
@@ -2014,7 +1946,7 @@
             document.querySelectorAll("[data-i18n-placeholder]").forEach(node => {
                 node.placeholder = t(node.dataset.i18nPlaceholder);
             });
-            document.getElementById("sbtn-lbl").textContent = authMode === "signup" ? t("auth_create_account") : t("auth_connect");
+            document.getElementById("sbtn-lbl").textContent = t("auth_connect");
             elStatPts.textContent = t("stat_points", { count: Number.parseInt(elStatPts.textContent, 10) || 0 });
             langBtn.textContent = currentLang === "ko" ? "EN" : "KO";
             renderLoadout(true);
@@ -2027,59 +1959,24 @@
             renderStaticI18n();
         }
 
-        function setMode(mode) {
-            authMode = mode;
-            const signup = mode === "signup";
-            document.getElementById("cfm-row").style.display = signup ? "" : "none";
-            document.getElementById("sbtn-lbl").textContent = signup ? t("auth_create_account") : t("auth_connect");
-            document.getElementById("btn-ln").className = "mbtn" + (signup ? "" : " on");
-            document.getElementById("btn-su").className = "mbtn" + (signup ? " on" : "");
-            setMsg("", "");
-        }
-
         function setMsg(text, cls) {
             elMsg.textContent = text ? `> ${text}` : "";
             elMsg.className = "auth-msg " + (cls || "");
         }
 
         function handleAuth() {
-            const user = document.getElementById("i-user").value.trim(),
-                pass = document.getElementById("i-pass").value,
-                confirm = document.getElementById("i-cfm").value;
+            const user = document.getElementById("i-user").value.trim();
             if (!user) return setMsg(t("auth_err_username"), "err");
-            if (!pass) return setMsg(t("auth_err_password"), "err");
-            const db = getDB();
-            if (authMode === "signup") {
-                if (pass !== confirm) return setMsg(t("auth_err_mismatch"), "err");
-                if (pass.length < 4) return setMsg(t("auth_err_minpw"), "err");
-                if (db[user]) return setMsg(t("auth_err_exists", { user }), "err");
-                db[user] = { pw: pass, ts: Date.now() };
-                saveDB(db);
-                setMsg(t("auth_ok_welcome", { user }), "ok");
-                return setTimeout(() => startGame(user), 600);
-            }
-            if (!db[user]) return setMsg(t("auth_err_notfound"), "err");
-            if (db[user].pw !== pass) return setMsg(t("auth_err_wrongpass"), "err");
             setMsg(t("auth_ok_connecting", { user }), "ok");
             setTimeout(() => startGame(user), 400);
         }
 
-        const authFieldIds = ["i-user", "i-pass", "i-cfm"];
-
-        function visibleAuthFieldIds() {
-            return authMode === "signup" ? authFieldIds : authFieldIds.slice(0, 2);
-        }
+        const authFieldIds = ["i-user"];
 
         authFieldIds.forEach(id => {
             document.getElementById(id).addEventListener("keydown", e => {
                 if (e.key !== "Enter") return;
                 e.preventDefault();
-                const ids = visibleAuthFieldIds(),
-                    idx = ids.indexOf(id);
-                if (idx >= 0 && idx < ids.length - 1) {
-                    document.getElementById(ids[idx + 1]).focus();
-                    return;
-                }
                 handleAuth();
             });
         });
@@ -2126,31 +2023,14 @@
             lastClassAttemptError = "",
             classPrompted = false,
             classSelectionPending = false,
-            devCheatProgress = 0,
             lastLoadoutSignature = "",
             rafId = null,
             attackCooldown = false;
-
-        function trackDevCheat(key) {
-            if (!gameRunning || chatFocused()) return;
-            const normalized = String(key || "").toLowerCase();
-            const expected = DEV_CHEAT_SEQUENCE[devCheatProgress];
-            if (normalized === expected) {
-                devCheatProgress += 1;
-                if (devCheatProgress >= DEV_CHEAT_SEQUENCE.length) {
-                    devCheatProgress = 0;
-                    activateDevCheat();
-                }
-                return;
-            }
-            devCheatProgress = normalized === DEV_CHEAT_SEQUENCE[0] ? 1 : 0;
-        }
 
         renderStaticI18n();
         Object.keys(panelBodies).forEach(applyPanelState);
 
         addEventListener("keydown", e => {
-            trackDevCheat(e.key);
             if (!chatFocused() && ["1", "2", "3"].includes(e.key)) {
                 if (selectClassByIndex(Number(e.key) - 1)) {
                     e.preventDefault();
@@ -2704,7 +2584,6 @@
             classScreenOpen = false;
             classPrompted = false;
             classSelectionPending = false;
-            devCheatProgress = 0;
             myId = null;
             playerMap = {};
             orbMap = {};
@@ -2729,8 +2608,6 @@
             document.getElementById("chat-wrap").style.display = "none";
             controlsCard.style.display = "none";
             document.getElementById("auth-screen").style.display = "flex";
-            document.getElementById("i-pass").value = "";
-            document.getElementById("i-cfm").value = "";
             chatLog.innerHTML = "";
             levelupFlash.classList.remove("show");
             elHpFill.style.background = "linear-gradient(90deg,rgba(248,113,113,.4),#dc2626)";
