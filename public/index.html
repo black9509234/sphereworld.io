@@ -1378,7 +1378,7 @@
             document.getElementById("sbtn-lbl").textContent = authMode === "signup" ? t("auth_create_account") : t("auth_connect");
             elStatPts.textContent = t("stat_points", { count: Number.parseInt(elStatPts.textContent, 10) || 0 });
             langBtn.textContent = currentLang === "ko" ? "EN" : "KO";
-            renderLoadout();
+            renderLoadout(true);
         }
 
         function toggleLanguage() {
@@ -1479,6 +1479,7 @@
         let lastKeys = {},
             gameRunning = false,
             inventoryOpen = false,
+            lastLoadoutSignature = "",
             rafId = null,
             attackCooldown = false;
 
@@ -1575,7 +1576,21 @@
             return t(key) === key ? code : t(key);
         }
 
-        function renderLoadout() {
+        function getLoadoutSignature() {
+            return JSON.stringify({
+                lang: currentLang,
+                lootCount: currentSelf?.lootCount || 0,
+                inventoryLimit: currentSelf?.inventoryLimit || 12,
+                inventory: currentSelf?.inventory || [],
+                equipment: currentSelf?.equipment || {},
+            });
+        }
+
+        function renderLoadout(force = false) {
+            const signature = getLoadoutSignature();
+            if (!force && signature === lastLoadoutSignature) return;
+            lastLoadoutSignature = signature;
+
             const inventory = Array.isArray(currentSelf?.inventory) ? currentSelf.inventory : [];
             const equipment = currentSelf?.equipment || {};
 
@@ -1973,6 +1988,7 @@
             renderMonsters = {};
             dmgNums.length = 0;
             inventoryOpen = false;
+            lastLoadoutSignature = "";
             if (socket) {
                 socket.disconnect();
                 socket = null;
