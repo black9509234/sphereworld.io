@@ -304,6 +304,48 @@
             pointer-events: none;
         }
 
+        .panel-shell {
+            pointer-events: auto;
+        }
+
+        .panel-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 8px 10px;
+            border: 1px solid var(--border);
+            border-radius: 3px;
+            background: var(--panel);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 24px rgba(18, 18, 18, .08);
+        }
+
+        .panel-head.tight {
+            padding: 7px 9px;
+        }
+
+        .panel-title {
+            color: var(--muted);
+            font: 10px var(--mono);
+            letter-spacing: .16em;
+            text-transform: uppercase;
+        }
+
+        .panel-toggle {
+            min-width: 26px;
+            height: 26px;
+            border: 1px solid rgba(17, 17, 17, .12);
+            border-radius: 2px;
+            background: rgba(17, 17, 17, .04);
+            color: var(--accent);
+            font: 700 12px var(--mono);
+        }
+
+        .panel-body.collapsed {
+            display: none !important;
+        }
+
         .hud-panel,
         #controls-card,
         #chat-wrap>.chat-head,
@@ -589,25 +631,23 @@
 
         #class-screen {
             position: fixed;
-            inset: 0;
-            z-index: 23;
+            top: 84px;
+            right: 12px;
+            z-index: 22;
             display: none;
-            align-items: center;
-            justify-content: center;
-            padding: 24px;
-            background: rgba(252, 252, 249, .72);
-            backdrop-filter: blur(8px);
+            width: min(340px, calc(100vw - 24px));
         }
 
         .class-box {
-            width: min(640px, calc(100vw - 24px));
-            max-height: min(640px, calc(100vh - 24px));
-            padding: 14px;
+            width: 100%;
+            max-height: calc(100vh - 108px);
+            padding: 10px;
             overflow-y: auto;
-            border: 1px solid var(--border2);
-            border-radius: 4px;
-            background: linear-gradient(180deg, rgba(255, 255, 255, .96), rgba(243, 243, 238, .96));
-            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            border-radius: 3px;
+            background: var(--panel);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 24px rgba(18, 18, 18, .08);
         }
 
         .class-sub {
@@ -663,10 +703,69 @@
         }
 
         .class-copy {
-            min-height: 52px;
+            min-height: 42px;
             color: var(--muted);
             font-size: 12px;
             line-height: 1.5;
+        }
+
+        .class-preview {
+            position: relative;
+            width: 54px;
+            height: 54px;
+            margin-bottom: 2px;
+            border: 1px solid rgba(17, 17, 17, .08);
+            border-radius: 3px;
+            background: linear-gradient(180deg, rgba(255, 255, 255, .94), rgba(241, 241, 237, .92));
+        }
+
+        .class-preview::before,
+        .class-preview::after {
+            content: "";
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .class-preview.preview-none::before {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #64748b;
+            border: 3px solid #ffffff;
+        }
+
+        .class-preview.preview-vanguard::before {
+            width: 20px;
+            height: 20px;
+            background: #1d4ed8;
+            border: 3px solid #ffffff;
+            transform: translate(-50%, -50%) rotate(45deg);
+        }
+
+        .class-preview.preview-ranger::before {
+            width: 0;
+            height: 0;
+            border-left: 14px solid transparent;
+            border-right: 14px solid transparent;
+            border-bottom: 24px solid #059669;
+            transform: translate(-50%, -58%);
+        }
+
+        .class-preview.preview-mystic::before {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #7c3aed;
+            border: 3px solid #ffffff;
+        }
+
+        .class-preview.preview-mystic::after {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 2px dashed rgba(124, 58, 237, .45);
         }
 
         .class-action {
@@ -1093,7 +1192,12 @@
     </div>
     <canvas id="canvas"></canvas>
     <button id="lang-btn" onclick="toggleLanguage()">KO</button>
-    <div id="hud">
+    <div id="hud" class="panel-shell">
+        <div class="panel-head tight">
+            <div class="panel-title">TACTICAL FEED</div>
+            <button class="panel-toggle" type="button" id="hud-toggle" onclick="togglePanel('hud')">-</button>
+        </div>
+        <div class="panel-body" id="hud-body">
         <div class="hud-panel hud-stats">
             <div class="hud-chip">
                 <div class="hi-label" data-i18n="hud_player">PLAYER</div>
@@ -1175,6 +1279,7 @@
                 </div>
             </div>
         </div>
+        </div>
     </div>
     <button id="class-toggle" onclick="toggleClassScreen()" data-i18n="btn_class">CLASS</button>
     <button id="inventory-toggle" onclick="toggleInventory()" data-i18n="btn_inventory">INVENTORY</button>
@@ -1185,10 +1290,15 @@
                     <div class="chat-kicker" data-i18n="class_screen_kicker">CLASS</div>
                     <div class="control-title" data-i18n="class_screen_title">SELECT CLASS</div>
                 </div>
-                <button id="class-close" onclick="toggleClassScreen(false)">X</button>
+                <div style="display:flex; gap:6px;">
+                    <button class="panel-toggle" type="button" id="class-collapse" onclick="togglePanel('class')">-</button>
+                    <button id="class-close" onclick="toggleClassScreen(false)">X</button>
+                </div>
             </div>
-            <div class="auth-sub class-sub" id="class-sub">Reach level 15 to unlock class selection.</div>
-            <div class="class-grid" id="class-options"></div>
+            <div class="panel-body" id="class-body">
+                <div class="auth-sub class-sub" id="class-sub">Reach level 15 to unlock class selection.</div>
+                <div class="class-grid" id="class-options"></div>
+            </div>
         </div>
     </div>
     <div id="inventory-panel">
@@ -1197,48 +1307,65 @@
                 <div class="chat-kicker" data-i18n="hud_gear">GEAR</div>
                 <div class="control-title" data-i18n="hud_inventory">INVENTORY</div>
             </div>
-            <button id="inventory-close" onclick="toggleInventory(false)">X</button>
-        </div>
-        <div class="inventory-meta">
-            <span class="hi-sub" id="h-lootcnt">0 drops nearby</span>
-            <span class="hi-sub" id="h-invcount">0 / 12</span>
-        </div>
-        <div class="gear-grid">
-            <div class="gear-col">
-                <div class="gear-head"><span class="hi-label" data-i18n="hud_equipped">EQUIPPED</span></div>
-                <div class="gear-list" id="equip-list"></div>
-            </div>
-            <div class="gear-col">
-                <div class="gear-head"><span class="hi-label" data-i18n="hud_inventory">INVENTORY</span></div>
-                <div class="gear-list" id="inventory-list"></div>
+            <div style="display:flex; gap:6px;">
+                <button class="panel-toggle" type="button" id="inventory-collapse" onclick="togglePanel('inventory')">-</button>
+                <button id="inventory-close" onclick="toggleInventory(false)">X</button>
             </div>
         </div>
-        <div class="gear-note" data-i18n="hud_penalty">Death can cost XP, a stat point, and one owned item.</div>
+        <div class="panel-body" id="inventory-body">
+            <div class="inventory-meta">
+                <span class="hi-sub" id="h-lootcnt">0 drops nearby</span>
+                <span class="hi-sub" id="h-invcount">0 / 12</span>
+            </div>
+            <div class="gear-grid">
+                <div class="gear-col">
+                    <div class="gear-head"><span class="hi-label" data-i18n="hud_equipped">EQUIPPED</span></div>
+                    <div class="gear-list" id="equip-list"></div>
+                </div>
+                <div class="gear-col">
+                    <div class="gear-head"><span class="hi-label" data-i18n="hud_inventory">INVENTORY</span></div>
+                    <div class="gear-list" id="inventory-list"></div>
+                </div>
+            </div>
+            <div class="gear-note" data-i18n="hud_penalty">Death can cost XP, a stat point, and one owned item.</div>
+        </div>
     </div>
     <button id="logout-btn" onclick="doLogout()" data-i18n="btn_disconnect">DISCONNECT</button>
-    <div id="controls-card">
-        <div class="control-kicker" data-i18n="controls_kicker">CONTROLS</div>
-        <div class="control-title" data-i18n="controls_title">KEYMAP</div>
-        <div class="control-list">
-            <div class="control-row"><span data-i18n="controls_move">MOVE</span><span class="kbd">WASD</span></div>
-            <div class="control-row"><span data-i18n="controls_attack">ATTACK</span><span class="kbd">LMB</span></div>
-            <div class="control-row"><span data-i18n="controls_chat">CHAT</span><span class="kbd">ENTER</span></div>
-            <div class="control-row"><span data-i18n="controls_class">CLASS</span><span class="kbd">C</span></div>
-            <div class="control-row"><span data-i18n="controls_inventory">INVENTORY</span><span class="kbd">E</span></div>
-            <div class="control-row"><span data-i18n="controls_close">CLOSE</span><span class="kbd">ESC</span></div>
+    <div id="controls-card" class="panel-shell">
+        <div class="panel-head tight">
+            <div>
+                <div class="control-kicker" data-i18n="controls_kicker">CONTROLS</div>
+                <div class="control-title" data-i18n="controls_title">KEYMAP</div>
+            </div>
+            <button class="panel-toggle" type="button" id="controls-toggle" onclick="togglePanel('controls')">-</button>
+        </div>
+        <div class="panel-body" id="controls-body">
+            <div class="control-list">
+                <div class="control-row"><span data-i18n="controls_move">MOVE</span><span class="kbd">WASD</span></div>
+                <div class="control-row"><span data-i18n="controls_attack">ATTACK</span><span class="kbd">LMB</span></div>
+                <div class="control-row"><span data-i18n="controls_chat">CHAT</span><span class="kbd">ENTER</span></div>
+                <div class="control-row"><span data-i18n="controls_class">CLASS</span><span class="kbd">C</span></div>
+                <div class="control-row"><span data-i18n="controls_inventory">INVENTORY</span><span class="kbd">E</span></div>
+                <div class="control-row"><span data-i18n="controls_close">CLOSE</span><span class="kbd">ESC</span></div>
+            </div>
         </div>
     </div>
-    <div id="chat-wrap">
+    <div id="chat-wrap" class="panel-shell">
         <div class="chat-head">
             <div>
                 <div class="chat-kicker" data-i18n="chat_kicker">WORLD CHAT</div>
                 <div class="chat-title" data-i18n="chat_title">realtime.log</div>
             </div>
-            <div class="chat-hint">ENTER</div>
+            <div style="display:flex; gap:6px;">
+                <div class="chat-hint">ENTER</div>
+                <button class="panel-toggle" type="button" id="chat-toggle" onclick="togglePanel('chat')">-</button>
+            </div>
         </div>
-        <div id="chat-log"></div>
-        <div id="chat-input-row"><input id="chat-input" type="text" placeholder="message" data-i18n-placeholder="ph_chat" maxlength="80"
-                autocomplete="off" /><button id="chat-send" onclick="sendChat()" data-i18n="btn_send">SEND</button></div>
+        <div class="panel-body" id="chat-body">
+            <div id="chat-log"></div>
+            <div id="chat-input-row"><input id="chat-input" type="text" placeholder="message" data-i18n-placeholder="ph_chat" maxlength="80"
+                    autocomplete="off" /><button id="chat-send" onclick="sendChat()" data-i18n="btn_send">SEND</button></div>
+        </div>
     </div>
     <div id="levelup-flash"></div>
     <script>
@@ -1563,6 +1690,7 @@
         };
         const DEV_CHEAT_SEQUENCE = ["arrowup", "arrowup", "arrowdown", "arrowdown", "arrowleft", "arrowright", "arrowleft", "arrowright", "a", "b"];
         const DECOR_PORTAL_OFFSET_X = 96;
+        const PANEL_STATE_KEY = "sphere_panel_state_v1";
 
         let authMode = "login",
             currentLang = localStorage.getItem(LANG_KEY) === "en" ? "en" : "ko";
@@ -1604,6 +1732,11 @@
             classScreen = document.getElementById("class-screen"),
             classSub = document.getElementById("class-sub"),
             classOptions = document.getElementById("class-options"),
+            hudBody = document.getElementById("hud-body"),
+            classBody = document.getElementById("class-body"),
+            inventoryBody = document.getElementById("inventory-body"),
+            controlsBody = document.getElementById("controls-body"),
+            chatBody = document.getElementById("chat-body"),
             inventoryToggleBtn = document.getElementById("inventory-toggle"),
             inventoryPanel = document.getElementById("inventory-panel"),
             langBtn = document.getElementById("lang-btn"),
@@ -1611,6 +1744,22 @@
             chatInput = document.getElementById("chat-input"),
             controlsCard = document.getElementById("controls-card"),
             levelupFlash = document.getElementById("levelup-flash");
+        const panelBodies = {
+            hud: hudBody,
+            class: classBody,
+            inventory: inventoryBody,
+            controls: controlsBody,
+            chat: chatBody,
+        };
+        const panelButtons = {
+            hud: document.getElementById("hud-toggle"),
+            class: document.getElementById("class-collapse"),
+            inventory: document.getElementById("inventory-collapse"),
+            controls: document.getElementById("controls-toggle"),
+            chat: document.getElementById("chat-toggle"),
+        };
+        const loadPanelState = () => { try { return JSON.parse(localStorage.getItem(PANEL_STATE_KEY)) || {} } catch { return {} } };
+        let panelState = loadPanelState();
 
         function classInfo(classKey) {
             return CLASS_META[classKey]?.[currentLang] || CLASS_META[classKey]?.en || null;
@@ -1618,6 +1767,22 @@
 
         function currentMapId() {
             return currentSelf?.mapId || playerMap[myId]?.mapId || "field";
+        }
+
+        function applyPanelState(name) {
+            const body = panelBodies[name];
+            const button = panelButtons[name];
+            if (!body || !button) return;
+            const collapsed = !!panelState[name];
+            body.classList.toggle("collapsed", collapsed);
+            button.textContent = collapsed ? "+" : "-";
+        }
+
+        function togglePanel(name, force) {
+            const next = typeof force === "boolean" ? force : !panelState[name];
+            panelState[name] = !!next;
+            localStorage.setItem(PANEL_STATE_KEY, JSON.stringify(panelState));
+            applyPanelState(name);
         }
 
         function mapName(mapId) {
@@ -1676,6 +1841,9 @@
                 kicker.className = "class-kicker";
                 kicker.textContent = t("class_screen_kicker");
 
+                const previewNode = document.createElement("div");
+                previewNode.className = `class-preview preview-${classKey || "none"}`;
+
                 const nameNode = document.createElement("div");
                 nameNode.className = "class-name";
                 nameNode.textContent = className(classKey);
@@ -1689,6 +1857,7 @@
                 actionNode.textContent = selectedClass === classKey ? t("class_selected_state") : t("class_pick");
 
                 card.appendChild(kicker);
+                card.appendChild(previewNode);
                 card.appendChild(nameNode);
                 card.appendChild(copyNode);
                 card.appendChild(actionNode);
@@ -1723,9 +1892,13 @@
             const next = typeof force === "boolean" ? force : !classScreenOpen;
             if (next && !gameRunning) return;
             if (next && !classUnlocked()) return;
+            if (next) toggleInventory(false);
             classScreenOpen = next;
-            classScreen.style.display = classScreenOpen ? "flex" : "none";
-            if (classScreenOpen) renderClassOptions();
+            classScreen.style.display = classScreenOpen ? "block" : "none";
+            if (classScreenOpen) {
+                renderClassOptions();
+                applyPanelState("class");
+            }
         }
 
         function selectClass(classKey) {
@@ -1739,6 +1912,8 @@
                     syncClassUi();
                     return;
                 }
+                if (playerMap[myId]) playerMap[myId].classKey = res.classKey;
+                if (renderPlayers[myId]) renderPlayers[myId].classKey = res.classKey;
                 applySelfState(res.self || currentSelf);
                 addChatLine(`<span class="ct">${escHtml(t("sys_class_selected", { name: className(res.classKey) }))}</span>`, "lvlup");
                 toggleClassScreen(false);
@@ -1898,6 +2073,7 @@
         }
 
         renderStaticI18n();
+        Object.keys(panelBodies).forEach(applyPanelState);
 
         addEventListener("keydown", e => {
             trackDevCheat(e.key);
@@ -1999,7 +2175,9 @@
 
         function toggleInventory(force) {
             inventoryOpen = typeof force === "boolean" ? force : !inventoryOpen;
+            if (inventoryOpen) toggleClassScreen(false);
             inventoryPanel.style.display = inventoryOpen && gameRunning ? "block" : "none";
+            if (inventoryOpen) applyPanelState("inventory");
         }
 
         function equipErrorMessage(code) {
@@ -2111,6 +2289,9 @@
 
         function applySelfState(self) {
             currentSelf = self || null;
+            if (self?.classKey && playerMap[myId]) playerMap[myId].classKey = self.classKey;
+            if (self?.classKey && renderPlayers[myId]) renderPlayers[myId].classKey = self.classKey;
+            if (self?.mapId && playerMap[myId]) playerMap[myId].mapId = self.mapId;
             renderLoadout();
             syncClassUi();
         }
@@ -2819,6 +3000,54 @@
             ctx.restore();
         }
 
+        function drawPlayerBody(player, isMe, sx, sy) {
+            const classKey = player.classKey || null;
+            const fill = classKey === "vanguard" ? (isMe ? "#1d4ed8" : "#64748b")
+                : classKey === "ranger" ? (isMe ? "#059669" : "#64748b")
+                    : classKey === "mystic" ? (isMe ? "#7c3aed" : "#64748b")
+                        : (isMe ? C.player : C.playerOther);
+            const stroke = isMe ? C.playerStroke : "#e2e8f0";
+
+            ctx.save();
+            ctx.translate(sx, sy);
+            ctx.fillStyle = fill;
+            ctx.strokeStyle = stroke;
+            ctx.lineWidth = isMe ? 3 : 2.5;
+
+            if (classKey === "vanguard") {
+                ctx.rotate(Math.PI / 4);
+                ctx.fillRect(-player.r * .82, -player.r * .82, player.r * 1.64, player.r * 1.64);
+                ctx.strokeRect(-player.r * .82, -player.r * .82, player.r * 1.64, player.r * 1.64);
+            } else if (classKey === "ranger") {
+                ctx.beginPath();
+                ctx.moveTo(0, -player.r);
+                ctx.lineTo(player.r * .88, player.r * .84);
+                ctx.lineTo(-player.r * .88, player.r * .84);
+                ctx.closePath();
+                ctx.fill();
+                ctx.stroke();
+            } else if (classKey === "mystic") {
+                ctx.beginPath();
+                ctx.arc(0, 0, player.r * .82, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.arc(0, 0, player.r + 4, 0, Math.PI * 2);
+                ctx.strokeStyle = isMe ? "rgba(124,58,237,.42)" : "rgba(100,116,139,.3)";
+                ctx.lineWidth = 2;
+                ctx.setLineDash([5, 4]);
+                ctx.stroke();
+                ctx.setLineDash([]);
+            } else {
+                ctx.beginPath();
+                ctx.arc(0, 0, player.r, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.stroke();
+            }
+
+            ctx.restore();
+        }
+
         function drawPlayer(player, isMe) {
             const sx = player.x - camX,
                 sy = player.y - camY;
@@ -2833,13 +3062,7 @@
                 ctx.stroke();
                 ctx.setLineDash([]);
             }
-            ctx.beginPath();
-            ctx.arc(sx, sy, player.r, 0, Math.PI * 2);
-            ctx.fillStyle = isMe ? C.player : C.playerOther;
-            ctx.fill();
-            ctx.strokeStyle = isMe ? C.playerStroke : "#e2e8f0";
-            ctx.lineWidth = isMe ? 3 : 2.5;
-            ctx.stroke();
+            drawPlayerBody(player, isMe, sx, sy);
             if (isMe) {
                 ctx.beginPath();
                 ctx.arc(sx, sy, player.r + 6, 0, Math.PI * 2);
