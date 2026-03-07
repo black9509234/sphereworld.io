@@ -1310,8 +1310,6 @@
             setTimeout(() => startGame(user), 400);
         }
 
-        renderStaticI18n();
-
         const authFieldIds = ["i-user", "i-pass", "i-cfm"];
 
         function visibleAuthFieldIds() {
@@ -1368,6 +1366,8 @@
             gameRunning = false,
             rafId = null,
             attackCooldown = false;
+
+        renderStaticI18n();
 
         addEventListener("keydown", e => {
             if (e.key === "Enter" && !chatFocused() && gameRunning) {
