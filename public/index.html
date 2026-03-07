@@ -447,6 +447,94 @@
             cursor: default;
         }
 
+        .hud-chip-wide {
+            grid-column: 1 / -1;
+        }
+
+        .gear-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 8px;
+        }
+
+        .gear-col {
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .gear-head {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            gap: 8px;
+        }
+
+        .gear-list {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            min-height: 24px;
+        }
+
+        .gear-row {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: 6px;
+            align-items: start;
+            padding: 6px;
+            border: 1px solid rgba(17, 17, 17, .08);
+            border-radius: 2px;
+            background: rgba(255, 255, 255, .62);
+        }
+
+        .gear-main {
+            min-width: 0;
+        }
+
+        .gear-name {
+            color: var(--text);
+            font-size: 11px;
+            font-weight: 700;
+            line-height: 1.3;
+        }
+
+        .gear-copy,
+        .gear-slot,
+        .gear-empty,
+        .gear-note {
+            color: var(--muted);
+            font-size: 10px;
+            line-height: 1.35;
+        }
+
+        .gear-slot {
+            margin-bottom: 2px;
+            letter-spacing: .04em;
+        }
+
+        .gear-empty {
+            padding: 4px 0;
+        }
+
+        .gear-btn {
+            min-width: 48px;
+            height: 22px;
+            padding: 0 8px;
+            border: 1px solid rgba(17, 17, 17, .12);
+            border-radius: 2px;
+            background: rgba(17, 17, 17, .04);
+            color: var(--accent);
+            font: 700 10px var(--mono);
+            letter-spacing: .08em;
+            text-transform: uppercase;
+        }
+
+        .gear-note {
+            margin-top: 2px;
+        }
+
         .track {
             height: 6px;
             overflow: hidden;
@@ -750,6 +838,7 @@
         @media (max-width:520px) {
 
             .hud-stats,
+            .gear-grid,
             .mode-row {
                 grid-template-columns: 1fr;
             }
@@ -883,6 +972,20 @@
                         <button class="stat-add" id="btn-luk" onclick="allocateStat('luk')" disabled>+</button>
                     </div>
                 </div>
+            </div>
+            <div class="hud-chip hud-chip-wide interactive">
+                <div class="hi-line"><span class="hi-label" data-i18n="hud_gear">GEAR</span><span class="hi-sub" id="h-lootcnt">0 drops nearby</span></div>
+                <div class="gear-grid">
+                    <div class="gear-col">
+                        <div class="gear-head"><span class="hi-label" data-i18n="hud_equipped">EQUIPPED</span></div>
+                        <div class="gear-list" id="equip-list"></div>
+                    </div>
+                    <div class="gear-col">
+                        <div class="gear-head"><span class="hi-label" data-i18n="hud_inventory">INVENTORY</span><span class="hi-sub" id="h-invcount">0 / 12</span></div>
+                        <div class="gear-list" id="inventory-list"></div>
+                    </div>
+                </div>
+                <div class="gear-note" data-i18n="hud_penalty">Death can cost XP, a stat point, and one owned item.</div>
             </div>
         </div>
     </div>
@@ -1053,6 +1156,62 @@
             stat_desc_luk: "Raises crit chance and crit damage.",
         });
 
+        Object.assign(I18N.ko, {
+            hud_gear: "장비",
+            hud_equipped: "장착",
+            hud_inventory: "인벤토리",
+            hud_penalty: "사망 시 XP, 남은 스탯 포인트, 보유 장비 1개를 잃을 수 있습니다.",
+            hud_loot_count: "개인 드랍 {count}",
+            inventory_count: "{count} / {limit}",
+            inventory_empty: "획득한 장비가 없습니다.",
+            equipment_empty: "비어 있음",
+            btn_equip: "장착",
+            btn_unequip: "해제",
+            sys_loot_drop: "드랍 생성 :: {item}",
+            sys_loot_pick: "획득 완료 :: {item}",
+            sys_equip: "장착 완료 :: {item}",
+            sys_unequip: "해제 완료 :: {item}",
+            sys_inventory_full: "인벤토리가 가득 차서 더 주울 수 없습니다.",
+            sys_death_penalty: "사망 페널티 :: XP -{xp} :: PT -{points} :: {item}",
+            sys_death_penalty_no_item: "장비 손실 없음",
+        });
+
+        Object.assign(I18N.en, {
+            hud_gear: "GEAR",
+            hud_equipped: "EQUIPPED",
+            hud_inventory: "INVENTORY",
+            hud_penalty: "Death can cost XP, one spare stat point, and one owned item.",
+            hud_loot_count: "private drops {count}",
+            inventory_count: "{count} / {limit}",
+            inventory_empty: "No gear collected yet.",
+            equipment_empty: "Empty",
+            btn_equip: "EQUIP",
+            btn_unequip: "UNEQUIP",
+            sys_loot_drop: "DROP SPAWNED :: {item}",
+            sys_loot_pick: "LOOT SECURED :: {item}",
+            sys_equip: "EQUIPPED :: {item}",
+            sys_unequip: "UNEQUIPPED :: {item}",
+            sys_inventory_full: "Inventory full. Make room before picking up more gear.",
+            sys_death_penalty: "DEATH PENALTY :: XP -{xp} :: PT -{points} :: {item}",
+            sys_death_penalty_no_item: "no item lost",
+        });
+
+        const SLOT_ORDER = ["weapon", "armor", "boots", "gloves", "charm"];
+        const SLOT_META = {
+            weapon: { ko: "무기", en: "WEAPON" },
+            armor: { ko: "갑옷", en: "ARMOR" },
+            boots: { ko: "신발", en: "BOOTS" },
+            gloves: { ko: "장갑", en: "GLOVES" },
+            charm: { ko: "부적", en: "CHARM" },
+        };
+        const ITEM_META = {
+            iron_blade: { ko: "철검", en: "Iron Blade" },
+            guard_armor: { ko: "가드 아머", en: "Guard Armor" },
+            wind_boots: { ko: "윈드 부츠", en: "Wind Boots" },
+            focus_gloves: { ko: "포커스 글러브", en: "Focus Gloves" },
+            lucky_charm: { ko: "행운 부적", en: "Lucky Charm" },
+        };
+
         let authMode = "login",
             currentLang = localStorage.getItem(LANG_KEY) === "en" ? "en" : "ko";
 
@@ -1084,6 +1243,10 @@
             btnDex = document.getElementById("btn-dex"),
             btnWis = document.getElementById("btn-wis"),
             btnLuk = document.getElementById("btn-luk"),
+            elLootCnt = document.getElementById("h-lootcnt"),
+            elInvCnt = document.getElementById("h-invcount"),
+            equipList = document.getElementById("equip-list"),
+            inventoryList = document.getElementById("inventory-list"),
             langBtn = document.getElementById("lang-btn"),
             chatLog = document.getElementById("chat-log"),
             chatInput = document.getElementById("chat-input"),
@@ -1101,6 +1264,7 @@
             document.getElementById("sbtn-lbl").textContent = authMode === "signup" ? t("auth_create_account") : t("auth_connect");
             elStatPts.textContent = t("stat_points", { count: Number.parseInt(elStatPts.textContent, 10) || 0 });
             langBtn.textContent = currentLang === "ko" ? "EN" : "KO";
+            renderLoadout();
         }
 
         function toggleLanguage() {
@@ -1194,6 +1358,8 @@
             playerMap = {},
             orbMap = {},
             monsterMap = {},
+            lootMap = {},
+            currentSelf = null,
             renderPlayers = {},
             renderMonsters = {};
         const TILE = 60,
@@ -1255,6 +1421,112 @@
             return player?.atkRange ?? (player?.r ? player.r + 26 : 0);
         }
 
+        function slotLabel(slot) {
+            return SLOT_META[slot]?.[currentLang] || slot.toUpperCase();
+        }
+
+        function itemLabel(item) {
+            return ITEM_META[item?.key]?.[currentLang] || item?.key || "UNKNOWN";
+        }
+
+        function formatBonuses(bonuses) {
+            const parts = Object.entries(bonuses || {})
+                .filter(([, value]) => Number(value) > 0)
+                .map(([stat, value]) => `${stat.toUpperCase()}+${value}`);
+            return parts.join(" / ") || "-";
+        }
+
+        function renderLoadout() {
+            const inventory = Array.isArray(currentSelf?.inventory) ? currentSelf.inventory : [];
+            const equipment = currentSelf?.equipment || {};
+
+            elLootCnt.textContent = t("hud_loot_count", { count: currentSelf?.lootCount || 0 });
+            elInvCnt.textContent = t("inventory_count", { count: inventory.length, limit: currentSelf?.inventoryLimit || 12 });
+
+            equipList.innerHTML = "";
+            for (const slot of SLOT_ORDER) {
+                const row = document.createElement("div");
+                row.className = "gear-row";
+
+                const main = document.createElement("div");
+                main.className = "gear-main";
+
+                const slotNode = document.createElement("div");
+                slotNode.className = "gear-slot";
+                slotNode.textContent = slotLabel(slot);
+                main.appendChild(slotNode);
+
+                const item = equipment[slot];
+                if (item) {
+                    const nameNode = document.createElement("div");
+                    nameNode.className = "gear-name";
+                    nameNode.textContent = itemLabel(item);
+                    main.appendChild(nameNode);
+
+                    const copyNode = document.createElement("div");
+                    copyNode.className = "gear-copy";
+                    copyNode.textContent = formatBonuses(item.bonuses);
+                    main.appendChild(copyNode);
+
+                    const button = document.createElement("button");
+                    button.className = "gear-btn";
+                    button.textContent = t("btn_unequip");
+                    button.onclick = () => unequipItem(slot);
+                    row.appendChild(main);
+                    row.appendChild(button);
+                } else {
+                    const emptyNode = document.createElement("div");
+                    emptyNode.className = "gear-empty";
+                    emptyNode.textContent = t("equipment_empty");
+                    main.appendChild(emptyNode);
+                    row.appendChild(main);
+                }
+
+                equipList.appendChild(row);
+            }
+
+            inventoryList.innerHTML = "";
+            if (inventory.length === 0) {
+                const emptyNode = document.createElement("div");
+                emptyNode.className = "gear-empty";
+                emptyNode.textContent = t("inventory_empty");
+                inventoryList.appendChild(emptyNode);
+                return;
+            }
+
+            for (const item of inventory) {
+                const row = document.createElement("div");
+                row.className = "gear-row";
+
+                const main = document.createElement("div");
+                main.className = "gear-main";
+
+                const nameNode = document.createElement("div");
+                nameNode.className = "gear-name";
+                nameNode.textContent = `${itemLabel(item)} [${slotLabel(item.slot)}]`;
+                main.appendChild(nameNode);
+
+                const copyNode = document.createElement("div");
+                copyNode.className = "gear-copy";
+                copyNode.textContent = formatBonuses(item.bonuses);
+                main.appendChild(copyNode);
+
+                const button = document.createElement("button");
+                button.className = "gear-btn";
+                button.textContent = t("btn_equip");
+                button.onclick = () => equipItem(item.id);
+
+                row.appendChild(main);
+                row.appendChild(button);
+                inventoryList.appendChild(row);
+            }
+        }
+
+        function applySelfState(self) {
+            currentSelf = self || null;
+            renderLoadout();
+        }
+
         function tryAttackAt(clientX, clientY) {
             if (attackCooldown || !socket) return;
             const me = playerMap[myId];
@@ -1313,6 +1585,30 @@
                 }
                 updateStatControls(res.statPoints);
                 addChatLine(`<span class="ct">${escHtml(t("sys_stat_applied", { stat: stat.toUpperCase() }))}</span>`, "sys");
+            });
+        }
+
+        function equipItem(itemId) {
+            if (!socket) return;
+            socket.emit("equipItem", { itemId }, res => {
+                if (!res?.ok) {
+                    if (res?.error === "inventory_full") addChatLine(`<span class="ct">${escHtml(t("sys_inventory_full"))}</span>`, "sys");
+                    return;
+                }
+                applySelfState(res.self);
+                addChatLine(`<span class="ct">${escHtml(t("sys_equip", { item: itemLabel(res.item) }))}</span>`, "sys");
+            });
+        }
+
+        function unequipItem(slot) {
+            if (!socket) return;
+            socket.emit("unequipItem", { slot }, res => {
+                if (!res?.ok) {
+                    if (res?.error === "inventory_full") addChatLine(`<span class="ct">${escHtml(t("sys_inventory_full"))}</span>`, "sys");
+                    return;
+                }
+                applySelfState(res.self);
+                addChatLine(`<span class="ct">${escHtml(t("sys_unequip", { item: itemLabel(res.item) }))}</span>`, "sys");
             });
         }
 
@@ -1441,6 +1737,9 @@
                 (d.monsters || []).forEach(m => monsterMap[m.id] = m);
                 orbMap = {};
                 (d.orbs || []).forEach(o => orbMap[o.id] = o);
+                lootMap = {};
+                (d.loots || []).forEach(loot => lootMap[loot.id] = loot);
+                applySelfState(d.self || null);
                 syncRenderEntities(playerMap, renderPlayers, 260);
                 syncRenderEntities(monsterMap, renderMonsters, 180);
                 elCnt.textContent = d.players.length;
@@ -1467,7 +1766,10 @@
                 const me = playerMap[myId];
                 if (me) spawnDmgNum(me.x, me.y - me.r - 10, `-${dmg}`, "#dc2626");
             });
-            socket.on("died", () => addChatLine(`<span class="ct">${escHtml(t("sys_respawned"))}</span>`, "sys"));
+            socket.on("died", ({ xpLost = 0, statPointsLost = 0, lostItem = null } = {}) => {
+                addChatLine(`<span class="ct">${escHtml(t("sys_respawned"))}</span>`, "sys");
+                addChatLine(`<span class="ct">${escHtml(t("sys_death_penalty", { xp: xpLost, points: statPointsLost, item: lostItem ? itemLabel(lostItem) : t("sys_death_penalty_no_item") }))}</span>`, "sys");
+            });
             socket.on("attackResult", ({ monsterId, dmg, crit }) => {
                 const m = monsterMap[monsterId];
                 if (m) spawnDmgNum(m.x, m.y - m.r - 8, crit ? `CRIT ${dmg}` : String(dmg), crit ? "#f59e0b" : "#2563eb");
@@ -1476,6 +1778,12 @@
                 delete monsterMap[monsterId];
                 delete renderMonsters[monsterId];
                 if (killerId === myId) addChatLine(`<span class="ct">${escHtml(t("sys_target_down", { xp }))}</span>`, "sys");
+            });
+            socket.on("lootDropped", ({ item }) => {
+                addChatLine(`<span class="ct">${escHtml(t("sys_loot_drop", { item: itemLabel(item) }))}</span>`, "sys");
+            });
+            socket.on("lootPicked", ({ item }) => {
+                addChatLine(`<span class="ct">${escHtml(t("sys_loot_pick", { item: itemLabel(item) }))}</span>`, "sys");
             });
             socket.on("levelUp", ({ id, level, name, gained, statPoints }) => {
                 if (id === myId) {
@@ -1505,6 +1813,8 @@
             playerMap = {};
             orbMap = {};
             monsterMap = {};
+            lootMap = {};
+            currentSelf = null;
             renderPlayers = {};
             renderMonsters = {};
             dmgNums.length = 0;
@@ -1529,6 +1839,7 @@
             elDex.textContent = "0";
             elWis.textContent = "0";
             elLuk.textContent = "0";
+            renderLoadout();
             updateStatControls(0);
             camX = camY = 0;
             lastPosStr = "";
@@ -1721,6 +2032,32 @@
             }
         }
 
+        function drawLoots() {
+            const me = playerMap[myId];
+            for (const loot of Object.values(lootMap)) {
+                const sx = loot.x - camX,
+                    sy = loot.y - camY;
+                if (sx < -40 || sx > viewW + 40 || sy < -40 || sy > viewH + 40) continue;
+
+                ctx.save();
+                ctx.translate(sx, sy);
+                ctx.rotate(Math.PI / 4);
+                ctx.fillStyle = loot.item?.color || "#111827";
+                ctx.strokeStyle = "rgba(17,17,17,.7)";
+                ctx.lineWidth = 2;
+                ctx.fillRect(-8, -8, 16, 16);
+                ctx.strokeRect(-8, -8, 16, 16);
+                ctx.restore();
+
+                if (me && Math.hypot(me.x - loot.x, me.y - loot.y) < 110) {
+                    drawPill(itemLabel(loot.item), sx, sy - 18, {
+                        font: "700 10px Consolas, monospace",
+                        bg: "rgba(255,255,255,.92)",
+                    });
+                }
+            }
+        }
+
         function drawMonster(monster) {
             const sx = monster.x - camX,
                 sy = monster.y - camY;
@@ -1895,6 +2232,7 @@
             drawGrid();
             drawBorder();
             drawOrbs();
+            drawLoots();
             Object.values(renderMonsters).forEach(drawMonster);
             Object.values(renderPlayers).forEach(player => drawPlayer(player, player.id === myId));
             drawDmgNums(dt);
