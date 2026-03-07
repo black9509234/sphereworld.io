@@ -681,26 +681,14 @@
             border: 1px solid rgba(17, 17, 17, .1);
             border-radius: 3px;
             background: rgba(255, 255, 255, .82);
-            appearance: none;
-            outline: none;
             text-align: left;
             transition: border-color .16s, transform .16s, box-shadow .16s;
         }
 
-        .class-card:hover:not(:disabled) {
+        .class-card:hover {
             border-color: rgba(17, 17, 17, .2);
             transform: translateY(-1px);
             box-shadow: 0 12px 24px rgba(18, 18, 18, .08);
-        }
-
-        .class-card:focus-visible:not(:disabled) {
-            border-color: rgba(37, 99, 235, .34);
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, .14), 0 12px 24px rgba(18, 18, 18, .08);
-        }
-
-        .class-card:disabled {
-            cursor: default;
-            opacity: .88;
         }
 
         .class-card.chosen {
@@ -801,6 +789,18 @@
             font: 700 10px var(--mono);
             letter-spacing: .12em;
             text-transform: uppercase;
+            appearance: none;
+            outline: none;
+        }
+
+        .class-action:focus-visible:not(:disabled) {
+            border-color: rgba(37, 99, 235, .34);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, .14);
+        }
+
+        .class-action:disabled {
+            cursor: default;
+            opacity: .72;
         }
 
         #inventory-panel {
@@ -1879,10 +1879,8 @@
             const selectedClass = currentClassKey();
             classOptions.innerHTML = "";
             for (const classKey of CLASS_ORDER) {
-                const card = document.createElement("button");
-                card.type = "button";
+                const card = document.createElement("div");
                 card.className = "class-card" + (selectedClass === classKey ? " chosen" : "");
-                card.disabled = classSelectionPending || !!selectedClass;
 
                 const kicker = document.createElement("div");
                 kicker.className = "class-kicker";
@@ -1899,16 +1897,18 @@
                 copyNode.className = "class-copy";
                 copyNode.textContent = classDescription(classKey);
 
-                const actionNode = document.createElement("div");
+                const actionNode = document.createElement("button");
+                actionNode.type = "button";
                 actionNode.className = "class-action";
+                actionNode.disabled = classSelectionPending || !!selectedClass;
                 actionNode.textContent = selectedClass === classKey ? t("class_selected_state") : t("class_pick");
+                if (!selectedClass) actionNode.addEventListener("click", () => selectClass(classKey));
 
                 card.appendChild(kicker);
                 card.appendChild(previewNode);
                 card.appendChild(nameNode);
                 card.appendChild(copyNode);
                 card.appendChild(actionNode);
-                if (!selectedClass) card.onclick = () => selectClass(classKey);
                 classOptions.appendChild(card);
             }
         }
