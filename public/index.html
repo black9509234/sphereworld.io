@@ -17,11 +17,11 @@
             --text: #101010;
             --muted: #686868;
             --soft: #8a8a8a;
-            --accent: #111111;
-            --accent2: #4a4a4a;
-            --ok: #111111;
-            --bad: #5c5c5c;
-            --warn: #303030;
+            --accent: #2563eb;
+            --accent2: #1d4ed8;
+            --ok: #059669;
+            --bad: #dc2626;
+            --warn: #d97706;
             --mono: "Consolas", "Courier New", monospace;
             --sans: "Consolas", "Courier New", monospace;
             --shadow: 0 18px 40px rgba(16, 16, 16, .08);
@@ -408,12 +408,12 @@
         }
 
         #xp-fill {
-            background: linear-gradient(90deg, rgba(120, 120, 120, .24), #141414);
+            background: linear-gradient(90deg, rgba(96, 165, 250, .35), #2563eb);
         }
 
         #hp-fill {
             width: 100%;
-            background: linear-gradient(90deg, rgba(160, 160, 160, .34), #555555);
+            background: linear-gradient(90deg, rgba(248, 113, 113, .4), #dc2626);
         }
 
         #logout-btn {
@@ -1088,15 +1088,15 @@
                 elHpFill.style.width = `${(me.hp / me.maxHp * 100).toFixed(1)}%`;
             });
             socket.on("damaged", ({ dmg }) => {
-                elHpFill.style.background = "linear-gradient(90deg,rgba(190,190,190,.42),#3c3c3c)";
-                setTimeout(() => elHpFill.style.background = "linear-gradient(90deg,rgba(160,160,160,.34),#555555)", 260);
+                elHpFill.style.background = "linear-gradient(90deg,rgba(252,165,165,.5),#ef4444)";
+                setTimeout(() => elHpFill.style.background = "linear-gradient(90deg,rgba(248,113,113,.4),#dc2626)", 260);
                 const me = playerMap[myId];
-                if (me) spawnDmgNum(me.x, me.y - me.r - 10, `-${dmg}`, "#2f2f2f");
+                if (me) spawnDmgNum(me.x, me.y - me.r - 10, `-${dmg}`, "#dc2626");
             });
             socket.on("died", () => addChatLine("<span class=\"ct\">NODE OFFLINE :: RESPAWNED AT SAFE POINT</span>", "sys"));
             socket.on("attackResult", ({ monsterId, dmg }) => {
                 const m = monsterMap[monsterId];
-                if (m) spawnDmgNum(m.x, m.y - m.r - 8, String(dmg), "#111111");
+                if (m) spawnDmgNum(m.x, m.y - m.r - 8, String(dmg), "#2563eb");
             });
             socket.on("monsterDied", ({ monsterId, killerId, xp }) => {
                 delete monsterMap[monsterId];
@@ -1144,7 +1144,7 @@
             document.getElementById("i-cfm").value = "";
             chatLog.innerHTML = "";
             levelupFlash.classList.remove("show");
-            elHpFill.style.background = "linear-gradient(90deg,rgba(160,160,160,.34),#555555)";
+            elHpFill.style.background = "linear-gradient(90deg,rgba(248,113,113,.4),#dc2626)";
             camX = camY = 0;
             lastPosStr = "";
             setMsg("INFO :: disconnected", "info");
@@ -1164,16 +1164,16 @@
                 gridMaj: "rgba(0,0,0,.08)",
                 axis: "rgba(0,0,0,.14)",
                 border: "rgba(0,0,0,.18)",
-                player: "#171717",
+                player: "#2563eb",
                 playerStroke: "#ffffff",
-                playerOther: "#949494",
+                playerOther: "#64748b",
                 muted: "#7d7d7d",
                 text: "#101010",
-                orb: "#ffffff",
-                orbStroke: "#1e1e1e",
-                hpHi: "#111111",
-                hpMid: "#666666",
-                hpLow: "#b8b8b8"
+                orb: "#fbbf24",
+                orbStroke: "#b45309",
+                hpHi: "#ef4444",
+                hpMid: "#dc2626",
+                hpLow: "#991b1b"
             };
 
         function updateCam(me, dt) {
@@ -1435,7 +1435,7 @@
             ctx.arc(sx, sy, player.r, 0, Math.PI * 2);
             ctx.fillStyle = isMe ? C.player : C.playerOther;
             ctx.fill();
-            ctx.strokeStyle = isMe ? C.playerStroke : "#ffffff";
+            ctx.strokeStyle = isMe ? C.playerStroke : "#e2e8f0";
             ctx.lineWidth = isMe ? 3 : 2.5;
             ctx.stroke();
             if (isMe) {
@@ -1449,7 +1449,7 @@
 
             drawPill(player.name, sx, sy - player.r - 28);
             ctx.save();
-            ctx.fillStyle = isMe ? "#111111" : "#6d6d6d";
+            ctx.fillStyle = isMe ? "#1d4ed8" : "#475569";
             ctx.font = "700 11px Consolas, monospace";
             ctx.textAlign = "center";
             ctx.fillText(`Lv.${player.level}`, sx, sy - player.r - 8);
