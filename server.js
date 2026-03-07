@@ -407,6 +407,10 @@ function buildSelfState(p, loots) {
   };
 }
 
+function emitSelfState(socketId, p) {
+  io.to(socketId).emit('selfSync', buildSelfState(p, playerLootsFor(p)));
+}
+
 const players = {};
 const orbs = {};
 const monsters = {};
@@ -548,6 +552,7 @@ setInterval(() => {
       for (const loot of pickedLoots) {
         io.to(p.id).emit('lootPicked', { item: loot.item });
       }
+      emitSelfState(p.id, p);
       persistPlayerProfile(p);
     }
 
@@ -599,6 +604,7 @@ setInterval(() => {
             nearest.y = pos.y;
             recalcDerivedStats(nearest);
             nearest.hp = nearest.maxHp;
+            emitSelfState(nearest.id, nearest);
             persistPlayerProfile(nearest);
             io.to(nearest.id).emit('died', penalty);
           }
@@ -755,7 +761,7 @@ io.on('connection', socket => {
   socket.on('equipItem', ({ itemId }, ack) => {
     const p = players[socket.id];
     if (!p) return ack && ack({ ok: false, error: 'not_joined' });
-    const index = p.inventory.findIndex(item => item.id === itemId);
+    const index = p.inventory.findIndex(item => String(item.id) === String(itemId));
     if (index < 0) return ack && ack({ ok: false, error: 'item_missing' });
 
     const item = p.inventory[index];
@@ -764,6 +770,7 @@ io.on('connection', socket => {
     if (current) p.inventory.push(current);
     p.equipment[item.slot] = item;
     applyEquipmentShift(p);
+    emitSelfState(socket.id, p);
     persistPlayerProfile(p);
 
     if (ack) {
@@ -786,6 +793,7 @@ io.on('connection', socket => {
     p.equipment[slot] = null;
     p.inventory.push(item);
     applyEquipmentShift(p);
+    emitSelfState(socket.id, p);
     persistPlayerProfile(p);
 
     if (ack) {

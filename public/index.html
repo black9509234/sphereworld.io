@@ -1276,6 +1276,10 @@
             sys_inventory_full: "인벤토리가 가득 차서 더 주울 수 없습니다.",
             sys_death_penalty: "사망 페널티 :: XP -{xp} :: PT -{points} :: {item}",
             sys_death_penalty_no_item: "장비 손실 없음",
+            sys_equip_error_not_joined: "장착 실패 :: 캐릭터 연결이 끊어졌습니다.",
+            sys_equip_error_item_missing: "장착 실패 :: 해당 아이템을 인벤토리에서 찾지 못했습니다.",
+            sys_equip_error_bad_slot: "장착 실패 :: 잘못된 슬롯입니다.",
+            sys_equip_error_slot_empty: "해제 실패 :: 해당 슬롯이 비어 있습니다.",
         });
 
         Object.assign(I18N.en, {
@@ -1298,6 +1302,10 @@
             sys_inventory_full: "Inventory full. Make room before picking up more gear.",
             sys_death_penalty: "DEATH PENALTY :: XP -{xp} :: PT -{points} :: {item}",
             sys_death_penalty_no_item: "no item lost",
+            sys_equip_error_not_joined: "EQUIP FAILED :: character is not connected.",
+            sys_equip_error_item_missing: "EQUIP FAILED :: item not found in inventory.",
+            sys_equip_error_bad_slot: "UNEQUIP FAILED :: invalid slot.",
+            sys_equip_error_slot_empty: "UNEQUIP FAILED :: slot is empty.",
         });
 
         const SLOT_ORDER = ["weapon", "armor", "boots", "gloves", "charm"];
@@ -1562,6 +1570,11 @@
             inventoryPanel.style.display = inventoryOpen && gameRunning ? "block" : "none";
         }
 
+        function equipErrorMessage(code) {
+            const key = `sys_equip_error_${code || "item_missing"}`;
+            return t(key) === key ? code : t(key);
+        }
+
         function renderLoadout() {
             const inventory = Array.isArray(currentSelf?.inventory) ? currentSelf.inventory : [];
             const equipment = currentSelf?.equipment || {};
@@ -1595,6 +1608,7 @@
                     main.appendChild(copyNode);
 
                     const button = document.createElement("button");
+                    button.type = "button";
                     button.className = "gear-btn";
                     button.textContent = t("btn_unequip");
                     button.onclick = () => unequipItem(slot);
@@ -1638,6 +1652,7 @@
                 main.appendChild(copyNode);
 
                 const button = document.createElement("button");
+                button.type = "button";
                 button.className = "gear-btn";
                 button.textContent = t("btn_equip");
                 button.onclick = () => equipItem(item.id);
@@ -1718,7 +1733,11 @@
             if (!socket) return;
             socket.emit("equipItem", { itemId }, res => {
                 if (!res?.ok) {
-                    if (res?.error === "inventory_full") addChatLine(`<span class="ct">${escHtml(t("sys_inventory_full"))}</span>`, "sys");
+                    if (res?.error === "inventory_full") {
+                        addChatLine(`<span class="ct">${escHtml(t("sys_inventory_full"))}</span>`, "sys");
+                    } else {
+                        addChatLine(`<span class="ct">${escHtml(equipErrorMessage(res?.error))}</span>`, "sys");
+                    }
                     return;
                 }
                 applySelfState(res.self);
@@ -1730,7 +1749,11 @@
             if (!socket) return;
             socket.emit("unequipItem", { slot }, res => {
                 if (!res?.ok) {
-                    if (res?.error === "inventory_full") addChatLine(`<span class="ct">${escHtml(t("sys_inventory_full"))}</span>`, "sys");
+                    if (res?.error === "inventory_full") {
+                        addChatLine(`<span class="ct">${escHtml(t("sys_inventory_full"))}</span>`, "sys");
+                    } else {
+                        addChatLine(`<span class="ct">${escHtml(equipErrorMessage(res?.error))}</span>`, "sys");
+                    }
                     return;
                 }
                 applySelfState(res.self);
@@ -1887,6 +1910,9 @@
                 elWis.textContent = me.stats?.wis ?? 0;
                 elLuk.textContent = me.stats?.luk ?? 0;
                 updateStatControls(me.statPoints || 0);
+            });
+            socket.on("selfSync", self => {
+                applySelfState(self);
             });
             socket.on("damaged", ({ dmg }) => {
                 elHpFill.style.background = "linear-gradient(90deg,rgba(252,165,165,.5),#ef4444)";
