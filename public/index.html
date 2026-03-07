@@ -1257,6 +1257,18 @@
         });
 
         Object.assign(I18N.ko, {
+            stat_desc_agi: "이동 속도·회피율 증가",
+            stat_desc_dex: "공격 속도·사거리 증가",
+            combat_evade: "회피",
+        });
+
+        Object.assign(I18N.en, {
+            stat_desc_agi: "Raises move speed and dodge chance.",
+            stat_desc_dex: "Raises attack speed and melee reach.",
+            combat_evade: "EVADE",
+        });
+
+        Object.assign(I18N.ko, {
             hud_gear: "장비",
             hud_equipped: "장착",
             hud_inventory: "인벤토리",
@@ -1544,7 +1556,11 @@
         }
 
         function attackRangeForPlayer(player) {
-            return player?.atkRange ?? (player?.r ? player.r + 26 : 0);
+            return player?.atkRange ?? 34;
+        }
+
+        function attackCooldownForPlayer(player) {
+            return player?.atkCd ?? 620;
         }
 
         function slotLabel(slot) {
@@ -1708,7 +1724,7 @@
             if (!nearest) return;
             socket.emit("attack", { monsterId: nearest.id });
             attackCooldown = true;
-            setTimeout(() => attackCooldown = false, 400);
+            setTimeout(() => attackCooldown = false, attackCooldownForPlayer(me));
         }
 
         function updateStatControls(points) {
@@ -1935,7 +1951,12 @@
                 const me = playerMap[myId];
                 if (me) spawnDmgNum(me.x, me.y - me.r - 10, `-${dmg}`, "#dc2626");
             });
+            socket.on("dodged", () => {
+                const me = playerMap[myId];
+                if (me) spawnDmgNum(me.x, me.y - me.r - 10, t("combat_evade"), "#059669");
+            });
             socket.on("died", ({ xpLost = 0, statPointsLost = 0, lostItem = null } = {}) => {
+                attackCooldown = false;
                 addChatLine(`<span class="ct">${escHtml(t("sys_respawned"))}</span>`, "sys");
                 addChatLine(`<span class="ct">${escHtml(t("sys_death_penalty", { xp: xpLost, points: statPointsLost, item: lostItem ? itemLabel(lostItem) : t("sys_death_penalty_no_item") }))}</span>`, "sys");
             });
@@ -1978,6 +1999,7 @@
             }
             keys.up = keys.down = keys.left = keys.right = false;
             lastKeys = {};
+            attackCooldown = false;
             myId = null;
             playerMap = {};
             orbMap = {};

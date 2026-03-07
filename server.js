@@ -14,7 +14,9 @@ app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.ht
 const WORLD_W = 3000;
 const WORLD_H = 3000;
 const TICK_MS = 1000 / 30;
-const BASE_PLAYER_SPEED = 4;
+const BASE_PLAYER_SPEED = 3.2;
+const BASE_PLAYER_ATTACK_CD = 620;
+const MIN_PLAYER_ATTACK_CD = 260;
 const PLAYER_RADIUS = 18;
 const MAX_LEVEL = 50;
 const STAT_POINTS_PER_LEVEL = 3;
@@ -138,7 +140,7 @@ function dist(a, b) {
 }
 
 function xpToNextLevel(level) {
-  return Math.floor(30 * Math.pow(1.4, level - 1));
+  return Math.floor(30 * Math.pow(1.2, level - 1));
 }
 
 function radiusForLevel() {
@@ -251,28 +253,47 @@ function applyEquipmentShift(p) {
 }
 
 function speedForPlayer(p) {
-  return BASE_PLAYER_SPEED + getTotalStats(p).agi * 0.22;
+  return BASE_PLAYER_SPEED + getTotalStats(p).agi * 0.2;
+}
+
+function dodgeChanceForPlayer(p) {
+  return Math.min(0.22, getTotalStats(p).agi * 0.01);
 }
 
 function damageForPlayer(p) {
   const total = getTotalStats(p);
-  return 10 + (p.level - 1) * 3 + total.str * 2;
+  return 8 + (p.level - 1) * 2 + total.str * 2;
 }
 
 function attackRangeForPlayer(p) {
-  return PLAYER_RADIUS + 26 + getTotalStats(p).str * 1.5;
+  return 34 + getTotalStats(p).dex * 1.25;
+}
+
+function attackCooldownForPlayer(p) {
+  return Math.max(MIN_PLAYER_ATTACK_CD, BASE_PLAYER_ATTACK_CD - getTotalStats(p).dex * 22);
 }
 
 function critChanceForPlayer(p) {
-  return Math.min(0.35, getTotalStats(p).luk * 0.02);
+  return Math.min(0.3, getTotalStats(p).luk * 0.015);
 }
 
 function critMultiplierForPlayer(p) {
-  return 1.7 + getTotalStats(p).luk * 0.03;
+  return 1.6 + getTotalStats(p).luk * 0.025;
 }
 
-function orbBonusForPlayer(p) {
-  return 1 + getTotalStats(p).wis * 0.04;
+function xpBonusForPlayer(p) {
+  return 1 + getTotalStats(p).wis * 0.025;
+}
+
+function healFromOrbForPlayer(p, value) {
+  return Math.ceil(value * (0.65 + getTotalStats(p).wis * 0.07));
+}
+
+function lootDropChanceForMonster(monster) {
+  if (monster.xp >= 60) return 0.45;
+  if (monster.xp >= 35) return 0.35;
+  if (monster.xp >= 18) return 0.24;
+  return 0.14;
 }
 
 function serializePlayerProfile(p) {
@@ -330,6 +351,7 @@ function makePlayerState(socketId, name, saved = {}) {
     stats,
     inventory,
     equipment,
+    lastAttackAt: 0,
     keys: { up: false, down: false, left: false, right: false },
   };
   recalcDerivedStats(p);
@@ -478,6 +500,7 @@ function playerLootsFor(player) {
 }
 
 function spawnLootForPlayer(player, monster) {
+  if (Math.random() > lootDropChanceForMonster(monster)) return null;
   const item = rollItemForMonster(monster);
   if (!item) return null;
   const id = ++lootIdCounter;
@@ -531,9 +554,9 @@ setInterval(() => {
 
     for (const oid of pickedOrbs) {
       if (!orbs[oid]) continue;
-      const bonus = orbBonusForPlayer(p);
+      const bonus = xpBonusForPlayer(p);
       p.xp += Math.round(orbs[oid].value * bonus);
-      p.hp = clamp(p.hp + Math.ceil(orbs[oid].value * (0.8 + getTotalStats(p).wis * 0.1)), 0, p.maxHp);
+      p.hp = clamp(p.hp + healFromOrbForPlayer(p, orbs[oid].value), 0, p.maxHp);
       delete orbs[oid];
     }
 
@@ -594,6 +617,10 @@ setInterval(() => {
         const lastHit = m.lastAttack[nearest.id] || 0;
         if (now - lastHit > m.atkCD) {
           m.lastAttack[nearest.id] = now;
+          if (Math.random() < dodgeChanceForPlayer(nearest)) {
+            io.to(nearest.id).emit('dodged');
+            continue;
+          }
           nearest.hp -= m.dmg;
           io.to(nearest.id).emit('damaged', { dmg: m.dmg });
 
@@ -644,6 +671,7 @@ setInterval(() => {
     hp: p.hp,
     maxHp: p.maxHp,
     atkRange: attackRangeForPlayer(p),
+    atkCd: attackCooldownForPlayer(p),
     statPoints: p.statPoints,
     stats: getTotalStats(p),
   }));
@@ -714,6 +742,9 @@ io.on('connection', socket => {
     const m = monsters[monsterId];
     if (!p || !m) return;
     if (dist(p, m) > attackRangeForPlayer(p) + m.r) return;
+    const now = Date.now();
+    if (now - p.lastAttackAt < attackCooldownForPlayer(p)) return;
+    p.lastAttackAt = now;
 
     const isCrit = Math.random() < critChanceForPlayer(p);
     const dmg = Math.round(damageForPlayer(p) * (isCrit ? critMultiplierForPlayer(p) : 1));
@@ -721,7 +752,7 @@ io.on('connection', socket => {
     socket.emit('attackResult', { monsterId, dmg, hp: m.hp, crit: isCrit });
 
     if (m.hp <= 0) {
-      p.xp += Math.round(m.xp * orbBonusForPlayer(p));
+      p.xp += Math.round(m.xp * xpBonusForPlayer(p));
       const gained = applyLevelUp(p);
       const loot = spawnLootForPlayer(p, m);
       if (gained > 0) {
