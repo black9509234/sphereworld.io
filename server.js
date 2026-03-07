@@ -31,6 +31,10 @@ const LOOT_RADIUS = 14;
 const LOOT_DESPAWN_MS = 45000;
 const DEATH_XP_LOSS_RATIO = 0.25;
 const DEATH_POINT_LOSS = 1;
+const DEFAULT_MAP_ID = 'field';
+const MONO_MAP_ID = 'mono';
+const PORTAL_RADIUS = 42;
+const PORTAL_COOLDOWN_MS = 1200;
 
 const SAVE_DIR = path.join(__dirname, 'data');
 const SAVE_FILE = path.join(SAVE_DIR, 'profiles.json');
@@ -49,6 +53,30 @@ const CLASS_DEFS = Object.freeze({
   vanguard: { key: 'vanguard' },
   ranger: { key: 'ranger' },
   mystic: { key: 'mystic' },
+});
+const MAP_DEFS = Object.freeze({
+  [DEFAULT_MAP_ID]: {
+    key: DEFAULT_MAP_ID,
+    portal: {
+      x: WORLD_W - 96,
+      y: WORLD_H / 2,
+      r: PORTAL_RADIUS,
+      targetMapId: MONO_MAP_ID,
+      targetX: 160,
+      targetY: WORLD_H / 2,
+    },
+  },
+  [MONO_MAP_ID]: {
+    key: MONO_MAP_ID,
+    portal: {
+      x: 96,
+      y: WORLD_H / 2,
+      r: PORTAL_RADIUS,
+      targetMapId: DEFAULT_MAP_ID,
+      targetX: WORLD_W - 160,
+      targetY: WORLD_H / 2,
+    },
+  },
 });
 const ITEM_DEFS = Object.freeze({
   iron_blade: {
@@ -171,6 +199,14 @@ function normalizeStats(raw = {}) {
 
 function normalizeClassKey(raw) {
   return typeof raw === 'string' && CLASS_DEFS[raw] ? raw : null;
+}
+
+function normalizeMapId(raw) {
+  return typeof raw === 'string' && MAP_DEFS[raw] ? raw : DEFAULT_MAP_ID;
+}
+
+function portalForMap(mapId) {
+  return MAP_DEFS[normalizeMapId(mapId)]?.portal || null;
 }
 
 function addStats(target, bonus) {
@@ -316,6 +352,7 @@ function serializePlayerProfile(p) {
     hp: p.hp,
     statPoints: p.statPoints,
     classKey: p.classKey,
+    mapId: p.mapId,
     stats: p.stats,
     inventory: p.inventory,
     equipment: p.equipment,
@@ -343,6 +380,7 @@ function makePlayerState(socketId, name, saved = {}) {
   const inventory = normalizeInventory(saved.inventory);
   const equipment = normalizeEquipment(saved.equipment);
   const classKey = normalizeClassKey(saved.classKey);
+  const mapId = normalizeMapId(saved.mapId);
   const level = clamp(Number(saved.level) || 1, 1, MAX_LEVEL);
   const r = radiusForLevel(level);
   const defaultPos = randomPos(PLAYER_RADIUS);
@@ -361,10 +399,12 @@ function makePlayerState(socketId, name, saved = {}) {
     maxHp: 100,
     statPoints: clamp(Number(saved.statPoints) || 0, 0, 9999),
     classKey,
+    mapId,
     stats,
     inventory,
     equipment,
     lastAttackAt: 0,
+    lastPortalAt: 0,
     keys: { up: false, down: false, left: false, right: false },
   };
   recalcDerivedStats(p);
@@ -433,6 +473,7 @@ function buildSelfState(p, loots) {
   return {
     classKey: p.classKey,
     classUnlocked: p.level >= CLASS_UNLOCK_LEVEL,
+    mapId: p.mapId,
     stats: getTotalStats(p),
     statPoints: p.statPoints,
     hp: p.hp,
@@ -463,14 +504,14 @@ function removePlayer(socketId, { save = true } = {}) {
   delete players[socketId];
 }
 
-function spawnOrb() {
+function spawnOrb(mapId = DEFAULT_MAP_ID) {
   if (Object.keys(orbs).length >= MAX_ORBS) return;
   const id = ++orbIdCounter;
   const pos = randomPos(30);
-  orbs[id] = { id, x: pos.x, y: pos.y, value: 5 + Math.floor(Math.random() * 6) };
+  orbs[id] = { id, mapId, x: pos.x, y: pos.y, value: 5 + Math.floor(Math.random() * 6) };
 }
 
-function spawnMonster() {
+function spawnMonster(mapId = DEFAULT_MAP_ID) {
   if (Object.keys(monsters).length >= MAX_MONSTERS) return;
   const def = MONSTER_TYPES[Math.floor(Math.random() * MONSTER_TYPES.length)];
   const id = ++monsterIdCounter;
@@ -478,6 +519,7 @@ function spawnMonster() {
   const wander = randomWander(pos.x, pos.y);
   monsters[id] = {
     id,
+    mapId,
     type: def.type,
     color: def.color,
     x: pos.x,
@@ -500,6 +542,7 @@ function spawnMonster() {
 function serializeLoot(loot) {
   return {
     id: loot.id,
+    mapId: loot.mapId,
     x: loot.x,
     y: loot.y,
     expiresAt: loot.expiresAt,
@@ -510,7 +553,7 @@ function serializeLoot(loot) {
 function playerLootsFor(player) {
   const ownerKey = playerNameKey(player.name);
   return Object.values(loots)
-    .filter(loot => loot.ownerKey === ownerKey)
+    .filter(loot => loot.ownerKey === ownerKey && loot.mapId === player.mapId)
     .map(serializeLoot);
 }
 
@@ -522,6 +565,7 @@ function spawnLootForPlayer(player, monster) {
   loots[id] = {
     id,
     ownerKey: playerNameKey(player.name),
+    mapId: player.mapId,
     x: monster.x,
     y: monster.y,
     item,
@@ -530,11 +574,11 @@ function spawnLootForPlayer(player, monster) {
   return loots[id];
 }
 
-for (let i = 0; i < MAX_ORBS; i++) spawnOrb();
-for (let i = 0; i < MAX_MONSTERS; i++) spawnMonster();
+for (let i = 0; i < MAX_ORBS; i++) spawnOrb(DEFAULT_MAP_ID);
+for (let i = 0; i < MAX_MONSTERS; i++) spawnMonster(DEFAULT_MAP_ID);
 
-setInterval(spawnOrb, ORB_SPAWN_MS);
-setInterval(spawnMonster, 3000);
+setInterval(() => spawnOrb(DEFAULT_MAP_ID), ORB_SPAWN_MS);
+setInterval(() => spawnMonster(DEFAULT_MAP_ID), 3000);
 
 setInterval(() => {
   const now = Date.now();
@@ -562,8 +606,21 @@ setInterval(() => {
     p.x = clamp(p.x + dx * moveSpeed, r, WORLD_W - r);
     p.y = clamp(p.y + dy * moveSpeed, r, WORLD_H - r);
 
+    const portal = portalForMap(p.mapId);
+    if (portal && now - p.lastPortalAt >= PORTAL_COOLDOWN_MS && dist(p, portal) < r + portal.r) {
+      p.mapId = portal.targetMapId;
+      p.x = clamp(portal.targetX, r, WORLD_W - r);
+      p.y = clamp(portal.targetY, r, WORLD_H - r);
+      p.lastPortalAt = now;
+      emitSelfState(p.id, p);
+      persistPlayerProfile(p);
+      io.to(p.id).emit('mapChanged', { mapId: p.mapId });
+      continue;
+    }
+
     const pickedOrbs = [];
     for (const oid in orbs) {
+      if (orbs[oid].mapId !== p.mapId) continue;
       if (dist(p, orbs[oid]) < r + ORB_RADIUS) pickedOrbs.push(oid);
     }
 
@@ -580,6 +637,7 @@ setInterval(() => {
     for (const lid in loots) {
       const loot = loots[lid];
       if (loot.ownerKey !== ownerKey) continue;
+      if (loot.mapId !== p.mapId) continue;
       if (dist(p, loot) >= r + LOOT_RADIUS) continue;
       if (!addItemToInventory(p, loot.item)) continue;
       pickedLoots.push(loot);
@@ -612,6 +670,7 @@ setInterval(() => {
     let nearDist = 300;
 
     for (const p of playerList) {
+      if (p.mapId !== m.mapId) continue;
       const d = dist(m, p);
       if (d < nearDist) {
         nearDist = d;
@@ -684,6 +743,7 @@ setInterval(() => {
     xp: p.xp,
     xpMax: xpToNextLevel(p.level),
     classKey: p.classKey,
+    mapId: p.mapId,
     hp: p.hp,
     maxHp: p.maxHp,
     atkRange: attackRangeForPlayer(p),
@@ -695,6 +755,7 @@ setInterval(() => {
   const sharedOrbs = Object.values(orbs);
   const sharedMonsters = Object.values(monsters).map(m => ({
     id: m.id,
+    mapId: m.mapId,
     x: m.x,
     y: m.y,
     type: m.type,
@@ -706,10 +767,13 @@ setInterval(() => {
 
   for (const p of playerList) {
     const privateLoots = playerLootsFor(p);
+    const sameMapPlayers = sharedPlayers.filter(entry => entry.mapId === p.mapId);
+    const sameMapOrbs = sharedOrbs.filter(entry => entry.mapId === p.mapId);
+    const sameMapMonsters = sharedMonsters.filter(entry => entry.mapId === p.mapId);
     io.to(p.id).emit('state', {
-      players: sharedPlayers,
-      orbs: sharedOrbs,
-      monsters: sharedMonsters,
+      players: sameMapPlayers,
+      orbs: sameMapOrbs,
+      monsters: sameMapMonsters,
       loots: privateLoots,
       self: buildSelfState(p, privateLoots),
     });
@@ -757,6 +821,7 @@ io.on('connection', socket => {
     const p = players[socket.id];
     const m = monsters[monsterId];
     if (!p || !m) return;
+    if (p.mapId !== m.mapId) return;
     if (dist(p, m) > attackRangeForPlayer(p) + m.r) return;
     const now = Date.now();
     if (now - p.lastAttackAt < attackCooldownForPlayer(p)) return;
@@ -821,6 +886,39 @@ io.on('connection', socket => {
       ack({
         ok: true,
         classKey: p.classKey,
+        self: buildSelfState(p, playerLootsFor(p)),
+      });
+    }
+  });
+
+  socket.on('devCheat', ack => {
+    const p = players[socket.id];
+    if (!p) return ack && ack({ ok: false, error: 'not_joined' });
+
+    let levelsGranted = 0;
+    let statPointsGranted = 0;
+
+    if (p.level < CLASS_UNLOCK_LEVEL) {
+      levelsGranted = CLASS_UNLOCK_LEVEL - p.level;
+      p.level = CLASS_UNLOCK_LEVEL;
+      p.xp = 0;
+      statPointsGranted += levelsGranted * STAT_POINTS_PER_LEVEL;
+    } else {
+      statPointsGranted += 15;
+    }
+
+    p.statPoints += statPointsGranted;
+    p.hp = p.maxHp;
+    emitSelfState(socket.id, p);
+    persistPlayerProfile(p);
+
+    if (ack) {
+      ack({
+        ok: true,
+        level: p.level,
+        levelsGranted,
+        statPointsGranted,
+        statPoints: p.statPoints,
         self: buildSelfState(p, playerLootsFor(p)),
       });
     }

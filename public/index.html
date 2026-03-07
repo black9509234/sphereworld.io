@@ -1441,6 +1441,24 @@
         });
 
         Object.assign(I18N.ko, {
+            map_field: "기본 구역",
+            map_mono: "흑백 구역",
+            portal_hint: "{map} 이동",
+            sys_map_changed: "포탈 이동 :: {map}",
+            sys_dev_cheat: "개발자 치트 :: 레벨 {level} :: +{points} PT",
+            sys_dev_cheat_error_not_joined: "개발자 치트 실패 :: 캐릭터가 연결되지 않았습니다",
+        });
+
+        Object.assign(I18N.en, {
+            map_field: "FIELD",
+            map_mono: "MONO ZONE",
+            portal_hint: "TO {map}",
+            sys_map_changed: "PORTAL SHIFT :: {map}",
+            sys_dev_cheat: "DEV CHEAT :: LEVEL {level} :: +{points} PT",
+            sys_dev_cheat_error_not_joined: "DEV CHEAT FAILED :: character is not connected",
+        });
+
+        Object.assign(I18N.ko, {
             hud_gear: "장비",
             hud_equipped: "장착",
             hud_inventory: "인벤토리",
@@ -1524,6 +1542,26 @@
                 en: { name: "MYSTIC", desc: "Support-oriented class built around control and utility." },
             },
         };
+        const MAP_META = {
+            field: {
+                nameKey: "map_field",
+                theme: null,
+            },
+            mono: {
+                nameKey: "map_mono",
+                theme: {
+                    bgTop: "#efefec",
+                    bgBottom: "#d3d3cf",
+                    grid: "rgba(0,0,0,.07)",
+                    gridMaj: "rgba(0,0,0,.11)",
+                    axis: "rgba(0,0,0,.24)",
+                    border: "rgba(0,0,0,.26)",
+                    muted: "#5e5e5e",
+                    text: "#111111",
+                },
+            },
+        };
+        const DEV_CHEAT_SEQUENCE = ["arrowup", "arrowup", "arrowdown", "arrowdown", "arrowleft", "arrowright", "arrowleft", "arrowright", "a", "b"];
         const DECOR_PORTAL_OFFSET_X = 96;
 
         let authMode = "login",
@@ -1578,6 +1616,26 @@
             return CLASS_META[classKey]?.[currentLang] || CLASS_META[classKey]?.en || null;
         }
 
+        function currentMapId() {
+            return currentSelf?.mapId || playerMap[myId]?.mapId || "field";
+        }
+
+        function mapName(mapId) {
+            return t(MAP_META[mapId]?.nameKey || "map_field");
+        }
+
+        function currentWorldStyle() {
+            const theme = MAP_META[currentMapId()]?.theme;
+            return theme ? { ...C, ...theme } : C;
+        }
+
+        function portalForMap(mapId = currentMapId()) {
+            if (mapId === "mono") {
+                return { x: DECOR_PORTAL_OFFSET_X, y: worldH / 2, targetMapId: "field" };
+            }
+            return { x: worldW - DECOR_PORTAL_OFFSET_X, y: worldH / 2, targetMapId: "mono" };
+        }
+
         function className(classKey) {
             return classInfo(classKey)?.name || t("class_unassigned");
         }
@@ -1597,6 +1655,11 @@
         function classErrorMessage(code, extra = {}) {
             const key = `sys_class_error_${code || "bad_class"}`;
             return t(key, extra) === key ? String(code || "bad_class") : t(key, extra);
+        }
+
+        function devCheatErrorMessage(code) {
+            const key = `sys_dev_cheat_error_${code || "not_joined"}`;
+            return t(key) === key ? String(code || "not_joined") : t(key);
         }
 
         function renderClassOptions() {
@@ -1679,6 +1742,19 @@
                 applySelfState(res.self || currentSelf);
                 addChatLine(`<span class="ct">${escHtml(t("sys_class_selected", { name: className(res.classKey) }))}</span>`, "lvlup");
                 toggleClassScreen(false);
+            });
+        }
+
+        function activateDevCheat() {
+            if (!socket) return;
+            socket.emit("devCheat", res => {
+                if (!res?.ok) {
+                    addChatLine(`<span class="ct">${escHtml(devCheatErrorMessage(res?.error))}</span>`, "sys");
+                    return;
+                }
+                applySelfState(res.self || currentSelf);
+                if (res.levelsGranted > 0) showLevelUpFlash(res.level);
+                addChatLine(`<span class="ct">${escHtml(t("sys_dev_cheat", { level: res.level, points: res.statPointsGranted || 0 }))}</span>`, "lvlup");
             });
         }
 
@@ -1801,13 +1877,30 @@
             classScreenOpen = false,
             classPrompted = false,
             classSelectionPending = false,
+            devCheatProgress = 0,
             lastLoadoutSignature = "",
             rafId = null,
             attackCooldown = false;
 
+        function trackDevCheat(key) {
+            if (!gameRunning || chatFocused()) return;
+            const normalized = String(key || "").toLowerCase();
+            const expected = DEV_CHEAT_SEQUENCE[devCheatProgress];
+            if (normalized === expected) {
+                devCheatProgress += 1;
+                if (devCheatProgress >= DEV_CHEAT_SEQUENCE.length) {
+                    devCheatProgress = 0;
+                    activateDevCheat();
+                }
+                return;
+            }
+            devCheatProgress = normalized === DEV_CHEAT_SEQUENCE[0] ? 1 : 0;
+        }
+
         renderStaticI18n();
 
         addEventListener("keydown", e => {
+            trackDevCheat(e.key);
             if ((e.key === "e" || e.key === "E") && gameRunning && !chatFocused()) {
                 toggleInventory();
                 e.preventDefault();
@@ -2268,6 +2361,10 @@
             socket.on("selfSync", self => {
                 applySelfState(self);
             });
+            socket.on("mapChanged", ({ mapId }) => {
+                attackCooldown = false;
+                addChatLine(`<span class="ct">${escHtml(t("sys_map_changed", { map: mapName(mapId) }))}</span>`, "sys");
+            });
             socket.on("damaged", ({ dmg }) => {
                 elHpFill.style.background = "linear-gradient(90deg,rgba(252,165,165,.5),#ef4444)";
                 setTimeout(() => elHpFill.style.background = "linear-gradient(90deg,rgba(248,113,113,.4),#dc2626)", 260);
@@ -2326,6 +2423,7 @@
             classScreenOpen = false;
             classPrompted = false;
             classSelectionPending = false;
+            devCheatProgress = 0;
             myId = null;
             playerMap = {};
             orbMap = {};
@@ -2433,17 +2531,19 @@
         }
 
         function drawBg() {
+            const worldStyle = currentWorldStyle();
             const base = ctx.createLinearGradient(0, 0, 0, viewH);
-            base.addColorStop(0, C.bgTop);
-            base.addColorStop(1, C.bgBottom);
+            base.addColorStop(0, worldStyle.bgTop);
+            base.addColorStop(1, worldStyle.bgBottom);
             ctx.fillStyle = base;
             ctx.fillRect(0, 0, viewW, viewH);
         }
 
         function drawGrid() {
+            const worldStyle = currentWorldStyle();
             let sx0 = Math.floor(camX / TILE) * TILE,
                 sy0 = Math.floor(camY / TILE) * TILE;
-            ctx.strokeStyle = C.grid;
+            ctx.strokeStyle = worldStyle.grid;
             ctx.lineWidth = 1;
             ctx.beginPath();
             for (let x = sx0; x < camX + viewW + TILE; x += TILE) {
@@ -2457,7 +2557,7 @@
             ctx.stroke();
 
             const major = TILE * 5;
-            ctx.strokeStyle = C.gridMaj;
+            ctx.strokeStyle = worldStyle.gridMaj;
             ctx.lineWidth = 1.2;
             sx0 = Math.floor(camX / major) * major;
             sy0 = Math.floor(camY / major) * major;
@@ -2475,7 +2575,7 @@
             const axisX = worldW / 2 - camX,
                 axisY = worldH / 2 - camY;
             ctx.save();
-            ctx.strokeStyle = C.axis;
+            ctx.strokeStyle = worldStyle.axis;
             ctx.lineWidth = 1.6;
             ctx.setLineDash([7, 5]);
             ctx.beginPath();
@@ -2486,7 +2586,7 @@
             ctx.stroke();
             ctx.restore();
 
-            ctx.fillStyle = C.muted;
+            ctx.fillStyle = worldStyle.muted;
             ctx.font = "11px Consolas, monospace";
             ctx.textAlign = "center";
             for (let x = Math.floor(camX / major) * major; x < camX + viewW + major; x += major) {
@@ -2498,7 +2598,7 @@
                 const value = Math.round(worldH / 2 - y);
                 if (value) ctx.fillText(String(value), axisX - 8, y - camY + 4);
             }
-            ctx.fillStyle = C.text;
+            ctx.fillStyle = worldStyle.text;
             ctx.font = "700 11px Consolas, monospace";
             ctx.textAlign = "left";
             ctx.fillText("0", axisX + 9, axisY - 10);
@@ -2508,8 +2608,9 @@
 
         function drawArrow(x, y, dx, dy) {
             const size = 7;
+            const worldStyle = currentWorldStyle();
             ctx.save();
-            ctx.fillStyle = C.axis;
+            ctx.fillStyle = worldStyle.axis;
             ctx.translate(x, y);
             ctx.rotate(Math.atan2(dy, dx));
             ctx.beginPath();
@@ -2522,12 +2623,13 @@
         }
 
         function drawBorder() {
-            ctx.strokeStyle = C.border;
+            const worldStyle = currentWorldStyle();
+            ctx.strokeStyle = worldStyle.border;
             ctx.lineWidth = 2.5;
             ctx.strokeRect(-camX, -camY, worldW, worldH);
             const hw = Math.round(worldW / 2),
                 hh = Math.round(worldH / 2);
-            ctx.fillStyle = "rgba(0,0,0,.42)";
+            ctx.fillStyle = worldStyle.muted;
             ctx.font = "11px Consolas, monospace";
             [
                 { x: -camX + 8, y: -camY + 16, text: `(-${hw}, +${hh})`, align: "left" },
@@ -2541,11 +2643,7 @@
         }
 
         function drawPortal() {
-            const portal = {
-                x: worldW - DECOR_PORTAL_OFFSET_X,
-                y: worldH / 2,
-                r: 34,
-            };
+            const portal = { ...portalForMap(), r: 34 };
             const sx = portal.x - camX,
                 sy = portal.y - camY;
             if (sx < -120 || sx > viewW + 120 || sy < -120 || sy > viewH + 120) return;
@@ -2581,7 +2679,7 @@
             ctx.stroke();
             ctx.setLineDash([]);
 
-            drawPill(`${t("portal_label")} :: ${t("portal_state")}`, sx, sy - portal.r - 20, {
+            drawPill(`${t("portal_label")} :: ${t("portal_hint", { map: mapName(portal.targetMapId) })}`, sx, sy - portal.r - 20, {
                 font: "700 10px Consolas, monospace",
                 bg: "rgba(255,255,255,.92)",
             });
