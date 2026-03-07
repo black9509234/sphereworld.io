@@ -147,6 +147,14 @@ function scheduleSaveProfiles() {
   if (typeof saveTimer.unref === 'function') saveTimer.unref();
 }
 
+function flushSaveProfilesSync() {
+  if (saveTimer) {
+    clearTimeout(saveTimer);
+    saveTimer = null;
+  }
+  fs.writeFileSync(SAVE_FILE, JSON.stringify(savedProfiles, null, 2), 'utf8');
+}
+
 function clamp(v, lo, hi) {
   return v < lo ? lo : v > hi ? hi : v;
 }
@@ -365,12 +373,16 @@ function readSavedProfile(name) {
   return savedProfiles[key] || savedProfiles[normalized] || null;
 }
 
-function persistPlayerProfile(p) {
+function persistPlayerProfile(p, { immediate = false } = {}) {
   const profile = serializePlayerProfile(p);
   const normalized = normalizePlayerName(p.name);
   const key = playerNameKey(normalized);
   savedProfiles[key] = profile;
   if (normalized !== key) savedProfiles[normalized] = profile;
+  if (immediate) {
+    flushSaveProfilesSync();
+    return;
+  }
   scheduleSaveProfiles();
 }
 
@@ -503,7 +515,7 @@ const activePlayersByName = {};
 function removePlayer(socketId, { save = true } = {}) {
   const p = players[socketId];
   if (!p) return;
-  if (save) persistPlayerProfile(p);
+  if (save) persistPlayerProfile(p, { immediate: true });
   const key = playerNameKey(p.name);
   if (activePlayersByName[key] === socketId) delete activePlayersByName[key];
   delete players[socketId];
@@ -862,7 +874,7 @@ io.on('connection', socket => {
     p.stats[stat] += 1;
     recalcDerivedStats(p);
     if (stat === 'vit') p.hp = clamp(p.hp + (p.maxHp - prevMaxHp), 0, p.maxHp);
-    persistPlayerProfile(p);
+    persistPlayerProfile(p, { immediate: true });
 
     if (ack) {
       ack({
@@ -896,7 +908,7 @@ io.on('connection', socket => {
     p.classKey = nextClassKey;
     console.log('[class/select] success', { socketId: socket.id, classKey: p.classKey });
     emitSelfState(socket.id, p);
-    persistPlayerProfile(p);
+    persistPlayerProfile(p, { immediate: true });
 
     if (ack) {
       ack({
@@ -926,7 +938,7 @@ io.on('connection', socket => {
     p.statPoints += statPointsGranted;
     p.hp = p.maxHp;
     emitSelfState(socket.id, p);
-    persistPlayerProfile(p);
+    persistPlayerProfile(p, { immediate: true });
 
     if (ack) {
       ack({
@@ -999,6 +1011,22 @@ io.on('connection', socket => {
     console.log('[-]', socket.id);
     removePlayer(socket.id, { save: true });
   });
+});
+
+for (const signal of ['SIGINT', 'SIGTERM']) {
+  process.on(signal, () => {
+    try {
+      flushSaveProfilesSync();
+    } finally {
+      process.exit(0);
+    }
+  });
+}
+
+process.on('exit', () => {
+  try {
+    flushSaveProfilesSync();
+  } catch {}
 });
 
 const PORT = process.env.PORT || 3000;
