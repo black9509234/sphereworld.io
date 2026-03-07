@@ -1699,6 +1699,7 @@
         const DEV_CHEAT_SEQUENCE = ["arrowup", "arrowup", "arrowdown", "arrowdown", "arrowleft", "arrowright", "arrowleft", "arrowright", "a", "b"];
         const DECOR_PORTAL_OFFSET_X = 96;
         const PANEL_STATE_KEY = "sphere_panel_state_v1";
+        const PERSISTENT_PANELS = new Set(["hud", "controls", "chat"]);
 
         let authMode = "login",
             currentLang = localStorage.getItem(LANG_KEY) === "en" ? "en" : "ko";
@@ -1773,7 +1774,14 @@
             controls: document.getElementById("controls-toggle"),
             chat: document.getElementById("chat-toggle"),
         };
-        const loadPanelState = () => { try { return JSON.parse(localStorage.getItem(PANEL_STATE_KEY)) || {} } catch { return {} } };
+        const loadPanelState = () => {
+            try {
+                const raw = JSON.parse(localStorage.getItem(PANEL_STATE_KEY)) || {};
+                return Object.fromEntries(Object.entries(raw).filter(([name]) => PERSISTENT_PANELS.has(name)));
+            } catch {
+                return {};
+            }
+        };
         let panelState = loadPanelState();
 
         function classInfo(classKey) {
@@ -1798,11 +1806,18 @@
             button.setAttribute("aria-expanded", collapsed ? "false" : "true");
         }
 
+        function setPanelCollapsed(name, collapsed, { persist = PERSISTENT_PANELS.has(name) } = {}) {
+            panelState[name] = !!collapsed;
+            if (persist) {
+                const storedState = Object.fromEntries(Object.entries(panelState).filter(([panelName]) => PERSISTENT_PANELS.has(panelName)));
+                localStorage.setItem(PANEL_STATE_KEY, JSON.stringify(storedState));
+            }
+            applyPanelState(name);
+        }
+
         function togglePanel(name, force) {
             const next = typeof force === "boolean" ? force : !panelState[name];
-            panelState[name] = !!next;
-            localStorage.setItem(PANEL_STATE_KEY, JSON.stringify(panelState));
-            applyPanelState(name);
+            setPanelCollapsed(name, next);
         }
 
         function mapName(mapId) {
@@ -1917,7 +1932,7 @@
             classScreen.style.display = classScreenOpen ? "block" : "none";
             if (classScreenOpen) {
                 renderClassOptions();
-                applyPanelState("class");
+                setPanelCollapsed("class", false, { persist: false });
             }
         }
 
@@ -2197,7 +2212,7 @@
             inventoryOpen = typeof force === "boolean" ? force : !inventoryOpen;
             if (inventoryOpen) toggleClassScreen(false);
             inventoryPanel.style.display = inventoryOpen && gameRunning ? "block" : "none";
-            if (inventoryOpen) applyPanelState("inventory");
+            if (inventoryOpen) setPanelCollapsed("inventory", false, { persist: false });
         }
 
         function equipErrorMessage(code) {

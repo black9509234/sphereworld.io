@@ -1,2 +1,7 @@
 node_modules/
 .env
+.tmp-chrome-profile/
+.tmp-chrome-profile-*/
+.tmp-edge-profile/
+.tmp-server.out.log
+.tmp-server.err.log

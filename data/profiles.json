@@ -1,1 +1,29 @@
-{}
+{
+  "botuser": {
+    "name": "botuser",
+    "x": 762,
+    "y": 28,
+    "level": 15,
+    "xp": 0,
+    "hp": 100,
+    "statPoints": 42,
+    "classKey": "vanguard",
+    "mapId": "field",
+    "stats": {
+      "str": 0,
+      "agi": 0,
+      "vit": 0,
+      "dex": 0,
+      "wis": 0,
+      "luk": 0
+    },
+    "inventory": [],
+    "equipment": {
+      "weapon": null,
+      "armor": null,
+      "boots": null,
+      "gloves": null,
+      "charm": null
+    }
+  }
+}
