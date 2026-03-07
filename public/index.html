@@ -8,23 +8,23 @@
     <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
     <style>
         :root {
-            --bg1: #0a0a0a;
-            --bg2: #000000;
-            --panel: rgba(10, 10, 10, .84);
-            --panel2: rgba(18, 18, 18, .94);
-            --border: rgba(255, 255, 255, .14);
-            --border2: rgba(255, 255, 255, .28);
-            --text: #f2f2f2;
-            --muted: #b8b8b8;
-            --soft: #7f7f7f;
-            --accent: #ffffff;
-            --accent2: #cfcfcf;
-            --ok: #ffffff;
-            --bad: #7f7f7f;
-            --warn: #d4d4d4;
+            --bg1: #fcfcfa;
+            --bg2: #efefea;
+            --panel: rgba(255, 255, 255, .82);
+            --panel2: rgba(250, 250, 247, .94);
+            --border: rgba(20, 20, 20, .08);
+            --border2: rgba(20, 20, 20, .16);
+            --text: #101010;
+            --muted: #686868;
+            --soft: #8a8a8a;
+            --accent: #111111;
+            --accent2: #4a4a4a;
+            --ok: #111111;
+            --bad: #5c5c5c;
+            --warn: #303030;
             --mono: "Consolas", "Courier New", monospace;
             --sans: "Consolas", "Courier New", monospace;
-            --shadow: 0 18px 40px rgba(0, 0, 0, .32);
+            --shadow: 0 18px 40px rgba(16, 16, 16, .08);
         }
 
         * {
@@ -56,16 +56,16 @@
 
         body::before {
             background:
-                linear-gradient(rgba(255, 255, 255, .03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255, 255, 255, .025) 1px, transparent 1px);
+                linear-gradient(rgba(16, 16, 16, .02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(16, 16, 16, .018) 1px, transparent 1px);
             background-size: 100% 4px, 28px 100%;
-            opacity: .3;
+            opacity: .5;
         }
 
         body::after {
             background:
-                radial-gradient(circle at 50% 0, rgba(255, 255, 255, .08), transparent 42%),
-                linear-gradient(180deg, rgba(255, 255, 255, .04), transparent 24%, transparent 76%, rgba(255, 255, 255, .03));
+                radial-gradient(circle at 50% 0, rgba(255, 255, 255, .8), transparent 45%),
+                linear-gradient(180deg, rgba(255, 255, 255, .48), transparent 26%, transparent 78%, rgba(0, 0, 0, .02));
         }
 
         button,
@@ -91,7 +91,7 @@
             align-items: center;
             justify-content: center;
             padding: 24px;
-            background: rgba(0, 0, 0, .74);
+            background: rgba(252, 252, 249, .76);
             backdrop-filter: blur(8px);
         }
 
@@ -101,7 +101,7 @@
             overflow: hidden;
             border: 1px solid var(--border2);
             border-radius: 4px;
-            background: linear-gradient(180deg, rgba(18, 18, 18, .98), rgba(5, 5, 5, .98));
+            background: linear-gradient(180deg, rgba(255, 255, 255, .98), rgba(243, 243, 238, .96));
             box-shadow: var(--shadow);
         }
 
@@ -110,27 +110,20 @@
             position: absolute;
             inset: 0 0 auto;
             height: 52px;
-            background: linear-gradient(90deg, rgba(255, 255, 255, .12), rgba(255, 255, 255, 0));
+            background: linear-gradient(90deg, rgba(0, 0, 0, .04), rgba(0, 0, 0, 0));
         }
 
         .auth-titlebar {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 0;
             padding: 14px 18px;
-            border-bottom: 1px solid rgba(255, 255, 255, .12);
-            background: rgba(16, 16, 16, .94);
+            border-bottom: 1px solid rgba(17, 17, 17, .08);
+            background: rgba(252, 252, 251, .92);
             color: var(--muted);
             font: 11px var(--mono);
             letter-spacing: .12em;
             text-transform: uppercase;
-        }
-
-        .auth-titlebar .dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 1px;
-            flex-shrink: 0;
         }
 
         .auth-body {
@@ -167,14 +160,14 @@
             font-weight: 700;
             letter-spacing: .02em;
             text-transform: uppercase;
-            text-shadow: 0 0 14px rgba(255, 255, 255, .08);
+            text-shadow: none;
         }
 
         .auth-pill {
             padding: 6px 10px;
-            border: 1px solid rgba(255, 255, 255, .18);
+            border: 1px solid rgba(17, 17, 17, .12);
             border-radius: 2px;
-            background: rgba(255, 255, 255, .05);
+            background: rgba(255, 255, 255, .72);
             color: var(--accent);
             font: 10px var(--mono);
             letter-spacing: .14em;
@@ -196,9 +189,9 @@
 
         .mbtn {
             padding: 12px 0;
-            border: 1px solid rgba(255, 255, 255, .12);
+            border: 1px solid rgba(17, 17, 17, .1);
             border-radius: 2px;
-            background: rgba(14, 14, 14, .92);
+            background: rgba(255, 255, 255, .72);
             color: var(--muted);
             font: 700 12px var(--mono);
             letter-spacing: .12em;
@@ -207,14 +200,14 @@
         }
 
         .mbtn.on {
-            border-color: rgba(255, 255, 255, .34);
-            background: rgba(255, 255, 255, .08);
+            border-color: rgba(17, 17, 17, .18);
+            background: rgba(17, 17, 17, .06);
             color: var(--accent);
-            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .1), 0 0 18px rgba(255, 255, 255, .04);
+            box-shadow: inset 0 0 0 1px rgba(17, 17, 17, .04), 0 10px 20px rgba(17, 17, 17, .04);
         }
 
         .mbtn:hover:not(.on) {
-            border-color: rgba(255, 255, 255, .24);
+            border-color: rgba(17, 17, 17, .16);
             color: var(--accent);
         }
 
@@ -232,15 +225,15 @@
             align-items: center;
             gap: 10px;
             padding: 0 14px;
-            border: 1px solid rgba(255, 255, 255, .12);
+            border: 1px solid rgba(17, 17, 17, .1);
             border-radius: 2px;
-            background: rgba(7, 7, 7, .88);
+            background: rgba(255, 255, 255, .86);
             transition: border-color .16s, box-shadow .16s;
         }
 
         .irow:focus-within {
-            border-color: rgba(255, 255, 255, .32);
-            box-shadow: 0 0 0 3px rgba(255, 255, 255, .06);
+            border-color: rgba(17, 17, 17, .18);
+            box-shadow: 0 0 0 3px rgba(17, 17, 17, .04);
         }
 
         .ipfx {
@@ -262,25 +255,25 @@
 
         .irow input::placeholder,
         #chat-input::placeholder {
-            color: rgba(184, 184, 184, .54);
+            color: rgba(80, 80, 80, .54);
         }
 
         .sep {
             margin: 18px 0;
             border: none;
-            border-top: 1px solid rgba(255, 255, 255, .1);
+            border-top: 1px solid rgba(17, 17, 17, .08);
         }
 
         .sbtn {
             width: 100%;
             padding: 15px;
-            border: 1px solid rgba(255, 255, 255, .24);
+            border: 1px solid rgba(17, 17, 17, .12);
             border-radius: 2px;
-            background: rgba(255, 255, 255, .07);
-            color: var(--accent);
+            background: linear-gradient(180deg, rgba(34, 34, 34, .96), rgba(17, 17, 17, .96));
+            color: #ffffff;
             font: 700 12px var(--mono);
             letter-spacing: .14em;
-            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .06);
+            box-shadow: none;
             text-transform: uppercase;
         }
 
@@ -321,7 +314,7 @@
             border: 1px solid var(--border);
             background: var(--panel);
             backdrop-filter: blur(10px);
-            box-shadow: 0 10px 24px rgba(0, 0, 0, .22);
+            box-shadow: 0 10px 24px rgba(18, 18, 18, .08);
         }
 
         .hud-panel {
@@ -370,7 +363,7 @@
             gap: 6px;
             min-width: 0;
             padding: 10px;
-            border: 1px solid rgba(255, 255, 255, .1);
+            border: 1px solid rgba(17, 17, 17, .08);
             border-radius: 2px;
             background: var(--panel2);
         }
@@ -402,8 +395,8 @@
             height: 6px;
             overflow: hidden;
             border-radius: 1px;
-            background: rgba(255, 255, 255, .08);
-            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .06);
+            background: rgba(17, 17, 17, .08);
+            box-shadow: inset 0 0 0 1px rgba(17, 17, 17, .05);
         }
 
         #xp-fill,
@@ -415,12 +408,12 @@
         }
 
         #xp-fill {
-            background: linear-gradient(90deg, rgba(255, 255, 255, .22), var(--accent));
+            background: linear-gradient(90deg, rgba(120, 120, 120, .24), #141414);
         }
 
         #hp-fill {
             width: 100%;
-            background: linear-gradient(90deg, rgba(140, 140, 140, .42), var(--bad));
+            background: linear-gradient(90deg, rgba(160, 160, 160, .34), #555555);
         }
 
         #logout-btn {
@@ -439,9 +432,9 @@
         }
 
         #logout-btn:hover {
-            border-color: rgba(255, 255, 255, .24);
-            color: var(--bad);
-            background: rgba(255, 255, 255, .06);
+            border-color: rgba(17, 17, 17, .14);
+            color: var(--accent);
+            background: rgba(17, 17, 17, .04);
         }
 
         #controls-card {
@@ -485,9 +478,9 @@
             justify-content: center;
             min-width: 38px;
             padding: 5px 8px;
-            border: 1px solid rgba(255, 255, 255, .16);
+            border: 1px solid rgba(17, 17, 17, .12);
             border-radius: 2px;
-            background: rgba(255, 255, 255, .05);
+            background: rgba(17, 17, 17, .04);
             color: var(--accent);
             font: 700 11px var(--mono);
         }
@@ -525,7 +518,7 @@
             overflow-x: hidden;
             padding: 10px 12px;
             border-radius: 3px;
-            background: rgba(10, 10, 10, .9);
+            background: rgba(255, 255, 255, .88);
             scroll-behavior: smooth;
         }
 
@@ -535,7 +528,7 @@
 
         #chat-log::-webkit-scrollbar-thumb {
             border-radius: 1px;
-            background: rgba(255, 255, 255, .24);
+            background: rgba(17, 17, 17, .18);
         }
 
         .chat-line {
@@ -564,7 +557,7 @@
             gap: 8px;
             padding: 8px;
             border-radius: 3px;
-            background: rgba(10, 10, 10, .92);
+            background: rgba(255, 255, 255, .92);
         }
 
         #chat-input {
@@ -582,9 +575,9 @@
         #chat-send {
             flex-shrink: 0;
             padding: 8px 12px;
-            border: 1px solid rgba(255, 255, 255, .18);
+            border: 1px solid rgba(17, 17, 17, .12);
             border-radius: 2px;
-            background: rgba(255, 255, 255, .06);
+            background: rgba(17, 17, 17, .04);
             color: var(--accent);
             font: 700 11px var(--mono);
             letter-spacing: .12em;
@@ -596,11 +589,11 @@
             left: 50%;
             z-index: 50;
             padding: 14px 18px;
-            border: 1px solid rgba(255, 255, 255, .22);
+            border: 1px solid rgba(17, 17, 17, .1);
             border-radius: 3px;
-            background: rgba(8, 8, 8, .94);
+            background: rgba(255, 255, 255, .92);
             backdrop-filter: blur(10px);
-            box-shadow: 0 18px 40px rgba(0, 0, 0, .28);
+            box-shadow: 0 18px 40px rgba(18, 18, 18, .08);
             color: var(--accent);
             font: 700 22px var(--mono);
             letter-spacing: .16em;
@@ -704,9 +697,7 @@
 <body>
     <div id="auth-screen">
         <div class="auth-box">
-            <div class="auth-titlebar"><span class="dot" style="background:#ffffff"></span><span class="dot"
-                    style="background:#9f9f9f"></span><span class="dot"
-                    style="background:#555555"></span><span>SPHERE.IO // ACCESS NODE</span></div>
+            <div class="auth-titlebar"><span>SPHERE.IO // ACCESS NODE</span></div>
             <div class="auth-body">
                 <div class="auth-kicker">WORLD ACCESS</div>
                 <div class="auth-title-row">
@@ -1009,7 +1000,7 @@
                 ctx.textAlign = "center";
                 ctx.textBaseline = "middle";
                 ctx.lineWidth = 3;
-                ctx.strokeStyle = "rgba(4,12,8,.92)";
+                ctx.strokeStyle = "rgba(255,255,255,.96)";
                 ctx.strokeText(item.text, sx, sy);
                 ctx.fillStyle = item.color;
                 ctx.fillText(item.text, sx, sy);
@@ -1061,15 +1052,15 @@
                 elHpFill.style.width = `${(me.hp / me.maxHp * 100).toFixed(1)}%`;
             });
             socket.on("damaged", ({ dmg }) => {
-                elHpFill.style.background = "linear-gradient(90deg,rgba(255,255,255,.54),#8a8a8a)";
-                setTimeout(() => elHpFill.style.background = "linear-gradient(90deg,rgba(140,140,140,.42),#7f7f7f)", 260);
+                elHpFill.style.background = "linear-gradient(90deg,rgba(190,190,190,.42),#3c3c3c)";
+                setTimeout(() => elHpFill.style.background = "linear-gradient(90deg,rgba(160,160,160,.34),#555555)", 260);
                 const me = playerMap[myId];
-                if (me) spawnDmgNum(me.x, me.y - me.r - 10, `-${dmg}`, "#9a9a9a");
+                if (me) spawnDmgNum(me.x, me.y - me.r - 10, `-${dmg}`, "#2f2f2f");
             });
             socket.on("died", () => addChatLine("<span class=\"ct\">NODE OFFLINE :: RESPAWNED AT SAFE POINT</span>", "sys"));
             socket.on("attackResult", ({ monsterId, dmg }) => {
                 const m = monsterMap[monsterId];
-                if (m) spawnDmgNum(m.x, m.y - m.r - 8, String(dmg), "#f0f0f0");
+                if (m) spawnDmgNum(m.x, m.y - m.r - 8, String(dmg), "#111111");
             });
             socket.on("monsterDied", ({ monsterId, killerId, xp }) => {
                 delete monsterMap[monsterId];
@@ -1114,7 +1105,7 @@
             document.getElementById("i-cfm").value = "";
             chatLog.innerHTML = "";
             levelupFlash.classList.remove("show");
-            elHpFill.style.background = "linear-gradient(90deg,rgba(140,140,140,.42),#7f7f7f)";
+            elHpFill.style.background = "linear-gradient(90deg,rgba(160,160,160,.34),#555555)";
             camX = camY = 0;
             lastPosStr = "";
             setMsg("INFO :: disconnected", "info");
@@ -1126,22 +1117,22 @@
             lastTime = 0;
         const CAM_SPEED = 8,
             C = {
-                bgTop: "#121212",
-                bgBottom: "#030303",
-                grid: "rgba(255,255,255,.05)",
-                gridMaj: "rgba(255,255,255,.09)",
-                axis: "rgba(255,255,255,.18)",
-                border: "rgba(255,255,255,.24)",
-                player: "#d9d9d9",
+                bgTop: "#fcfcfa",
+                bgBottom: "#efefea",
+                grid: "rgba(0,0,0,.05)",
+                gridMaj: "rgba(0,0,0,.08)",
+                axis: "rgba(0,0,0,.14)",
+                border: "rgba(0,0,0,.18)",
+                player: "#171717",
                 playerStroke: "#ffffff",
-                playerOther: "#7b7b7b",
-                muted: "#8c8c8c",
-                text: "#f2f2f2",
-                orb: "#f5f5f5",
-                orbStroke: "#8e8e8e",
-                hpHi: "#f2f2f2",
-                hpMid: "#a5a5a5",
-                hpLow: "#4e4e4e"
+                playerOther: "#949494",
+                muted: "#7d7d7d",
+                text: "#101010",
+                orb: "#ffffff",
+                orbStroke: "#1e1e1e",
+                hpHi: "#111111",
+                hpMid: "#666666",
+                hpLow: "#b8b8b8"
             };
 
         function updateCam(me, dt) {
@@ -1275,7 +1266,7 @@
             ctx.strokeRect(-camX, -camY, worldW, worldH);
             const hw = Math.round(worldW / 2),
                 hh = Math.round(worldH / 2);
-            ctx.fillStyle = "rgba(255,255,255,.46)";
+            ctx.fillStyle = "rgba(0,0,0,.42)";
             ctx.font = "11px Consolas, monospace";
             [
                 { x: -camX + 8, y: -camY + 16, text: `(-${hw}, +${hh})`, align: "left" },
@@ -1339,14 +1330,14 @@
                     }
                     ctx.closePath();
                     ctx.fillStyle = monster.color;
-                    ctx.strokeStyle = monster.color;
+                    ctx.strokeStyle = "#2a2a2a";
                     ctx.lineWidth = 2;
                     ctx.fill();
                     ctx.stroke();
                     break;
                 case "square":
                     ctx.fillStyle = monster.color;
-                    ctx.strokeStyle = monster.color;
+                    ctx.strokeStyle = "#2a2a2a";
                     ctx.lineWidth = 2;
                     ctx.fillRect(-monster.r, -monster.r, monster.r * 2, monster.r * 2);
                     ctx.strokeRect(-monster.r, -monster.r, monster.r * 2, monster.r * 2);
@@ -1359,10 +1350,10 @@
                 hpPct = Math.max(0, monster.hp / monster.maxHp),
                 bx = sx - barW / 2,
                 by = sy - monster.r - 14;
-            ctx.fillStyle = "rgba(8,8,8,.92)";
+            ctx.fillStyle = "rgba(255,255,255,.92)";
             roundRect(ctx, bx, by, barW, barH, 2);
             ctx.fill();
-            ctx.strokeStyle = "rgba(255,255,255,.12)";
+            ctx.strokeStyle = "rgba(17,17,17,.1)";
             ctx.stroke();
             ctx.fillStyle = hpPct > .5 ? C.hpHi : hpPct > .25 ? C.hpMid : C.hpLow;
             roundRect(ctx, bx + 1, by + 1, Math.max(0, barW * hpPct - 2), barH - 2, 1);
@@ -1371,9 +1362,9 @@
 
         function drawPill(text, x, y, {
             font = "700 11px Consolas, monospace",
-            bg = "rgba(8,8,8,.9)",
-            border = "rgba(255,255,255,.18)",
-            color = "#f2f2f2",
+            bg = "rgba(255,255,255,.9)",
+            border = "rgba(17,17,17,.12)",
+            color = "#101010",
             padX = 10,
             height = 20,
             radius = 3
@@ -1403,13 +1394,13 @@
             ctx.arc(sx, sy, player.r, 0, Math.PI * 2);
             ctx.fillStyle = isMe ? C.player : C.playerOther;
             ctx.fill();
-            ctx.strokeStyle = isMe ? C.playerStroke : "#b0b0b0";
+            ctx.strokeStyle = isMe ? C.playerStroke : "#ffffff";
             ctx.lineWidth = isMe ? 3 : 2.5;
             ctx.stroke();
             if (isMe) {
                 ctx.beginPath();
                 ctx.arc(sx, sy, player.r + 6, 0, Math.PI * 2);
-                ctx.strokeStyle = "rgba(255,255,255,.28)";
+                ctx.strokeStyle = "rgba(0,0,0,.18)";
                 ctx.lineWidth = 2;
                 ctx.stroke();
             }
@@ -1417,7 +1408,7 @@
 
             drawPill(player.name, sx, sy - player.r - 28);
             ctx.save();
-            ctx.fillStyle = isMe ? "#ffffff" : "#b3b3b3";
+            ctx.fillStyle = isMe ? "#111111" : "#6d6d6d";
             ctx.font = "700 11px Consolas, monospace";
             ctx.textAlign = "center";
             ctx.fillText(`Lv.${player.level}`, sx, sy - player.r - 8);
@@ -1433,15 +1424,15 @@
                 ctx.textBaseline = "middle";
                 const tw = Math.min(ctx.measureText(bubble.text).width + 18, 220),
                     bh = 28;
-                ctx.fillStyle = "rgba(8,8,8,.92)";
-                ctx.strokeStyle = "rgba(255,255,255,.16)";
+                ctx.fillStyle = "rgba(255,255,255,.94)";
+                ctx.strokeStyle = "rgba(17,17,17,.1)";
                 roundRect(ctx, bx - tw / 2, by - bh / 2, tw, bh, 3);
                 ctx.fill();
                 ctx.stroke();
                 ctx.beginPath();
                 ctx.rect(bx - tw / 2 + 6, by - bh / 2, tw - 12, bh);
                 ctx.clip();
-                ctx.fillStyle = "#f2f2f2";
+                ctx.fillStyle = "#101010";
                 ctx.fillText(bubble.text, bx, by + .5);
                 ctx.restore();
             }
