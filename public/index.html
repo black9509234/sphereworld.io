@@ -1592,8 +1592,6 @@
             map_mono: "흑백 구역",
             portal_hint: "{map} 이동",
             sys_map_changed: "포탈 이동 :: {map}",
-            sys_dev_cheat: "개발자 치트 :: 레벨 {level} :: +{points} PT",
-            sys_dev_cheat_error_not_joined: "개발자 치트 실패 :: 캐릭터가 연결되지 않았습니다",
         });
 
         Object.assign(I18N.en, {
@@ -1601,8 +1599,6 @@
             map_mono: "MONO ZONE",
             portal_hint: "TO {map}",
             sys_map_changed: "PORTAL SHIFT :: {map}",
-            sys_dev_cheat: "DEV CHEAT :: LEVEL {level} :: +{points} PT",
-            sys_dev_cheat_error_not_joined: "DEV CHEAT FAILED :: character is not connected",
         });
 
         Object.assign(I18N.ko, {
@@ -1708,7 +1704,6 @@
                 },
             },
         };
-        const DEV_CHEAT_SEQUENCE = ["arrowup", "arrowup", "arrowdown", "arrowdown", "arrowleft", "arrowright", "arrowleft", "arrowright", "a", "b"];
         const DECOR_PORTAL_OFFSET_X = 96;
         const PANEL_STATE_KEY = "sphere_panel_state_v1";
         const PERSISTENT_PANELS = new Set(["hud", "controls", "chat"]);
@@ -1869,11 +1864,6 @@
             return t(key, extra) === key ? String(code || "bad_class") : t(key, extra);
         }
 
-        function devCheatErrorMessage(code) {
-            const key = `sys_dev_cheat_error_${code || "not_joined"}`;
-            return t(key) === key ? String(code || "not_joined") : t(key);
-        }
-
         function renderClassOptions() {
             if (!classOptions) return;
             const selectedClass = currentClassKey();
@@ -1990,19 +1980,6 @@
                 applySelfState(res.self || currentSelf);
                 addChatLine(`<span class="ct">${escHtml(t("sys_class_selected", { name: className(res.classKey) }))}</span>`, "lvlup");
                 toggleClassScreen(false);
-            });
-        }
-
-        function activateDevCheat() {
-            if (!socket) return;
-            socket.emit("devCheat", res => {
-                if (!res?.ok) {
-                    addChatLine(`<span class="ct">${escHtml(devCheatErrorMessage(res?.error))}</span>`, "sys");
-                    return;
-                }
-                applySelfState(res.self || currentSelf);
-                if (res.levelsGranted > 0) showLevelUpFlash(res.level);
-                addChatLine(`<span class="ct">${escHtml(t("sys_dev_cheat", { level: res.level, points: res.statPointsGranted || 0 }))}</span>`, "lvlup");
             });
         }
 
@@ -2126,31 +2103,14 @@
             lastClassAttemptError = "",
             classPrompted = false,
             classSelectionPending = false,
-            devCheatProgress = 0,
             lastLoadoutSignature = "",
             rafId = null,
             attackCooldown = false;
-
-        function trackDevCheat(key) {
-            if (!gameRunning || chatFocused()) return;
-            const normalized = String(key || "").toLowerCase();
-            const expected = DEV_CHEAT_SEQUENCE[devCheatProgress];
-            if (normalized === expected) {
-                devCheatProgress += 1;
-                if (devCheatProgress >= DEV_CHEAT_SEQUENCE.length) {
-                    devCheatProgress = 0;
-                    activateDevCheat();
-                }
-                return;
-            }
-            devCheatProgress = normalized === DEV_CHEAT_SEQUENCE[0] ? 1 : 0;
-        }
 
         renderStaticI18n();
         Object.keys(panelBodies).forEach(applyPanelState);
 
         addEventListener("keydown", e => {
-            trackDevCheat(e.key);
             if (!chatFocused() && ["1", "2", "3"].includes(e.key)) {
                 if (selectClassByIndex(Number(e.key) - 1)) {
                     e.preventDefault();
@@ -2704,7 +2664,6 @@
             classScreenOpen = false;
             classPrompted = false;
             classSelectionPending = false;
-            devCheatProgress = 0;
             myId = null;
             playerMap = {};
             orbMap = {};

@@ -919,39 +919,6 @@ io.on('connection', socket => {
     }
   });
 
-  socket.on('devCheat', ack => {
-    const p = players[socket.id];
-    if (!p) return ack && ack({ ok: false, error: 'not_joined' });
-
-    let levelsGranted = 0;
-    let statPointsGranted = 0;
-
-    if (p.level < CLASS_UNLOCK_LEVEL) {
-      levelsGranted = CLASS_UNLOCK_LEVEL - p.level;
-      p.level = CLASS_UNLOCK_LEVEL;
-      p.xp = 0;
-      statPointsGranted += levelsGranted * STAT_POINTS_PER_LEVEL;
-    } else {
-      statPointsGranted += 15;
-    }
-
-    p.statPoints += statPointsGranted;
-    p.hp = p.maxHp;
-    emitSelfState(socket.id, p);
-    persistPlayerProfile(p, { immediate: true });
-
-    if (ack) {
-      ack({
-        ok: true,
-        level: p.level,
-        levelsGranted,
-        statPointsGranted,
-        statPoints: p.statPoints,
-        self: buildSelfState(p, playerLootsFor(p)),
-      });
-    }
-  });
-
   socket.on('equipItem', ({ itemId }, ack) => {
     const p = players[socket.id];
     if (!p) return ack && ack({ ok: false, error: 'not_joined' });
