@@ -8,20 +8,20 @@
     <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
     <style>
         :root {
-            --bg1: #07110d;
-            --bg2: #020705;
-            --panel: rgba(5, 14, 10, .82);
-            --panel2: rgba(8, 18, 13, .92);
-            --border: rgba(103, 255, 184, .18);
-            --border2: rgba(103, 255, 184, .36);
-            --text: #d6ffe8;
-            --muted: #88c9aa;
-            --soft: #5f9379;
-            --accent: #67ffb8;
-            --accent2: #2fb875;
-            --ok: #7fffc3;
-            --bad: #ff6a7d;
-            --warn: #ffcf70;
+            --bg1: #0a0a0a;
+            --bg2: #000000;
+            --panel: rgba(10, 10, 10, .84);
+            --panel2: rgba(18, 18, 18, .94);
+            --border: rgba(255, 255, 255, .14);
+            --border2: rgba(255, 255, 255, .28);
+            --text: #f2f2f2;
+            --muted: #b8b8b8;
+            --soft: #7f7f7f;
+            --accent: #ffffff;
+            --accent2: #cfcfcf;
+            --ok: #ffffff;
+            --bad: #7f7f7f;
+            --warn: #d4d4d4;
             --mono: "Consolas", "Courier New", monospace;
             --sans: "Consolas", "Courier New", monospace;
             --shadow: 0 18px 40px rgba(0, 0, 0, .32);
@@ -56,16 +56,16 @@
 
         body::before {
             background:
-                linear-gradient(rgba(103, 255, 184, .035) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(103, 255, 184, .028) 1px, transparent 1px);
+                linear-gradient(rgba(255, 255, 255, .03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, .025) 1px, transparent 1px);
             background-size: 100% 4px, 28px 100%;
-            opacity: .38;
+            opacity: .3;
         }
 
         body::after {
             background:
-                radial-gradient(circle at 50% 0, rgba(103, 255, 184, .09), transparent 42%),
-                linear-gradient(180deg, rgba(103, 255, 184, .05), transparent 24%, transparent 76%, rgba(103, 255, 184, .04));
+                radial-gradient(circle at 50% 0, rgba(255, 255, 255, .08), transparent 42%),
+                linear-gradient(180deg, rgba(255, 255, 255, .04), transparent 24%, transparent 76%, rgba(255, 255, 255, .03));
         }
 
         button,
@@ -91,7 +91,7 @@
             align-items: center;
             justify-content: center;
             padding: 24px;
-            background: rgba(2, 8, 5, .72);
+            background: rgba(0, 0, 0, .74);
             backdrop-filter: blur(8px);
         }
 
@@ -101,7 +101,7 @@
             overflow: hidden;
             border: 1px solid var(--border2);
             border-radius: 4px;
-            background: linear-gradient(180deg, rgba(10, 22, 16, .98), rgba(4, 11, 8, .98));
+            background: linear-gradient(180deg, rgba(18, 18, 18, .98), rgba(5, 5, 5, .98));
             box-shadow: var(--shadow);
         }
 
@@ -110,7 +110,7 @@
             position: absolute;
             inset: 0 0 auto;
             height: 52px;
-            background: linear-gradient(90deg, rgba(103, 255, 184, .14), rgba(103, 255, 184, 0));
+            background: linear-gradient(90deg, rgba(255, 255, 255, .12), rgba(255, 255, 255, 0));
         }
 
         .auth-titlebar {
@@ -118,8 +118,8 @@
             align-items: center;
             gap: 8px;
             padding: 14px 18px;
-            border-bottom: 1px solid rgba(103, 255, 184, .14);
-            background: rgba(10, 24, 18, .94);
+            border-bottom: 1px solid rgba(255, 255, 255, .12);
+            background: rgba(16, 16, 16, .94);
             color: var(--muted);
             font: 11px var(--mono);
             letter-spacing: .12em;
@@ -167,14 +167,14 @@
             font-weight: 700;
             letter-spacing: .02em;
             text-transform: uppercase;
-            text-shadow: 0 0 14px rgba(103, 255, 184, .12);
+            text-shadow: 0 0 14px rgba(255, 255, 255, .08);
         }
 
         .auth-pill {
             padding: 6px 10px;
-            border: 1px solid rgba(103, 255, 184, .24);
+            border: 1px solid rgba(255, 255, 255, .18);
             border-radius: 2px;
-            background: rgba(103, 255, 184, .08);
+            background: rgba(255, 255, 255, .05);
             color: var(--accent);
             font: 10px var(--mono);
             letter-spacing: .14em;
@@ -196,9 +196,9 @@
 
         .mbtn {
             padding: 12px 0;
-            border: 1px solid rgba(103, 255, 184, .16);
+            border: 1px solid rgba(255, 255, 255, .12);
             border-radius: 2px;
-            background: rgba(9, 20, 15, .92);
+            background: rgba(14, 14, 14, .92);
             color: var(--muted);
             font: 700 12px var(--mono);
             letter-spacing: .12em;
@@ -207,14 +207,14 @@
         }
 
         .mbtn.on {
-            border-color: rgba(103, 255, 184, .42);
-            background: rgba(103, 255, 184, .12);
+            border-color: rgba(255, 255, 255, .34);
+            background: rgba(255, 255, 255, .08);
             color: var(--accent);
-            box-shadow: inset 0 0 0 1px rgba(103, 255, 184, .14), 0 0 18px rgba(103, 255, 184, .08);
+            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .1), 0 0 18px rgba(255, 255, 255, .04);
         }
 
         .mbtn:hover:not(.on) {
-            border-color: rgba(103, 255, 184, .28);
+            border-color: rgba(255, 255, 255, .24);
             color: var(--accent);
         }
 
@@ -232,15 +232,15 @@
             align-items: center;
             gap: 10px;
             padding: 0 14px;
-            border: 1px solid rgba(103, 255, 184, .16);
+            border: 1px solid rgba(255, 255, 255, .12);
             border-radius: 2px;
-            background: rgba(3, 10, 7, .88);
+            background: rgba(7, 7, 7, .88);
             transition: border-color .16s, box-shadow .16s;
         }
 
         .irow:focus-within {
-            border-color: rgba(103, 255, 184, .42);
-            box-shadow: 0 0 0 3px rgba(103, 255, 184, .08);
+            border-color: rgba(255, 255, 255, .32);
+            box-shadow: 0 0 0 3px rgba(255, 255, 255, .06);
         }
 
         .ipfx {
@@ -262,25 +262,25 @@
 
         .irow input::placeholder,
         #chat-input::placeholder {
-            color: rgba(136, 201, 170, .54);
+            color: rgba(184, 184, 184, .54);
         }
 
         .sep {
             margin: 18px 0;
             border: none;
-            border-top: 1px solid rgba(103, 255, 184, .12);
+            border-top: 1px solid rgba(255, 255, 255, .1);
         }
 
         .sbtn {
             width: 100%;
             padding: 15px;
-            border: 1px solid rgba(103, 255, 184, .36);
+            border: 1px solid rgba(255, 255, 255, .24);
             border-radius: 2px;
-            background: rgba(103, 255, 184, .12);
+            background: rgba(255, 255, 255, .07);
             color: var(--accent);
             font: 700 12px var(--mono);
             letter-spacing: .14em;
-            box-shadow: inset 0 0 0 1px rgba(103, 255, 184, .08);
+            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .06);
             text-transform: uppercase;
         }
 
@@ -370,7 +370,7 @@
             gap: 6px;
             min-width: 0;
             padding: 10px;
-            border: 1px solid rgba(103, 255, 184, .12);
+            border: 1px solid rgba(255, 255, 255, .1);
             border-radius: 2px;
             background: var(--panel2);
         }
@@ -402,8 +402,8 @@
             height: 6px;
             overflow: hidden;
             border-radius: 1px;
-            background: rgba(214, 255, 232, .08);
-            box-shadow: inset 0 0 0 1px rgba(103, 255, 184, .08);
+            background: rgba(255, 255, 255, .08);
+            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .06);
         }
 
         #xp-fill,
@@ -415,12 +415,12 @@
         }
 
         #xp-fill {
-            background: linear-gradient(90deg, rgba(103, 255, 184, .35), var(--accent));
+            background: linear-gradient(90deg, rgba(255, 255, 255, .22), var(--accent));
         }
 
         #hp-fill {
             width: 100%;
-            background: linear-gradient(90deg, rgba(255, 106, 125, .42), var(--bad));
+            background: linear-gradient(90deg, rgba(140, 140, 140, .42), var(--bad));
         }
 
         #logout-btn {
@@ -439,9 +439,9 @@
         }
 
         #logout-btn:hover {
-            border-color: rgba(255, 106, 125, .34);
+            border-color: rgba(255, 255, 255, .24);
             color: var(--bad);
-            background: rgba(255, 106, 125, .08);
+            background: rgba(255, 255, 255, .06);
         }
 
         #controls-card {
@@ -485,9 +485,9 @@
             justify-content: center;
             min-width: 38px;
             padding: 5px 8px;
-            border: 1px solid rgba(103, 255, 184, .18);
+            border: 1px solid rgba(255, 255, 255, .16);
             border-radius: 2px;
-            background: rgba(103, 255, 184, .06);
+            background: rgba(255, 255, 255, .05);
             color: var(--accent);
             font: 700 11px var(--mono);
         }
@@ -525,7 +525,7 @@
             overflow-x: hidden;
             padding: 10px 12px;
             border-radius: 3px;
-            background: rgba(5, 14, 10, .9);
+            background: rgba(10, 10, 10, .9);
             scroll-behavior: smooth;
         }
 
@@ -535,7 +535,7 @@
 
         #chat-log::-webkit-scrollbar-thumb {
             border-radius: 1px;
-            background: rgba(103, 255, 184, .24);
+            background: rgba(255, 255, 255, .24);
         }
 
         .chat-line {
@@ -564,7 +564,7 @@
             gap: 8px;
             padding: 8px;
             border-radius: 3px;
-            background: rgba(5, 14, 10, .92);
+            background: rgba(10, 10, 10, .92);
         }
 
         #chat-input {
@@ -582,9 +582,9 @@
         #chat-send {
             flex-shrink: 0;
             padding: 8px 12px;
-            border: 1px solid rgba(103, 255, 184, .22);
+            border: 1px solid rgba(255, 255, 255, .18);
             border-radius: 2px;
-            background: rgba(103, 255, 184, .1);
+            background: rgba(255, 255, 255, .06);
             color: var(--accent);
             font: 700 11px var(--mono);
             letter-spacing: .12em;
@@ -596,9 +596,9 @@
             left: 50%;
             z-index: 50;
             padding: 14px 18px;
-            border: 1px solid rgba(103, 255, 184, .28);
+            border: 1px solid rgba(255, 255, 255, .22);
             border-radius: 3px;
-            background: rgba(5, 14, 10, .94);
+            background: rgba(8, 8, 8, .94);
             backdrop-filter: blur(10px);
             box-shadow: 0 18px 40px rgba(0, 0, 0, .28);
             color: var(--accent);
@@ -704,9 +704,9 @@
 <body>
     <div id="auth-screen">
         <div class="auth-box">
-            <div class="auth-titlebar"><span class="dot" style="background:#ff6a7d"></span><span class="dot"
-                    style="background:#f2c45b"></span><span class="dot"
-                    style="background:#67ffb8"></span><span>SPHERE.IO // ACCESS NODE</span></div>
+            <div class="auth-titlebar"><span class="dot" style="background:#ffffff"></span><span class="dot"
+                    style="background:#9f9f9f"></span><span class="dot"
+                    style="background:#555555"></span><span>SPHERE.IO // ACCESS NODE</span></div>
             <div class="auth-body">
                 <div class="auth-kicker">WORLD ACCESS</div>
                 <div class="auth-title-row">
@@ -1061,15 +1061,15 @@
                 elHpFill.style.width = `${(me.hp / me.maxHp * 100).toFixed(1)}%`;
             });
             socket.on("damaged", ({ dmg }) => {
-                elHpFill.style.background = "linear-gradient(90deg,rgba(255,106,125,.62),#d65c68)";
-                setTimeout(() => elHpFill.style.background = "linear-gradient(90deg,rgba(255,106,125,.42),#d65c68)", 260);
+                elHpFill.style.background = "linear-gradient(90deg,rgba(255,255,255,.54),#8a8a8a)";
+                setTimeout(() => elHpFill.style.background = "linear-gradient(90deg,rgba(140,140,140,.42),#7f7f7f)", 260);
                 const me = playerMap[myId];
-                if (me) spawnDmgNum(me.x, me.y - me.r - 10, `-${dmg}`, "#ff6a7d");
+                if (me) spawnDmgNum(me.x, me.y - me.r - 10, `-${dmg}`, "#9a9a9a");
             });
             socket.on("died", () => addChatLine("<span class=\"ct\">NODE OFFLINE :: RESPAWNED AT SAFE POINT</span>", "sys"));
             socket.on("attackResult", ({ monsterId, dmg }) => {
                 const m = monsterMap[monsterId];
-                if (m) spawnDmgNum(m.x, m.y - m.r - 8, String(dmg), "#67ffb8");
+                if (m) spawnDmgNum(m.x, m.y - m.r - 8, String(dmg), "#f0f0f0");
             });
             socket.on("monsterDied", ({ monsterId, killerId, xp }) => {
                 delete monsterMap[monsterId];
@@ -1114,7 +1114,7 @@
             document.getElementById("i-cfm").value = "";
             chatLog.innerHTML = "";
             levelupFlash.classList.remove("show");
-            elHpFill.style.background = "linear-gradient(90deg,rgba(255,106,125,.42),#d65c68)";
+            elHpFill.style.background = "linear-gradient(90deg,rgba(140,140,140,.42),#7f7f7f)";
             camX = camY = 0;
             lastPosStr = "";
             setMsg("INFO :: disconnected", "info");
@@ -1126,19 +1126,22 @@
             lastTime = 0;
         const CAM_SPEED = 8,
             C = {
-                bgTop: "#eef4f7",
-                bgBottom: "#dbe5ed",
-                grid: "rgba(93,119,146,.12)",
-                gridMaj: "rgba(82,108,135,.18)",
-                axis: "rgba(87,113,140,.38)",
-                border: "rgba(74,98,123,.54)",
-                blue: "#2d6ff3",
-                blueDeep: "#1748b8",
-                muted: "#6a7d91",
-                text: "#162433",
-                shadow: "rgba(24,39,57,.18)",
-                orb: "#f4b84a",
-                orbStroke: "#d28c12"
+                bgTop: "#121212",
+                bgBottom: "#030303",
+                grid: "rgba(255,255,255,.05)",
+                gridMaj: "rgba(255,255,255,.09)",
+                axis: "rgba(255,255,255,.18)",
+                border: "rgba(255,255,255,.24)",
+                player: "#d9d9d9",
+                playerStroke: "#ffffff",
+                playerOther: "#7b7b7b",
+                muted: "#8c8c8c",
+                text: "#f2f2f2",
+                orb: "#f5f5f5",
+                orbStroke: "#8e8e8e",
+                hpHi: "#f2f2f2",
+                hpMid: "#a5a5a5",
+                hpLow: "#4e4e4e"
             };
 
         function updateCam(me, dt) {
@@ -1162,13 +1165,6 @@
             }
         }
 
-        function hexToRgba(hex, a) {
-            let value = hex.replace("#", "");
-            if (value.length === 3) value = value.split("").map(ch => ch + ch).join("");
-            const n = Number.parseInt(value, 16);
-            return `rgba(${n >> 16 & 255}, ${n >> 8 & 255}, ${n & 255}, ${a})`;
-        }
-
         function roundRect(c, x, y, w, h, r) {
             const radius = Math.min(r, w / 2, h / 2);
             c.beginPath();
@@ -1189,18 +1185,6 @@
             base.addColorStop(0, C.bgTop);
             base.addColorStop(1, C.bgBottom);
             ctx.fillStyle = base;
-            ctx.fillRect(0, 0, viewW, viewH);
-
-            const glowA = ctx.createRadialGradient(viewW * .2, viewH * .18, 0, viewW * .2, viewH * .18, viewW * .52);
-            glowA.addColorStop(0, "rgba(255,255,255,.38)");
-            glowA.addColorStop(1, "rgba(255,255,255,0)");
-            ctx.fillStyle = glowA;
-            ctx.fillRect(0, 0, viewW, viewH);
-
-            const glowB = ctx.createRadialGradient(viewW * .82, viewH * .8, 0, viewW * .82, viewH * .8, viewW * .38);
-            glowB.addColorStop(0, "rgba(122,168,255,.12)");
-            glowB.addColorStop(1, "rgba(122,168,255,0)");
-            ctx.fillStyle = glowB;
             ctx.fillRect(0, 0, viewW, viewH);
         }
 
@@ -1262,7 +1246,7 @@
                 const value = Math.round(worldH / 2 - y);
                 if (value) ctx.fillText(String(value), axisX - 8, y - camY + 4);
             }
-            ctx.fillStyle = C.blueDeep;
+            ctx.fillStyle = C.text;
             ctx.font = "700 11px Consolas, monospace";
             ctx.textAlign = "left";
             ctx.fillText("0", axisX + 9, axisY - 10);
@@ -1291,7 +1275,7 @@
             ctx.strokeRect(-camX, -camY, worldW, worldH);
             const hw = Math.round(worldW / 2),
                 hh = Math.round(worldH / 2);
-            ctx.fillStyle = "rgba(74,98,123,.62)";
+            ctx.fillStyle = "rgba(255,255,255,.46)";
             ctx.font = "11px Consolas, monospace";
             [
                 { x: -camX + 8, y: -camY + 16, text: `(-${hw}, +${hh})`, align: "left" },
@@ -1305,26 +1289,14 @@
         }
 
         function drawOrbs() {
-            const now = Date.now();
             for (const orb of Object.values(orbMap)) {
                 const sx = orb.x - camX,
                     sy = orb.y - camY;
                 if (sx < -24 || sx > viewW + 24 || sy < -24 || sy > viewH + 24) continue;
-                const pulse = 1 + .12 * Math.sin(now * .004 + orb.id),
-                    glow = ctx.createRadialGradient(sx, sy, 2, sx, sy, 18 * pulse);
-                glow.addColorStop(0, "rgba(255,233,190,.95)");
-                glow.addColorStop(.35, "rgba(244,184,74,.32)");
-                glow.addColorStop(1, "rgba(244,184,74,0)");
-                ctx.fillStyle = glow;
-                ctx.fillRect(sx - 18, sy - 18, 36, 36);
-
-                const core = ctx.createRadialGradient(sx - 2, sy - 3, 0, sx, sy, 8 * pulse);
-                core.addColorStop(0, "#fff8da");
-                core.addColorStop(.45, "#f9ca6e");
-                core.addColorStop(1, C.orb);
+                const pulse = 1 + .08 * Math.sin(Date.now() * .004 + orb.id);
                 ctx.beginPath();
                 ctx.arc(sx, sy, 6.4 * pulse, 0, Math.PI * 2);
-                ctx.fillStyle = core;
+                ctx.fillStyle = C.orb;
                 ctx.strokeStyle = C.orbStroke;
                 ctx.lineWidth = 1.5;
                 ctx.fill();
@@ -1336,34 +1308,28 @@
             const sx = monster.x - camX,
                 sy = monster.y - camY;
             if (sx < -100 || sx > viewW + 100 || sy < -100 || sy > viewH + 100) return;
-            const now = Date.now();
             ctx.save();
             ctx.translate(sx, sy);
-            ctx.shadowColor = hexToRgba(monster.color, .26);
-            ctx.shadowBlur = 14;
             switch (monster.type) {
                 case "dot":
                     ctx.fillStyle = monster.color;
                     ctx.beginPath();
                     ctx.arc(0, 0, monster.r, 0, Math.PI * 2);
                     ctx.fill();
-                    ctx.fillStyle = "rgba(255,255,255,.32)";
-                    ctx.beginPath();
-                    ctx.arc(-monster.r * .28, -monster.r * .32, monster.r * .42, 0, Math.PI * 2);
-                    ctx.fill();
+                    ctx.lineWidth = 2;
+                    ctx.strokeStyle = "#111";
+                    ctx.stroke();
                     break;
                 case "line":
-                    ctx.rotate(now * .002 % (Math.PI * 2));
                     ctx.strokeStyle = monster.color;
                     ctx.lineWidth = 4;
-                    ctx.lineCap = "round";
+                    ctx.lineCap = "square";
                     ctx.beginPath();
                     ctx.moveTo(-monster.r, 0);
                     ctx.lineTo(monster.r, 0);
                     ctx.stroke();
                     break;
                 case "triangle":
-                    ctx.rotate(now * .001);
                     ctx.beginPath();
                     for (let i = 0; i < 3; i++) {
                         const a = i / 3 * Math.PI * 2 - Math.PI / 2,
@@ -1372,17 +1338,16 @@
                         i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
                     }
                     ctx.closePath();
-                    ctx.fillStyle = hexToRgba(monster.color, .18);
+                    ctx.fillStyle = monster.color;
                     ctx.strokeStyle = monster.color;
-                    ctx.lineWidth = 2.5;
+                    ctx.lineWidth = 2;
                     ctx.fill();
                     ctx.stroke();
                     break;
                 case "square":
-                    ctx.rotate(now * .0007);
-                    ctx.fillStyle = hexToRgba(monster.color, .18);
+                    ctx.fillStyle = monster.color;
                     ctx.strokeStyle = monster.color;
-                    ctx.lineWidth = 2.5;
+                    ctx.lineWidth = 2;
                     ctx.fillRect(-monster.r, -monster.r, monster.r * 2, monster.r * 2);
                     ctx.strokeRect(-monster.r, -monster.r, monster.r * 2, monster.r * 2);
                     break;
@@ -1394,21 +1359,21 @@
                 hpPct = Math.max(0, monster.hp / monster.maxHp),
                 bx = sx - barW / 2,
                 by = sy - monster.r - 14;
-            ctx.fillStyle = "rgba(5,14,10,.92)";
+            ctx.fillStyle = "rgba(8,8,8,.92)";
             roundRect(ctx, bx, by, barW, barH, 2);
             ctx.fill();
-            ctx.strokeStyle = "rgba(103,255,184,.16)";
+            ctx.strokeStyle = "rgba(255,255,255,.12)";
             ctx.stroke();
-            ctx.fillStyle = hpPct > .5 ? "#67ffb8" : hpPct > .25 ? "#ffcf70" : "#ff6a7d";
+            ctx.fillStyle = hpPct > .5 ? C.hpHi : hpPct > .25 ? C.hpMid : C.hpLow;
             roundRect(ctx, bx + 1, by + 1, Math.max(0, barW * hpPct - 2), barH - 2, 1);
             ctx.fill();
         }
 
         function drawPill(text, x, y, {
             font = "700 11px Consolas, monospace",
-            bg = "rgba(5,14,10,.9)",
-            border = "rgba(103,255,184,.22)",
-            color = "#d6ffe8",
+            bg = "rgba(8,8,8,.9)",
+            border = "rgba(255,255,255,.18)",
+            color = "#f2f2f2",
             padX = 10,
             height = 20,
             radius = 3
@@ -1435,42 +1400,24 @@
             if (sx < -100 || sx > viewW + 100 || sy < -100 || sy > viewH + 100) return;
             ctx.save();
             ctx.beginPath();
-            ctx.arc(sx + 2, sy + 4, player.r, 0, Math.PI * 2);
-            ctx.fillStyle = C.shadow;
-            ctx.fill();
-
-            const g = ctx.createRadialGradient(sx - player.r * .34, sy - player.r * .45, 2, sx, sy, player.r * 1.15);
-            if (isMe) {
-                g.addColorStop(0, "#f4f8ff");
-                g.addColorStop(.32, "#9ec2ff");
-                g.addColorStop(1, C.blue);
-            } else {
-                g.addColorStop(0, "#f7f9ff");
-                g.addColorStop(.32, "#bfd1ff");
-                g.addColorStop(1, "#6d88d8");
-            }
-            ctx.shadowColor = isMe ? "rgba(45,111,243,.28)" : "rgba(94,117,168,.18)";
-            ctx.shadowBlur = 18;
-            ctx.beginPath();
             ctx.arc(sx, sy, player.r, 0, Math.PI * 2);
-            ctx.fillStyle = g;
+            ctx.fillStyle = isMe ? C.player : C.playerOther;
             ctx.fill();
-            ctx.shadowBlur = 0;
-            ctx.strokeStyle = isMe ? C.blueDeep : "#4767b4";
+            ctx.strokeStyle = isMe ? C.playerStroke : "#b0b0b0";
             ctx.lineWidth = isMe ? 3 : 2.5;
             ctx.stroke();
             if (isMe) {
                 ctx.beginPath();
                 ctx.arc(sx, sy, player.r + 6, 0, Math.PI * 2);
-                ctx.strokeStyle = "rgba(45,111,243,.22)";
-                ctx.lineWidth = 3;
+                ctx.strokeStyle = "rgba(255,255,255,.28)";
+                ctx.lineWidth = 2;
                 ctx.stroke();
             }
             ctx.restore();
 
             drawPill(player.name, sx, sy - player.r - 28);
             ctx.save();
-            ctx.fillStyle = isMe ? "#67ffb8" : "#88c9aa";
+            ctx.fillStyle = isMe ? "#ffffff" : "#b3b3b3";
             ctx.font = "700 11px Consolas, monospace";
             ctx.textAlign = "center";
             ctx.fillText(`Lv.${player.level}`, sx, sy - player.r - 8);
@@ -1486,15 +1433,15 @@
                 ctx.textBaseline = "middle";
                 const tw = Math.min(ctx.measureText(bubble.text).width + 18, 220),
                     bh = 28;
-                ctx.fillStyle = "rgba(5,14,10,.92)";
-                ctx.strokeStyle = "rgba(103,255,184,.18)";
+                ctx.fillStyle = "rgba(8,8,8,.92)";
+                ctx.strokeStyle = "rgba(255,255,255,.16)";
                 roundRect(ctx, bx - tw / 2, by - bh / 2, tw, bh, 3);
                 ctx.fill();
                 ctx.stroke();
                 ctx.beginPath();
                 ctx.rect(bx - tw / 2 + 6, by - bh / 2, tw - 12, bh);
                 ctx.clip();
-                ctx.fillStyle = "#d6ffe8";
+                ctx.fillStyle = "#f2f2f2";
                 ctx.fillText(bubble.text, bx, by + .5);
                 ctx.restore();
             }

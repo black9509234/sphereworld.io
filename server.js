@@ -26,10 +26,10 @@ const ORB_SPAWN_MS = 1200;
 
 const MAX_MONSTERS = 40;
 const MONSTER_TYPES = [
-  { type:'dot',      hp:20,  speed:1.2, r:6,  xp:8,  color:'#e05050', dmg:5,  atkR:22, atkCD:1500 },
-  { type:'line',     hp:40,  speed:0.9, r:14, xp:18, color:'#9050e0', dmg:10, atkR:28, atkCD:2000 },
-  { type:'triangle', hp:70,  speed:0.7, r:18, xp:35, color:'#e07020', dmg:18, atkR:32, atkCD:2500 },
-  { type:'square',   hp:120, speed:0.5, r:22, xp:60, color:'#205090', dmg:28, atkR:38, atkCD:3000 },
+  { type:'dot',      hp:20,  speed:1.2, r:6,  xp:8,  color:'#f2f2f2', dmg:5,  atkR:22, atkCD:1500 },
+  { type:'line',     hp:40,  speed:0.9, r:14, xp:18, color:'#bdbdbd', dmg:10, atkR:28, atkCD:2000 },
+  { type:'triangle', hp:70,  speed:0.7, r:18, xp:35, color:'#868686', dmg:18, atkR:32, atkCD:2500 },
+  { type:'square',   hp:120, speed:0.5, r:22, xp:60, color:'#4d4d4d', dmg:28, atkR:38, atkCD:3000 },
 ];
 let monsterIdCounter = 0;
 let orbIdCounter     = 0;
