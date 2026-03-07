@@ -8,42 +8,42 @@
     <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
     <style>
         :root {
-            --bg1: #eef4f7;
-            --bg2: #dbe5ed;
-            --panel: rgba(248, 252, 255, .82);
-            --panel2: rgba(255, 255, 255, .92);
-            --border: rgba(120, 142, 166, .2);
-            --border2: rgba(100, 122, 144, .32);
-            --text: #162433;
-            --muted: #6a7d91;
-            --soft: #8aa0b5;
-            --accent: #2d6ff3;
-            --accent2: #1748b8;
-            --ok: #1f9b63;
-            --bad: #d65c68;
-            --warn: #d99833;
+            --bg1: #07110d;
+            --bg2: #020705;
+            --panel: rgba(5, 14, 10, .82);
+            --panel2: rgba(8, 18, 13, .92);
+            --border: rgba(103, 255, 184, .18);
+            --border2: rgba(103, 255, 184, .36);
+            --text: #d6ffe8;
+            --muted: #88c9aa;
+            --soft: #5f9379;
+            --accent: #67ffb8;
+            --accent2: #2fb875;
+            --ok: #7fffc3;
+            --bad: #ff6a7d;
+            --warn: #ffcf70;
             --mono: "Consolas", "Courier New", monospace;
-            --sans: "Aptos", "Segoe UI", sans-serif;
-            --shadow: 0 20px 45px rgba(28, 45, 63, .14)
+            --sans: "Consolas", "Courier New", monospace;
+            --shadow: 0 18px 40px rgba(0, 0, 0, .32);
         }
 
         * {
             margin: 0;
             padding: 0;
-            box-sizing: border-box
+            box-sizing: border-box;
         }
 
         html,
         body {
             width: 100%;
-            height: 100%
+            height: 100%;
         }
 
         body {
             overflow: hidden;
-            font-family: var(--sans);
+            font-family: var(--mono);
             color: var(--text);
-            background: linear-gradient(180deg, var(--bg1), var(--bg2))
+            background: linear-gradient(180deg, var(--bg1), var(--bg2));
         }
 
         body::before,
@@ -51,30 +51,36 @@
             content: "";
             position: fixed;
             inset: 0;
-            pointer-events: none
+            pointer-events: none;
         }
 
         body::before {
-            background: radial-gradient(circle at 18% 18%, rgba(255, 255, 255, .72), transparent 34%), radial-gradient(circle at 82% 82%, rgba(151, 189, 255, .2), transparent 30%)
+            background:
+                linear-gradient(rgba(103, 255, 184, .035) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(103, 255, 184, .028) 1px, transparent 1px);
+            background-size: 100% 4px, 28px 100%;
+            opacity: .38;
         }
 
         body::after {
-            background: linear-gradient(135deg, rgba(255, 255, 255, .2), transparent 40%), linear-gradient(315deg, rgba(113, 146, 190, .08), transparent 45%)
+            background:
+                radial-gradient(circle at 50% 0, rgba(103, 255, 184, .09), transparent 42%),
+                linear-gradient(180deg, rgba(103, 255, 184, .05), transparent 24%, transparent 76%, rgba(103, 255, 184, .04));
         }
 
         button,
         input {
-            font: inherit
+            font: inherit;
         }
 
         button {
-            cursor: pointer
+            cursor: pointer;
         }
 
         canvas {
             display: block;
             width: 100vw;
-            height: 100vh
+            height: 100vh;
         }
 
         #auth-screen {
@@ -85,8 +91,8 @@
             align-items: center;
             justify-content: center;
             padding: 24px;
-            background: rgba(229, 237, 244, .58);
-            backdrop-filter: blur(10px)
+            background: rgba(2, 8, 5, .72);
+            backdrop-filter: blur(8px);
         }
 
         .auth-box {
@@ -94,17 +100,17 @@
             width: min(450px, 100%);
             overflow: hidden;
             border: 1px solid var(--border2);
-            border-radius: 30px;
-            background: linear-gradient(180deg, rgba(255, 255, 255, .9), rgba(243, 248, 252, .78));
-            box-shadow: var(--shadow)
+            border-radius: 4px;
+            background: linear-gradient(180deg, rgba(10, 22, 16, .98), rgba(4, 11, 8, .98));
+            box-shadow: var(--shadow);
         }
 
         .auth-box::before {
             content: "";
             position: absolute;
             inset: 0 0 auto;
-            height: 120px;
-            background: radial-gradient(circle at top left, rgba(45, 111, 243, .16), transparent 52%)
+            height: 52px;
+            background: linear-gradient(90deg, rgba(103, 255, 184, .14), rgba(103, 255, 184, 0));
         }
 
         .auth-titlebar {
@@ -112,23 +118,24 @@
             align-items: center;
             gap: 8px;
             padding: 14px 18px;
-            border-bottom: 1px solid rgba(130, 149, 170, .18);
-            background: rgba(250, 252, 255, .72);
+            border-bottom: 1px solid rgba(103, 255, 184, .14);
+            background: rgba(10, 24, 18, .94);
             color: var(--muted);
             font: 11px var(--mono);
-            letter-spacing: .1em
+            letter-spacing: .12em;
+            text-transform: uppercase;
         }
 
         .auth-titlebar .dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            flex-shrink: 0
+            width: 8px;
+            height: 8px;
+            border-radius: 1px;
+            flex-shrink: 0;
         }
 
         .auth-body {
             position: relative;
-            padding: 30px
+            padding: 24px;
         }
 
         .auth-kicker,
@@ -139,11 +146,12 @@
         .hud-overline {
             font: 10px var(--mono);
             letter-spacing: .16em;
-            color: var(--soft)
+            color: var(--soft);
+            text-transform: uppercase;
         }
 
         .auth-kicker {
-            margin-bottom: 10px
+            margin-bottom: 10px;
         }
 
         .auth-title-row {
@@ -151,69 +159,72 @@
             justify-content: space-between;
             align-items: flex-end;
             gap: 12px;
-            margin-bottom: 10px
+            margin-bottom: 10px;
         }
 
         .auth-title {
-            font-size: 40px;
-            font-weight: 800;
-            letter-spacing: -.06em
+            font-size: 34px;
+            font-weight: 700;
+            letter-spacing: .02em;
+            text-transform: uppercase;
+            text-shadow: 0 0 14px rgba(103, 255, 184, .12);
         }
 
         .auth-pill {
-            padding: 7px 12px;
-            border: 1px solid rgba(85, 116, 158, .2);
-            border-radius: 999px;
-            background: rgba(255, 255, 255, .8);
-            color: var(--accent2);
+            padding: 6px 10px;
+            border: 1px solid rgba(103, 255, 184, .24);
+            border-radius: 2px;
+            background: rgba(103, 255, 184, .08);
+            color: var(--accent);
             font: 10px var(--mono);
-            letter-spacing: .14em
+            letter-spacing: .14em;
         }
 
         .auth-sub {
             margin-bottom: 24px;
             color: var(--muted);
-            font-size: 14px;
-            line-height: 1.6
+            font-size: 13px;
+            line-height: 1.6;
         }
 
         .mode-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 10px;
-            margin-bottom: 22px
+            margin-bottom: 22px;
         }
 
         .mbtn {
             padding: 12px 0;
-            border: 1px solid rgba(116, 138, 163, .22);
-            border-radius: 14px;
-            background: rgba(255, 255, 255, .74);
+            border: 1px solid rgba(103, 255, 184, .16);
+            border-radius: 2px;
+            background: rgba(9, 20, 15, .92);
             color: var(--muted);
             font: 700 12px var(--mono);
             letter-spacing: .12em;
-            transition: .16s
+            text-transform: uppercase;
+            transition: .16s;
         }
 
         .mbtn.on {
-            border-color: transparent;
-            background: linear-gradient(135deg, var(--accent), var(--accent2));
-            color: #fff;
-            box-shadow: 0 12px 24px rgba(45, 111, 243, .22)
+            border-color: rgba(103, 255, 184, .42);
+            background: rgba(103, 255, 184, .12);
+            color: var(--accent);
+            box-shadow: inset 0 0 0 1px rgba(103, 255, 184, .14), 0 0 18px rgba(103, 255, 184, .08);
         }
 
         .mbtn:hover:not(.on) {
-            border-color: rgba(45, 111, 243, .32);
-            color: var(--accent2)
+            border-color: rgba(103, 255, 184, .28);
+            color: var(--accent);
         }
 
         .field {
-            margin-bottom: 14px
+            margin-bottom: 14px;
         }
 
         .field-lbl {
             display: block;
-            margin-bottom: 7px
+            margin-bottom: 7px;
         }
 
         .irow {
@@ -221,21 +232,21 @@
             align-items: center;
             gap: 10px;
             padding: 0 14px;
-            border: 1px solid rgba(121, 144, 168, .18);
-            border-radius: 16px;
-            background: rgba(255, 255, 255, .86);
-            transition: border-color .16s, box-shadow .16s
+            border: 1px solid rgba(103, 255, 184, .16);
+            border-radius: 2px;
+            background: rgba(3, 10, 7, .88);
+            transition: border-color .16s, box-shadow .16s;
         }
 
         .irow:focus-within {
-            border-color: rgba(45, 111, 243, .42);
-            box-shadow: 0 0 0 4px rgba(45, 111, 243, .08)
+            border-color: rgba(103, 255, 184, .42);
+            box-shadow: 0 0 0 3px rgba(103, 255, 184, .08);
         }
 
         .ipfx {
             color: var(--accent);
             font: 13px var(--mono);
-            user-select: none
+            user-select: none;
         }
 
         .irow input {
@@ -246,58 +257,59 @@
             background: transparent;
             color: var(--text);
             font: 14px var(--mono);
-            caret-color: var(--accent)
+            caret-color: var(--accent);
         }
 
         .irow input::placeholder,
         #chat-input::placeholder {
-            color: #9eb1c2
+            color: rgba(136, 201, 170, .54);
         }
 
         .sep {
             margin: 18px 0;
             border: none;
-            border-top: 1px solid rgba(121, 144, 168, .14)
+            border-top: 1px solid rgba(103, 255, 184, .12);
         }
 
         .sbtn {
             width: 100%;
             padding: 15px;
-            border: none;
-            border-radius: 16px;
-            background: linear-gradient(135deg, var(--accent), var(--accent2));
-            color: #fff;
+            border: 1px solid rgba(103, 255, 184, .36);
+            border-radius: 2px;
+            background: rgba(103, 255, 184, .12);
+            color: var(--accent);
             font: 700 12px var(--mono);
             letter-spacing: .14em;
-            box-shadow: 0 14px 26px rgba(45, 111, 243, .24)
+            box-shadow: inset 0 0 0 1px rgba(103, 255, 184, .08);
+            text-transform: uppercase;
         }
 
         .auth-msg {
             min-height: 18px;
             margin-top: 12px;
             color: var(--muted);
-            font: 11px var(--mono)
+            font: 11px var(--mono);
         }
 
         .auth-msg.err {
-            color: var(--bad)
+            color: var(--bad);
         }
 
         .auth-msg.ok {
-            color: var(--ok)
+            color: var(--ok);
         }
 
         #hud {
             position: fixed;
-            top: 20px;
-            left: 20px;
+            top: 16px;
+            left: 16px;
             z-index: 10;
             display: none;
-            flex-wrap: wrap;
-            align-items: flex-start;
-            gap: 12px;
-            max-width: min(1040px, calc(100vw - 40px));
-            pointer-events: none
+            flex-direction: column;
+            align-items: stretch;
+            gap: 8px;
+            width: min(420px, calc(100vw - 32px));
+            pointer-events: none;
         }
 
         .hud-panel,
@@ -308,24 +320,25 @@
         #logout-btn {
             border: 1px solid var(--border);
             background: var(--panel);
-            backdrop-filter: blur(16px);
-            box-shadow: 0 14px 34px rgba(28, 45, 63, .12)
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 24px rgba(0, 0, 0, .22);
         }
 
         .hud-panel {
-            border-radius: 24px
+            border-radius: 3px;
         }
 
         .hud-brand-panel {
-            min-width: 200px;
-            padding: 18px 20px
+            min-width: 0;
+            padding: 12px 14px;
         }
 
         .hbrand {
-            margin: 4px 0 5px;
-            font-size: 30px;
-            font-weight: 800;
-            letter-spacing: -.06em
+            margin: 6px 0 2px;
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: .04em;
+            text-transform: uppercase;
         }
 
         .hud-caption,
@@ -333,125 +346,127 @@
         .control-row,
         .chat-hint,
         .chat-line.sys {
-            color: var(--muted)
+            color: var(--muted);
         }
 
         .hud-caption {
-            max-width: 220px;
-            font-size: 13px;
-            line-height: 1.45
+            max-width: 100%;
+            font-size: 11px;
+            line-height: 1.5;
         }
 
         .hud-stats {
             display: grid;
-            grid-template-columns: repeat(4, minmax(150px, 1fr));
-            gap: 12px;
-            flex: 1;
-            min-width: min(760px, 100%);
-            padding: 12px
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 8px;
+            width: 100%;
+            min-width: 0;
+            padding: 8px;
         }
 
         .hud-chip {
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 6px;
             min-width: 0;
-            padding: 14px 15px;
-            border: 1px solid rgba(121, 144, 168, .16);
-            border-radius: 18px;
-            background: var(--panel2)
+            padding: 10px;
+            border: 1px solid rgba(103, 255, 184, .12);
+            border-radius: 2px;
+            background: var(--panel2);
         }
 
         .hi-line {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 10px
+            gap: 10px;
         }
 
         .hi-value {
-            font-size: 16px;
-            font-weight: 700
+            font-size: 15px;
+            font-weight: 700;
         }
 
         .hi-sub {
-            font-size: 12px;
-            line-height: 1.4
+            font-size: 11px;
+            line-height: 1.4;
         }
 
         .stat-bar {
             display: flex;
             flex-direction: column;
-            gap: 7px
+            gap: 7px;
         }
 
         .track {
-            height: 9px;
+            height: 6px;
             overflow: hidden;
-            border-radius: 999px;
-            background: #d9e3eb;
-            box-shadow: inset 0 1px 2px rgba(37, 56, 77, .08)
+            border-radius: 1px;
+            background: rgba(214, 255, 232, .08);
+            box-shadow: inset 0 0 0 1px rgba(103, 255, 184, .08);
         }
 
         #xp-fill,
         #hp-fill {
             height: 100%;
             width: 0;
-            border-radius: inherit;
-            transition: width .28s ease, background .18s ease
+            border-radius: 0;
+            transition: width .28s ease, background .18s ease;
         }
 
         #xp-fill {
-            background: linear-gradient(90deg, #9fc3ff, var(--accent))
+            background: linear-gradient(90deg, rgba(103, 255, 184, .35), var(--accent));
         }
 
         #hp-fill {
             width: 100%;
-            background: linear-gradient(90deg, #ff9c8f, var(--bad))
+            background: linear-gradient(90deg, rgba(255, 106, 125, .42), var(--bad));
         }
 
         #logout-btn {
             position: fixed;
-            top: 20px;
-            right: 20px;
+            top: 16px;
+            right: 16px;
             z-index: 11;
             display: none;
-            padding: 12px 16px;
-            border-radius: 999px;
+            padding: 10px 12px;
+            border-radius: 2px;
             color: var(--muted);
             font: 700 11px var(--mono);
             letter-spacing: .14em;
-            transition: .16s
+            text-transform: uppercase;
+            transition: .16s;
         }
 
         #logout-btn:hover {
-            border-color: rgba(214, 92, 104, .28);
+            border-color: rgba(255, 106, 125, .34);
             color: var(--bad);
-            background: rgba(255, 255, 255, .92)
+            background: rgba(255, 106, 125, .08);
         }
 
         #controls-card {
             position: fixed;
-            left: 20px;
-            bottom: 20px;
+            left: 16px;
+            bottom: 16px;
             z-index: 10;
             display: none;
-            width: min(290px, calc(100vw - 40px));
-            padding: 16px 18px;
-            border-radius: 24px
+            width: min(228px, calc(100vw - 32px));
+            padding: 12px;
+            border-radius: 3px;
         }
 
         .control-title,
         .chat-title {
-            margin-bottom: 12px;
-            font-size: 16px;
-            font-weight: 700
+            margin-bottom: 8px;
+            font-size: 14px;
+            font-weight: 700;
+            text-transform: uppercase;
         }
 
         .control-list {
             display: flex;
             flex-direction: column;
-            gap: 10px
+            gap: 8px;
         }
 
         .control-row {
@@ -459,7 +474,8 @@
             justify-content: space-between;
             align-items: center;
             gap: 12px;
-            font-size: 13px
+            font-size: 12px;
+            text-transform: uppercase;
         }
 
         .kbd,
@@ -467,27 +483,27 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            min-width: 42px;
-            padding: 6px 10px;
-            border: 1px solid rgba(120, 143, 168, .18);
-            border-radius: 10px;
-            background: rgba(255, 255, 255, .88);
-            color: var(--accent2);
-            font: 700 11px var(--mono)
+            min-width: 38px;
+            padding: 5px 8px;
+            border: 1px solid rgba(103, 255, 184, .18);
+            border-radius: 2px;
+            background: rgba(103, 255, 184, .06);
+            color: var(--accent);
+            font: 700 11px var(--mono);
         }
 
         #chat-wrap {
             position: fixed;
-            right: 20px;
-            bottom: 20px;
+            right: 16px;
+            bottom: 16px;
             z-index: 20;
             display: none;
-            width: min(350px, calc(100vw - 40px));
+            width: min(300px, calc(100vw - 32px));
             flex-direction: column;
-            gap: 8px;
+            gap: 6px;
             background: none;
             border: none;
-            box-shadow: none
+            box-shadow: none;
         }
 
         .chat-head {
@@ -495,60 +511,60 @@
             align-items: flex-start;
             justify-content: space-between;
             gap: 12px;
-            padding: 15px 16px;
-            border-radius: 24px
+            padding: 10px 12px;
+            border-radius: 3px;
         }
 
         .chat-title {
-            margin-bottom: 0
+            margin-bottom: 0;
         }
 
         #chat-log {
-            height: 190px;
+            height: 154px;
             overflow-y: auto;
             overflow-x: hidden;
-            padding: 14px 16px;
-            border-radius: 24px;
-            background: rgba(255, 255, 255, .8);
-            scroll-behavior: smooth
+            padding: 10px 12px;
+            border-radius: 3px;
+            background: rgba(5, 14, 10, .9);
+            scroll-behavior: smooth;
         }
 
         #chat-log::-webkit-scrollbar {
-            width: 6px
+            width: 6px;
         }
 
         #chat-log::-webkit-scrollbar-thumb {
-            border-radius: 999px;
-            background: rgba(127, 146, 169, .42)
+            border-radius: 1px;
+            background: rgba(103, 255, 184, .24);
         }
 
         .chat-line {
-            font-size: 13px;
-            line-height: 1.5;
-            word-break: break-word
+            font-size: 12px;
+            line-height: 1.55;
+            word-break: break-word;
         }
 
         .chat-line+.chat-line {
-            margin-top: 8px
+            margin-top: 8px;
         }
 
         .chat-line .cn {
             margin-right: 6px;
-            color: var(--accent2);
-            font-weight: 700
+            color: var(--accent);
+            font-weight: 700;
         }
 
         .chat-line.lvlup {
-            color: var(--warn)
+            color: var(--warn);
         }
 
         #chat-input-row {
             display: flex;
             align-items: center;
-            gap: 10px;
-            padding: 10px;
-            border-radius: 20px;
-            background: rgba(255, 255, 255, .84)
+            gap: 8px;
+            padding: 8px;
+            border-radius: 3px;
+            background: rgba(5, 14, 10, .92);
         }
 
         #chat-input {
@@ -559,19 +575,19 @@
             outline: none;
             background: transparent;
             color: var(--text);
-            font-size: 13px;
-            caret-color: var(--accent)
+            font-size: 12px;
+            caret-color: var(--accent);
         }
 
         #chat-send {
             flex-shrink: 0;
-            padding: 10px 14px;
-            border: none;
-            border-radius: 14px;
-            background: linear-gradient(135deg, var(--accent), var(--accent2));
-            color: #fff;
+            padding: 8px 12px;
+            border: 1px solid rgba(103, 255, 184, .22);
+            border-radius: 2px;
+            background: rgba(103, 255, 184, .1);
+            color: var(--accent);
             font: 700 11px var(--mono);
-            letter-spacing: .12em
+            letter-spacing: .12em;
         }
 
         #levelup-flash {
@@ -579,92 +595,88 @@
             top: 50%;
             left: 50%;
             z-index: 50;
-            padding: 18px 24px;
-            border: 1px solid rgba(255, 255, 255, .68);
-            border-radius: 999px;
-            background: rgba(255, 255, 255, .84);
-            backdrop-filter: blur(16px);
-            box-shadow: 0 24px 44px rgba(29, 46, 64, .18);
-            color: var(--accent2);
-            font: 700 28px var(--mono);
+            padding: 14px 18px;
+            border: 1px solid rgba(103, 255, 184, .28);
+            border-radius: 3px;
+            background: rgba(5, 14, 10, .94);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 18px 40px rgba(0, 0, 0, .28);
+            color: var(--accent);
+            font: 700 22px var(--mono);
             letter-spacing: .16em;
             opacity: 0;
             pointer-events: none;
             transform: translate(-50%, -46%) scale(.96);
-            transition: opacity .22s, transform .22s
+            transition: opacity .22s, transform .22s;
         }
 
         #levelup-flash.show {
             opacity: 1;
-            transform: translate(-50%, -50%) scale(1)
+            transform: translate(-50%, -50%) scale(1);
         }
 
         @media (max-width:1024px) {
             #hud {
-                max-width: calc(100vw - 24px);
                 top: 12px;
-                left: 12px
+                left: 12px;
             }
 
             .hud-stats {
-                min-width: min(620px, 100%);
-                grid-template-columns: repeat(2, minmax(150px, 1fr))
+                grid-template-columns: repeat(2, minmax(150px, 1fr));
             }
 
             #logout-btn,
             #chat-wrap {
-                right: 12px
+                right: 12px;
             }
 
             #logout-btn {
-                top: 12px
+                top: 12px;
             }
 
             #controls-card {
                 left: 12px;
-                bottom: 12px
+                bottom: 12px;
             }
         }
 
         @media (max-width:720px) {
             #auth-screen {
-                padding: 16px
+                padding: 16px;
             }
 
             .auth-body {
-                padding: 24px 22px
+                padding: 20px 18px;
             }
 
             .auth-title {
-                font-size: 34px
+                font-size: 30px;
             }
 
             #hud {
                 top: 12px;
                 left: 12px;
-                right: 12px;
-                max-width: none
+                width: min(100vw - 24px, 360px);
             }
 
             .hud-brand-panel,
             .hud-stats {
                 width: 100%;
-                min-width: 0
+                min-width: 0;
             }
 
             .hud-stats {
-                grid-template-columns: repeat(2, minmax(0, 1fr))
+                grid-template-columns: repeat(2, minmax(0, 1fr));
             }
 
             #controls-card {
-                width: calc(100vw - 24px)
+                width: min(220px, calc(100vw - 24px));
             }
 
             #chat-wrap {
                 right: 12px;
-                left: 12px;
                 bottom: 12px;
-                width: auto
+                width: min(280px, calc(100vw - 24px));
             }
         }
 
@@ -672,12 +684,18 @@
 
             .hud-stats,
             .mode-row {
-                grid-template-columns: 1fr
+                grid-template-columns: 1fr;
+            }
+
+            #hud,
+            #chat-wrap,
+            #controls-card {
+                width: calc(100vw - 24px);
             }
 
             .auth-title-row {
                 flex-direction: column;
-                align-items: flex-start
+                align-items: flex-start;
             }
         }
     </style>
@@ -686,16 +704,17 @@
 <body>
     <div id="auth-screen">
         <div class="auth-box">
-            <div class="auth-titlebar"><span class="dot" style="background:#ff8d8a"></span><span class="dot"
+            <div class="auth-titlebar"><span class="dot" style="background:#ff6a7d"></span><span class="dot"
                     style="background:#f2c45b"></span><span class="dot"
-                    style="background:#62c78a"></span><span>SPHERE.IO // LIVE SHARD</span></div>
+                    style="background:#67ffb8"></span><span>SPHERE.IO // ACCESS NODE</span></div>
             <div class="auth-body">
                 <div class="auth-kicker">WORLD ACCESS</div>
                 <div class="auth-title-row">
                     <div class="auth-title">sphere.io</div>
-                    <div class="auth-pill">CALM UI</div>
+                    <div class="auth-pill">TERMINAL UI</div>
                 </div>
-                <div class="auth-sub">눈에 부담을 덜 주는 색감과 정돈된 정보 구조로 다시 정리한 오픈 월드 아레나입니다.</div>
+                <div class="auth-sub">Compact terminal overlays. Lower visual weight, sharper hierarchy, less screen
+                    coverage.</div>
                 <div class="mode-row"><button class="mbtn on" id="btn-ln"
                         onclick="setMode('login')">LOGIN</button><button class="mbtn" id="btn-su"
                         onclick="setMode('signup')">REGISTER</button></div>
@@ -707,7 +726,8 @@
                     <div class="irow"><span class="ipfx">&gt;</span><input id="i-pass" type="password"
                             placeholder="password" maxlength="32" /></div>
                 </div>
-                <div class="field" id="cfm-row" style="display:none"><label class="field-lbl">CONFIRM_PASSWORD</label>
+                <div class="field" id="cfm-row" style="display:none"><label
+                        class="field-lbl">CONFIRM_PASSWORD</label>
                     <div class="irow"><span class="ipfx">&gt;</span><input id="i-cfm" type="password"
                             placeholder="confirm password" maxlength="32" /></div>
                 </div>
@@ -720,9 +740,9 @@
     <canvas id="canvas"></canvas>
     <div id="hud">
         <div class="hud-panel hud-brand-panel">
-            <div class="hud-overline">LIVE SHARD</div>
+            <div class="hud-overline">TACTICAL FEED</div>
             <div class="hbrand">sphere.io</div>
-            <div class="hud-caption">밝기는 낮추고 정보 계층은 더 선명하게 정리한 전투 HUD</div>
+            <div class="hud-caption">Compact readout with angular panels and reduced obstruction.</div>
         </div>
         <div class="hud-panel hud-stats">
             <div class="hud-chip">
@@ -747,13 +767,13 @@
                     <div class="track">
                         <div id="hp-fill"></div>
                     </div>
-                    <div class="hi-sub">monster hit feedback is softer but clearer</div>
+                    <div class="hi-sub">damage feedback stays visible without a bulky overlay</div>
                 </div>
             </div>
             <div class="hud-chip">
                 <div class="hi-label">WORLD</div>
-                <div class="hi-line"><span class="hi-sub">Coords</span><span class="hi-value" id="h-pos">(0,0)</span>
-                </div>
+                <div class="hi-line"><span class="hi-sub">Coords</span><span class="hi-value"
+                        id="h-pos">(0,0)</span></div>
                 <div class="hi-line"><span class="hi-sub">Online</span><span class="hi-value" id="h-cnt">0</span></div>
             </div>
         </div>
@@ -761,61 +781,746 @@
     <button id="logout-btn" onclick="doLogout()">DISCONNECT</button>
     <div id="controls-card">
         <div class="control-kicker">CONTROLS</div>
-        <div class="control-title">기본 조작</div>
+        <div class="control-title">KEYMAP</div>
         <div class="control-list">
-            <div class="control-row"><span>이동</span><span class="kbd">WASD</span></div>
-            <div class="control-row"><span>공격</span><span class="kbd">Z</span></div>
-            <div class="control-row"><span>채팅 열기</span><span class="kbd">ENTER</span></div>
-            <div class="control-row"><span>채팅 닫기</span><span class="kbd">ESC</span></div>
+            <div class="control-row"><span>MOVE</span><span class="kbd">WASD</span></div>
+            <div class="control-row"><span>ATTACK</span><span class="kbd">Z</span></div>
+            <div class="control-row"><span>CHAT</span><span class="kbd">ENTER</span></div>
+            <div class="control-row"><span>CLOSE</span><span class="kbd">ESC</span></div>
         </div>
     </div>
     <div id="chat-wrap">
         <div class="chat-head">
             <div>
                 <div class="chat-kicker">WORLD CHAT</div>
-                <div class="chat-title">실시간 대화</div>
+                <div class="chat-title">realtime.log</div>
             </div>
             <div class="chat-hint">ENTER</div>
         </div>
         <div id="chat-log"></div>
-        <div id="chat-input-row"><input id="chat-input" type="text" placeholder="메시지를 입력하세요" maxlength="80"
+        <div id="chat-input-row"><input id="chat-input" type="text" placeholder="message" maxlength="80"
                 autocomplete="off" /><button id="chat-send" onclick="sendChat()">SEND</button></div>
     </div>
     <div id="levelup-flash"></div>
     <script>
-        const UKEY = "sphere_users_v1", getDB = () => { try { return JSON.parse(localStorage.getItem(UKEY)) || {} } catch { return {} } }, saveDB = db => localStorage.setItem(UKEY, JSON.stringify(db)); let authMode = "login";
-        const elMsg = document.getElementById("auth-msg"), elUser = document.getElementById("h-user"), elPos = document.getElementById("h-pos"), elCnt = document.getElementById("h-cnt"), elLv = document.getElementById("h-lv"), elXp = document.getElementById("h-xp"), elXpMax = document.getElementById("h-xpmax"), elXpFill = document.getElementById("xp-fill"), elHp = document.getElementById("h-hp"), elHpFill = document.getElementById("hp-fill"), chatLog = document.getElementById("chat-log"), chatInput = document.getElementById("chat-input"), controlsCard = document.getElementById("controls-card"), levelupFlash = document.getElementById("levelup-flash");
-        function setMode(mode) { authMode = mode; const signup = mode === "signup"; document.getElementById("cfm-row").style.display = signup ? "" : "none"; document.getElementById("sbtn-lbl").textContent = signup ? "CREATE ACCOUNT" : "CONNECT"; document.getElementById("btn-ln").className = "mbtn" + (signup ? "" : " on"); document.getElementById("btn-su").className = "mbtn" + (signup ? " on" : ""); setMsg("", "") }
-        function setMsg(text, cls) { elMsg.textContent = text ? `> ${text}` : ""; elMsg.className = "auth-msg " + (cls || "") }
-        function handleAuth() { const user = document.getElementById("i-user").value.trim(), pass = document.getElementById("i-pass").value, confirm = document.getElementById("i-cfm").value; if (!user) return setMsg("ERR :: username required", "err"); if (!pass) return setMsg("ERR :: password required", "err"); const db = getDB(); if (authMode === "signup") { if (pass !== confirm) return setMsg("ERR :: passwords do not match", "err"); if (pass.length < 4) return setMsg("ERR :: password min 4 chars", "err"); if (db[user]) return setMsg(`ERR :: "${user}" already exists`, "err"); db[user] = { pw: pass, ts: Date.now() }; saveDB(db); setMsg(`OK :: welcome, ${user}`, "ok"); return setTimeout(() => startGame(user), 600) } if (!db[user]) return setMsg("ERR :: user not found", "err"); if (db[user].pw !== pass) return setMsg("ERR :: wrong password", "err"); setMsg(`OK :: connecting as ${user}`, "ok"); setTimeout(() => startGame(user), 400) }
-        ["i-user", "i-pass", "i-cfm"].forEach(id => document.getElementById(id).addEventListener("keydown", e => { if (e.key === "Enter") handleAuth() }));
-        const canvas = document.getElementById("canvas"), ctx = canvas.getContext("2d"); let viewW = innerWidth, viewH = innerHeight; function resize() { const ratio = devicePixelRatio || 1; viewW = innerWidth; viewH = innerHeight; canvas.width = Math.round(viewW * ratio); canvas.height = Math.round(viewH * ratio); canvas.style.width = `${viewW}px`; canvas.style.height = `${viewH}px`; ctx.setTransform(ratio, 0, 0, ratio, 0, 0) } resize(); addEventListener("resize", resize);
-        let socket, myId = null, worldW = 3000, worldH = 3000, playerMap = {}, orbMap = {}, monsterMap = {}; const TILE = 60, keys = { up: false, down: false, left: false, right: false }; let lastKeys = {}, gameRunning = false, rafId = null, attackCooldown = false;
-        addEventListener("keydown", e => { if (e.key === "Enter" && !chatFocused() && gameRunning) { chatInput.focus(); e.preventDefault(); return } if (chatFocused()) return; if ((e.key === "z" || e.key === "Z") && gameRunning) return tryAttack(); applyKey(e, true); sendKeys() }); addEventListener("keyup", e => { if (chatFocused()) return; applyKey(e, false); sendKeys() }); addEventListener("blur", () => { keys.up = keys.down = keys.left = keys.right = false; sendKeys() });
-        const chatFocused = () => document.activeElement === chatInput; function applyKey(e, v) { if (e.key === "ArrowUp" || e.key === "w" || e.key === "W") keys.up = v; if (e.key === "ArrowDown" || e.key === "s" || e.key === "S") keys.down = v; if (e.key === "ArrowLeft" || e.key === "a" || e.key === "A") keys.left = v; if (e.key === "ArrowRight" || e.key === "d" || e.key === "D") keys.right = v }
-        function sendKeys() { if (!socket) return; const changed = keys.up !== lastKeys.up || keys.down !== lastKeys.down || keys.left !== lastKeys.left || keys.right !== lastKeys.right; if (changed) { socket.emit("keys", { ...keys }); lastKeys = { ...keys } } }
-        function tryAttack() { if (attackCooldown || !socket) return; const me = playerMap[myId]; if (!me) return; let nearest = null, nearDist = Infinity; for (const monster of Object.values(monsterMap)) { const d = Math.hypot(me.x - monster.x, me.y - monster.y); if (d < nearDist) { nearDist = d; nearest = monster } } if (!nearest) return; socket.emit("attack", { monsterId: nearest.id }); attackCooldown = true; setTimeout(() => attackCooldown = false, 400) }
-        const bubbles = {}, MAX_CHAT_LINES = 80, dmgNums = []; const escHtml = value => String(value).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-        function addChatLine(safeHtml, cls = "") { const div = document.createElement("div"); div.className = "chat-line" + (cls ? ` ${cls}` : ""); div.innerHTML = safeHtml; chatLog.appendChild(div); while (chatLog.children.length > MAX_CHAT_LINES) chatLog.removeChild(chatLog.firstChild); chatLog.scrollTop = chatLog.scrollHeight }
-        function sendChat() { const text = chatInput.value.trim(); if (!text || !socket) return; socket.emit("chat", text); chatInput.value = ""; chatInput.blur() } chatInput.addEventListener("keydown", e => { if (e.key === "Enter") { sendChat(); e.preventDefault() } if (e.key === "Escape") chatInput.blur() });
-        const spawnDmgNum = (wx, wy, text, color) => dmgNums.push({ wx, wy, text, color, elapsed: 0, duration: 1.1 }); function drawDmgNums(dt) { for (let i = dmgNums.length - 1; i >= 0; i--) { const item = dmgNums[i]; item.elapsed += dt; if (item.elapsed >= item.duration) { dmgNums.splice(i, 1); continue } const t = item.elapsed / item.duration, sx = item.wx - camX, sy = item.wy - camY - t * 50; ctx.save(); ctx.globalAlpha = 1 - t; ctx.font = "700 15px Consolas, monospace"; ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.lineWidth = 3; ctx.strokeStyle = "rgba(255,255,255,.7)"; ctx.strokeText(item.text, sx, sy); ctx.fillStyle = item.color; ctx.fillText(item.text, sx, sy); ctx.restore() } }
-        let flashTimer = null; function showLevelUpFlash(level) { levelupFlash.textContent = `LEVEL ${level} UP`; levelupFlash.classList.add("show"); if (flashTimer) clearTimeout(flashTimer); flashTimer = setTimeout(() => levelupFlash.classList.remove("show"), 2200) }
-        function startGame(username) { if (gameRunning) return; gameRunning = true; document.getElementById("auth-screen").style.display = "none"; document.getElementById("hud").style.display = "flex"; document.getElementById("logout-btn").style.display = "block"; document.getElementById("chat-wrap").style.display = "flex"; controlsCard.style.display = "block"; elUser.textContent = username; socket = io(); socket.on("connect", () => socket.emit("join", { name: username })); socket.on("welcome", d => { myId = d.id; worldW = d.worldW; worldH = d.worldH; addChatLine("<span class=\"ct\">월드에 접속했습니다. WASD 이동, Z 공격, Enter 채팅</span>", "sys") }); socket.on("state", d => { playerMap = {}; (d.players || []).forEach(p => playerMap[p.id] = p); monsterMap = {}; (d.monsters || []).forEach(m => monsterMap[m.id] = m); orbMap = {}; (d.orbs || []).forEach(o => orbMap[o.id] = o); elCnt.textContent = d.players.length; const me = playerMap[myId]; if (!me) return; elLv.textContent = me.level; elXp.textContent = me.xp; elXpMax.textContent = me.xpMax; elXpFill.style.width = `${(me.xp / me.xpMax * 100).toFixed(1)}%`; elHp.textContent = me.hp; elHpFill.style.width = `${(me.hp / me.maxHp * 100).toFixed(1)}%` }); socket.on("damaged", ({ dmg }) => { elHpFill.style.background = "linear-gradient(90deg,#f38a93,#d65c68)"; setTimeout(() => elHpFill.style.background = "linear-gradient(90deg,#ff9c8f,#d65c68)", 260); const me = playerMap[myId]; if (me) spawnDmgNum(me.x, me.y - me.r - 10, `-${dmg}`, "#d65c68") }); socket.on("died", () => addChatLine("<span class=\"ct\">쓰러졌습니다. 안전 지점에서 다시 시작합니다.</span>", "sys")); socket.on("attackResult", ({ monsterId, dmg }) => { const m = monsterMap[monsterId]; if (m) spawnDmgNum(m.x, m.y - m.r - 8, String(dmg), "#2d4665") }); socket.on("monsterDied", ({ monsterId, killerId, xp }) => { delete monsterMap[monsterId]; if (killerId === myId) addChatLine(`<span class="ct">몬스터 처치, +${xp} XP</span>`, "sys") }); socket.on("levelUp", ({ id, level, name }) => { if (id === myId) showLevelUpFlash(level); addChatLine(`<span class="ct"><b>${escHtml(name)}</b> 님이 레벨 <b>${level}</b>에 도달했습니다.</span>`, "lvlup") }); socket.on("chat", ({ id, name, text }) => { bubbles[id] = { text, expiry: Date.now() + 3000 }; addChatLine(`<span class="cn">${escHtml(name)}</span><span class="ct">${escHtml(text)}</span>`) }); if (rafId) cancelAnimationFrame(rafId); lastTime = performance.now(); rafId = requestAnimationFrame(loop) }
-        function doLogout() { gameRunning = false; if (rafId) { cancelAnimationFrame(rafId); rafId = null } keys.up = keys.down = keys.left = keys.right = false; lastKeys = {}; myId = null; playerMap = {}; orbMap = {}; monsterMap = {}; dmgNums.length = 0; if (socket) { socket.disconnect(); socket = null } document.getElementById("hud").style.display = "none"; document.getElementById("logout-btn").style.display = "none"; document.getElementById("chat-wrap").style.display = "none"; controlsCard.style.display = "none"; document.getElementById("auth-screen").style.display = "flex"; document.getElementById("i-pass").value = ""; document.getElementById("i-cfm").value = ""; chatLog.innerHTML = ""; levelupFlash.classList.remove("show"); elHpFill.style.background = "linear-gradient(90deg,#ff9c8f,#d65c68)"; camX = camY = 0; lastPosStr = ""; setMsg("INFO :: disconnected", "info") }
-        let camX = 0, camY = 0, lastPosStr = "", lastTime = 0; const CAM_SPEED = 8, C = { bgTop: "#eef4f7", bgBottom: "#dbe5ed", grid: "rgba(93,119,146,.12)", gridMaj: "rgba(82,108,135,.18)", axis: "rgba(87,113,140,.38)", border: "rgba(74,98,123,.54)", blue: "#2d6ff3", blueDeep: "#1748b8", muted: "#6a7d91", text: "#162433", shadow: "rgba(24,39,57,.18)", orb: "#f4b84a", orbStroke: "#d28c12" };
-        function updateCam(me, dt) { const tx = me.x - viewW / 2, ty = me.y - viewH / 2, f = 1 - Math.exp(-CAM_SPEED * dt); camX += (tx - camX) * f; camY += (ty - camY) * f; camX = Math.max(0, Math.min(Math.max(0, worldW - viewW), camX)); camY = Math.max(0, Math.min(Math.max(0, worldH - viewH), camY)) }
-        const toMath = (x, y) => ({ mx: Math.round(x - worldW / 2), my: Math.round(worldH / 2 - y) }); function updateHudPos(me) { const { mx, my } = toMath(me.x, me.y), pos = `(${mx},${my})`; if (pos !== lastPosStr) { elPos.textContent = pos; lastPosStr = pos } }
-        function hexToRgba(hex, a) { let value = hex.replace("#", ""); if (value.length === 3) value = value.split("").map(ch => ch + ch).join(""); const n = Number.parseInt(value, 16); return `rgba(${n >> 16 & 255}, ${n >> 8 & 255}, ${n & 255}, ${a})` }
-        function roundRect(c, x, y, w, h, r) { const radius = Math.min(r, w / 2, h / 2); c.beginPath(); c.moveTo(x + radius, y); c.lineTo(x + w - radius, y); c.arcTo(x + w, y, x + w, y + radius, radius); c.lineTo(x + w, y + h - radius); c.arcTo(x + w, y + h, x + w - radius, y + h, radius); c.lineTo(x + radius, y + h); c.arcTo(x, y + h, x, y + h - radius, radius); c.lineTo(x, y + radius); c.arcTo(x, y, x + radius, y, radius); c.closePath() }
-        function drawBg() { const base = ctx.createLinearGradient(0, 0, 0, viewH); base.addColorStop(0, C.bgTop); base.addColorStop(1, C.bgBottom); ctx.fillStyle = base; ctx.fillRect(0, 0, viewW, viewH); const glowA = ctx.createRadialGradient(viewW * .2, viewH * .18, 0, viewW * .2, viewH * .18, viewW * .52); glowA.addColorStop(0, "rgba(255,255,255,.38)"); glowA.addColorStop(1, "rgba(255,255,255,0)"); ctx.fillStyle = glowA; ctx.fillRect(0, 0, viewW, viewH); const glowB = ctx.createRadialGradient(viewW * .82, viewH * .8, 0, viewW * .82, viewH * .8, viewW * .38); glowB.addColorStop(0, "rgba(122,168,255,.12)"); glowB.addColorStop(1, "rgba(122,168,255,0)"); ctx.fillStyle = glowB; ctx.fillRect(0, 0, viewW, viewH) }
-        function drawGrid() { let sx0 = Math.floor(camX / TILE) * TILE, sy0 = Math.floor(camY / TILE) * TILE; ctx.strokeStyle = C.grid; ctx.lineWidth = 1; ctx.beginPath(); for (let x = sx0; x < camX + viewW + TILE; x += TILE) { ctx.moveTo(x - camX, 0); ctx.lineTo(x - camX, viewH) } for (let y = sy0; y < camY + viewH + TILE; y += TILE) { ctx.moveTo(0, y - camY); ctx.lineTo(viewW, y - camY) } ctx.stroke(); const major = TILE * 5; ctx.strokeStyle = C.gridMaj; ctx.lineWidth = 1.2; sx0 = Math.floor(camX / major) * major; sy0 = Math.floor(camY / major) * major; ctx.beginPath(); for (let x = sx0; x < camX + viewW + major; x += major) { ctx.moveTo(x - camX, 0); ctx.lineTo(x - camX, viewH) } for (let y = sy0; y < camY + viewH + major; y += major) { ctx.moveTo(0, y - camY); ctx.lineTo(viewW, y - camY) } ctx.stroke(); const axisX = worldW / 2 - camX, axisY = worldH / 2 - camY; ctx.save(); ctx.strokeStyle = C.axis; ctx.lineWidth = 1.6; ctx.setLineDash([7, 5]); ctx.beginPath(); ctx.moveTo(0, axisY); ctx.lineTo(viewW, axisY); ctx.moveTo(axisX, 0); ctx.lineTo(axisX, viewH); ctx.stroke(); ctx.restore(); ctx.fillStyle = C.muted; ctx.font = "11px Consolas, monospace"; ctx.textAlign = "center"; for (let x = Math.floor(camX / major) * major; x < camX + viewW + major; x += major) { const value = Math.round(x - worldW / 2); if (value) ctx.fillText(String(value), x - camX, axisY + 15) } ctx.textAlign = "right"; for (let y = Math.floor(camY / major) * major; y < camY + viewH + major; y += major) { const value = Math.round(worldH / 2 - y); if (value) ctx.fillText(String(value), axisX - 8, y - camY + 4) } ctx.fillStyle = C.blueDeep; ctx.font = "700 11px Consolas, monospace"; ctx.textAlign = "left"; ctx.fillText("0", axisX + 9, axisY - 10); drawArrow(viewW - 18, axisY, 1, 0); drawArrow(axisX, 18, 0, -1) }
-        function drawArrow(x, y, dx, dy) { const size = 7; ctx.save(); ctx.fillStyle = C.axis; ctx.translate(x, y); ctx.rotate(Math.atan2(dy, dx)); ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(-size, -size / 2); ctx.lineTo(-size, size / 2); ctx.closePath(); ctx.fill(); ctx.restore() }
-        function drawBorder() { ctx.strokeStyle = C.border; ctx.lineWidth = 2.5; ctx.strokeRect(-camX, -camY, worldW, worldH); const hw = Math.round(worldW / 2), hh = Math.round(worldH / 2); ctx.fillStyle = "rgba(74,98,123,.62)"; ctx.font = "11px Consolas, monospace";[{ x: -camX + 8, y: -camY + 16, text: `(-${hw}, +${hh})`, align: "left" }, { x: -camX + worldW - 8, y: -camY + 16, text: `(+${hw}, +${hh})`, align: "right" }, { x: -camX + 8, y: -camY + worldH - 10, text: `(-${hw}, -${hh})`, align: "left" }, { x: -camX + worldW - 8, y: -camY + worldH - 10, text: `(+${hw}, -${hh})`, align: "right" }].forEach(c => { ctx.textAlign = c.align; ctx.fillText(c.text, c.x, c.y) }) }
-        function drawOrbs() { const now = Date.now(); for (const orb of Object.values(orbMap)) { const sx = orb.x - camX, sy = orb.y - camY; if (sx < -24 || sx > viewW + 24 || sy < -24 || sy > viewH + 24) continue; const pulse = 1 + .12 * Math.sin(now * .004 + orb.id), glow = ctx.createRadialGradient(sx, sy, 2, sx, sy, 18 * pulse); glow.addColorStop(0, "rgba(255,233,190,.95)"); glow.addColorStop(.35, "rgba(244,184,74,.32)"); glow.addColorStop(1, "rgba(244,184,74,0)"); ctx.fillStyle = glow; ctx.fillRect(sx - 18, sy - 18, 36, 36); const core = ctx.createRadialGradient(sx - 2, sy - 3, 0, sx, sy, 8 * pulse); core.addColorStop(0, "#fff8da"); core.addColorStop(.45, "#f9ca6e"); core.addColorStop(1, C.orb); ctx.beginPath(); ctx.arc(sx, sy, 6.4 * pulse, 0, Math.PI * 2); ctx.fillStyle = core; ctx.strokeStyle = C.orbStroke; ctx.lineWidth = 1.5; ctx.fill(); ctx.stroke() } }
-        function drawMonster(monster) { const sx = monster.x - camX, sy = monster.y - camY; if (sx < -100 || sx > viewW + 100 || sy < -100 || sy > viewH + 100) return; const now = Date.now(); ctx.save(); ctx.translate(sx, sy); ctx.shadowColor = hexToRgba(monster.color, .26); ctx.shadowBlur = 14; switch (monster.type) { case "dot": ctx.fillStyle = monster.color; ctx.beginPath(); ctx.arc(0, 0, monster.r, 0, Math.PI * 2); ctx.fill(); ctx.fillStyle = "rgba(255,255,255,.32)"; ctx.beginPath(); ctx.arc(-monster.r * .28, -monster.r * .32, monster.r * .42, 0, Math.PI * 2); ctx.fill(); break; case "line": ctx.rotate(now * .002 % (Math.PI * 2)); ctx.strokeStyle = monster.color; ctx.lineWidth = 4; ctx.lineCap = "round"; ctx.beginPath(); ctx.moveTo(-monster.r, 0); ctx.lineTo(monster.r, 0); ctx.stroke(); break; case "triangle": ctx.rotate(now * .001); ctx.beginPath(); for (let i = 0; i < 3; i++) { const a = i / 3 * Math.PI * 2 - Math.PI / 2, px = Math.cos(a) * monster.r, py = Math.sin(a) * monster.r; i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py) } ctx.closePath(); ctx.fillStyle = hexToRgba(monster.color, .18); ctx.strokeStyle = monster.color; ctx.lineWidth = 2.5; ctx.fill(); ctx.stroke(); break; case "square": ctx.rotate(now * .0007); ctx.fillStyle = hexToRgba(monster.color, .18); ctx.strokeStyle = monster.color; ctx.lineWidth = 2.5; ctx.fillRect(-monster.r, -monster.r, monster.r * 2, monster.r * 2); ctx.strokeRect(-monster.r, -monster.r, monster.r * 2, monster.r * 2); break }ctx.restore(); const barW = monster.r * 2 + 14, barH = 6, hpPct = Math.max(0, monster.hp / monster.maxHp), bx = sx - barW / 2, by = sy - monster.r - 14; ctx.fillStyle = "rgba(255,255,255,.8)"; roundRect(ctx, bx, by, barW, barH, 999); ctx.fill(); ctx.fillStyle = hpPct > .5 ? "#3ca76a" : hpPct > .25 ? "#d99833" : "#d65c68"; roundRect(ctx, bx, by, barW * hpPct, barH, 999); ctx.fill() }
-        function drawPill(text, x, y, { font = "600 12px Aptos, Segoe UI, sans-serif", bg = "rgba(255,255,255,.82)", border = "rgba(121,144,168,.2)", color = C.text, padX = 10, height = 24, radius = 12 } = {}) { ctx.save(); ctx.font = font; ctx.textAlign = "center"; ctx.textBaseline = "middle"; const width = ctx.measureText(text).width + padX * 2; ctx.fillStyle = bg; ctx.strokeStyle = border; ctx.lineWidth = 1; roundRect(ctx, x - width / 2, y - height / 2, width, height, radius); ctx.fill(); ctx.stroke(); ctx.fillStyle = color; ctx.fillText(text, x, y); ctx.restore() }
-        function drawPlayer(player, isMe) { const sx = player.x - camX, sy = player.y - camY; if (sx < -100 || sx > viewW + 100 || sy < -100 || sy > viewH + 100) return; ctx.save(); ctx.beginPath(); ctx.arc(sx + 2, sy + 4, player.r, 0, Math.PI * 2); ctx.fillStyle = C.shadow; ctx.fill(); const g = ctx.createRadialGradient(sx - player.r * .34, sy - player.r * .45, 2, sx, sy, player.r * 1.15); if (isMe) { g.addColorStop(0, "#f4f8ff"); g.addColorStop(.32, "#9ec2ff"); g.addColorStop(1, C.blue) } else { g.addColorStop(0, "#f7f9ff"); g.addColorStop(.32, "#bfd1ff"); g.addColorStop(1, "#6d88d8") } ctx.shadowColor = isMe ? "rgba(45,111,243,.28)" : "rgba(94,117,168,.18)"; ctx.shadowBlur = 18; ctx.beginPath(); ctx.arc(sx, sy, player.r, 0, Math.PI * 2); ctx.fillStyle = g; ctx.fill(); ctx.shadowBlur = 0; ctx.strokeStyle = isMe ? C.blueDeep : "#4767b4"; ctx.lineWidth = isMe ? 3 : 2.5; ctx.stroke(); if (isMe) { ctx.beginPath(); ctx.arc(sx, sy, player.r + 6, 0, Math.PI * 2); ctx.strokeStyle = "rgba(45,111,243,.22)"; ctx.lineWidth = 3; ctx.stroke() } ctx.restore(); drawPill(player.name, sx, sy - player.r - 28); ctx.save(); ctx.fillStyle = isMe ? C.blueDeep : C.muted; ctx.font = "700 11px Consolas, monospace"; ctx.textAlign = "center"; ctx.fillText(`Lv.${player.level}`, sx, sy - player.r - 8); ctx.restore(); const bubble = bubbles[player.id]; if (bubble && Date.now() < bubble.expiry) { const bx = sx, by = sy - player.r - 56; ctx.save(); ctx.font = "12px Aptos, Segoe UI, sans-serif"; ctx.textAlign = "center"; ctx.textBaseline = "middle"; const tw = Math.min(ctx.measureText(bubble.text).width + 18, 220), bh = 30; ctx.fillStyle = "rgba(20,33,47,.86)"; ctx.strokeStyle = "rgba(255,255,255,.08)"; roundRect(ctx, bx - tw / 2, by - bh / 2, tw, bh, 14); ctx.fill(); ctx.stroke(); ctx.beginPath(); ctx.rect(bx - tw / 2 + 6, by - bh / 2, tw - 12, bh); ctx.clip(); ctx.fillStyle = "#f6fbff"; ctx.fillText(bubble.text, bx, by + .5); ctx.restore() } }
-        function loop(timestamp) { if (!gameRunning) { rafId = null; return } const dt = Math.min((timestamp - lastTime) / 1000, .1); lastTime = timestamp; drawBg(); const me = playerMap[myId]; if (me) { updateCam(me, dt); updateHudPos(me) } drawGrid(); drawBorder(); drawOrbs(); Object.values(monsterMap).forEach(drawMonster); Object.values(playerMap).forEach(player => drawPlayer(player, player.id === myId)); drawDmgNums(dt); rafId = requestAnimationFrame(loop) }
+        const UKEY = "sphere_users_v1",
+            getDB = () => { try { return JSON.parse(localStorage.getItem(UKEY)) || {} } catch { return {} } },
+            saveDB = db => localStorage.setItem(UKEY, JSON.stringify(db));
+
+        let authMode = "login";
+
+        const elMsg = document.getElementById("auth-msg"),
+            elUser = document.getElementById("h-user"),
+            elPos = document.getElementById("h-pos"),
+            elCnt = document.getElementById("h-cnt"),
+            elLv = document.getElementById("h-lv"),
+            elXp = document.getElementById("h-xp"),
+            elXpMax = document.getElementById("h-xpmax"),
+            elXpFill = document.getElementById("xp-fill"),
+            elHp = document.getElementById("h-hp"),
+            elHpFill = document.getElementById("hp-fill"),
+            chatLog = document.getElementById("chat-log"),
+            chatInput = document.getElementById("chat-input"),
+            controlsCard = document.getElementById("controls-card"),
+            levelupFlash = document.getElementById("levelup-flash");
+
+        function setMode(mode) {
+            authMode = mode;
+            const signup = mode === "signup";
+            document.getElementById("cfm-row").style.display = signup ? "" : "none";
+            document.getElementById("sbtn-lbl").textContent = signup ? "CREATE ACCOUNT" : "CONNECT";
+            document.getElementById("btn-ln").className = "mbtn" + (signup ? "" : " on");
+            document.getElementById("btn-su").className = "mbtn" + (signup ? " on" : "");
+            setMsg("", "");
+        }
+
+        function setMsg(text, cls) {
+            elMsg.textContent = text ? `> ${text}` : "";
+            elMsg.className = "auth-msg " + (cls || "");
+        }
+
+        function handleAuth() {
+            const user = document.getElementById("i-user").value.trim(),
+                pass = document.getElementById("i-pass").value,
+                confirm = document.getElementById("i-cfm").value;
+            if (!user) return setMsg("ERR :: username required", "err");
+            if (!pass) return setMsg("ERR :: password required", "err");
+            const db = getDB();
+            if (authMode === "signup") {
+                if (pass !== confirm) return setMsg("ERR :: passwords do not match", "err");
+                if (pass.length < 4) return setMsg("ERR :: password min 4 chars", "err");
+                if (db[user]) return setMsg(`ERR :: "${user}" already exists`, "err");
+                db[user] = { pw: pass, ts: Date.now() };
+                saveDB(db);
+                setMsg(`OK :: welcome, ${user}`, "ok");
+                return setTimeout(() => startGame(user), 600);
+            }
+            if (!db[user]) return setMsg("ERR :: user not found", "err");
+            if (db[user].pw !== pass) return setMsg("ERR :: wrong password", "err");
+            setMsg(`OK :: connecting as ${user}`, "ok");
+            setTimeout(() => startGame(user), 400);
+        }
+
+        ["i-user", "i-pass", "i-cfm"].forEach(id => {
+            document.getElementById(id).addEventListener("keydown", e => {
+                if (e.key === "Enter") handleAuth();
+            });
+        });
+
+        const canvas = document.getElementById("canvas"),
+            ctx = canvas.getContext("2d");
+        let viewW = innerWidth,
+            viewH = innerHeight;
+
+        function resize() {
+            const ratio = devicePixelRatio || 1;
+            viewW = innerWidth;
+            viewH = innerHeight;
+            canvas.width = Math.round(viewW * ratio);
+            canvas.height = Math.round(viewH * ratio);
+            canvas.style.width = `${viewW}px`;
+            canvas.style.height = `${viewH}px`;
+            ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+        }
+
+        resize();
+        addEventListener("resize", resize);
+
+        let socket,
+            myId = null,
+            worldW = 3000,
+            worldH = 3000,
+            playerMap = {},
+            orbMap = {},
+            monsterMap = {};
+        const TILE = 60,
+            keys = { up: false, down: false, left: false, right: false };
+        let lastKeys = {},
+            gameRunning = false,
+            rafId = null,
+            attackCooldown = false;
+
+        addEventListener("keydown", e => {
+            if (e.key === "Enter" && !chatFocused() && gameRunning) {
+                chatInput.focus();
+                e.preventDefault();
+                return;
+            }
+            if (chatFocused()) return;
+            if ((e.key === "z" || e.key === "Z") && gameRunning) return tryAttack();
+            applyKey(e, true);
+            sendKeys();
+        });
+
+        addEventListener("keyup", e => {
+            if (chatFocused()) return;
+            applyKey(e, false);
+            sendKeys();
+        });
+
+        addEventListener("blur", () => {
+            keys.up = keys.down = keys.left = keys.right = false;
+            sendKeys();
+        });
+
+        const chatFocused = () => document.activeElement === chatInput;
+
+        function applyKey(e, v) {
+            if (e.key === "ArrowUp" || e.key === "w" || e.key === "W") keys.up = v;
+            if (e.key === "ArrowDown" || e.key === "s" || e.key === "S") keys.down = v;
+            if (e.key === "ArrowLeft" || e.key === "a" || e.key === "A") keys.left = v;
+            if (e.key === "ArrowRight" || e.key === "d" || e.key === "D") keys.right = v;
+        }
+
+        function sendKeys() {
+            if (!socket) return;
+            const changed = keys.up !== lastKeys.up || keys.down !== lastKeys.down || keys.left !== lastKeys.left || keys.right !== lastKeys.right;
+            if (changed) {
+                socket.emit("keys", { ...keys });
+                lastKeys = { ...keys };
+            }
+        }
+
+        function tryAttack() {
+            if (attackCooldown || !socket) return;
+            const me = playerMap[myId];
+            if (!me) return;
+            let nearest = null,
+                nearDist = Infinity;
+            for (const monster of Object.values(monsterMap)) {
+                const d = Math.hypot(me.x - monster.x, me.y - monster.y);
+                if (d < nearDist) {
+                    nearDist = d;
+                    nearest = monster;
+                }
+            }
+            if (!nearest) return;
+            socket.emit("attack", { monsterId: nearest.id });
+            attackCooldown = true;
+            setTimeout(() => attackCooldown = false, 400);
+        }
+
+        const bubbles = {},
+            MAX_CHAT_LINES = 80,
+            dmgNums = [];
+        const escHtml = value => String(value).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+        function addChatLine(safeHtml, cls = "") {
+            const div = document.createElement("div");
+            div.className = "chat-line" + (cls ? ` ${cls}` : "");
+            div.innerHTML = safeHtml;
+            chatLog.appendChild(div);
+            while (chatLog.children.length > MAX_CHAT_LINES) chatLog.removeChild(chatLog.firstChild);
+            chatLog.scrollTop = chatLog.scrollHeight;
+        }
+
+        function sendChat() {
+            const text = chatInput.value.trim();
+            if (!text || !socket) return;
+            socket.emit("chat", text);
+            chatInput.value = "";
+            chatInput.blur();
+        }
+
+        chatInput.addEventListener("keydown", e => {
+            if (e.key === "Enter") {
+                sendChat();
+                e.preventDefault();
+            }
+            if (e.key === "Escape") chatInput.blur();
+        });
+
+        const spawnDmgNum = (wx, wy, text, color) => dmgNums.push({ wx, wy, text, color, elapsed: 0, duration: 1.1 });
+
+        function drawDmgNums(dt) {
+            for (let i = dmgNums.length - 1; i >= 0; i--) {
+                const item = dmgNums[i];
+                item.elapsed += dt;
+                if (item.elapsed >= item.duration) {
+                    dmgNums.splice(i, 1);
+                    continue;
+                }
+                const t = item.elapsed / item.duration,
+                    sx = item.wx - camX,
+                    sy = item.wy - camY - t * 50;
+                ctx.save();
+                ctx.globalAlpha = 1 - t;
+                ctx.font = "700 15px Consolas, monospace";
+                ctx.textAlign = "center";
+                ctx.textBaseline = "middle";
+                ctx.lineWidth = 3;
+                ctx.strokeStyle = "rgba(4,12,8,.92)";
+                ctx.strokeText(item.text, sx, sy);
+                ctx.fillStyle = item.color;
+                ctx.fillText(item.text, sx, sy);
+                ctx.restore();
+            }
+        }
+
+        let flashTimer = null;
+
+        function showLevelUpFlash(level) {
+            levelupFlash.textContent = `LEVEL ${level} UP`;
+            levelupFlash.classList.add("show");
+            if (flashTimer) clearTimeout(flashTimer);
+            flashTimer = setTimeout(() => levelupFlash.classList.remove("show"), 2200);
+        }
+
+        function startGame(username) {
+            if (gameRunning) return;
+            gameRunning = true;
+            document.getElementById("auth-screen").style.display = "none";
+            document.getElementById("hud").style.display = "flex";
+            document.getElementById("logout-btn").style.display = "block";
+            document.getElementById("chat-wrap").style.display = "flex";
+            controlsCard.style.display = "block";
+            elUser.textContent = username;
+            socket = io();
+            socket.on("connect", () => socket.emit("join", { name: username }));
+            socket.on("welcome", d => {
+                myId = d.id;
+                worldW = d.worldW;
+                worldH = d.worldH;
+                addChatLine("<span class=\"ct\">LINK ESTABLISHED :: MOVE=WASD :: ATTACK=Z :: CHAT=ENTER</span>", "sys");
+            });
+            socket.on("state", d => {
+                playerMap = {};
+                (d.players || []).forEach(p => playerMap[p.id] = p);
+                monsterMap = {};
+                (d.monsters || []).forEach(m => monsterMap[m.id] = m);
+                orbMap = {};
+                (d.orbs || []).forEach(o => orbMap[o.id] = o);
+                elCnt.textContent = d.players.length;
+                const me = playerMap[myId];
+                if (!me) return;
+                elLv.textContent = me.level;
+                elXp.textContent = me.xp;
+                elXpMax.textContent = me.xpMax;
+                elXpFill.style.width = `${(me.xp / me.xpMax * 100).toFixed(1)}%`;
+                elHp.textContent = me.hp;
+                elHpFill.style.width = `${(me.hp / me.maxHp * 100).toFixed(1)}%`;
+            });
+            socket.on("damaged", ({ dmg }) => {
+                elHpFill.style.background = "linear-gradient(90deg,rgba(255,106,125,.62),#d65c68)";
+                setTimeout(() => elHpFill.style.background = "linear-gradient(90deg,rgba(255,106,125,.42),#d65c68)", 260);
+                const me = playerMap[myId];
+                if (me) spawnDmgNum(me.x, me.y - me.r - 10, `-${dmg}`, "#ff6a7d");
+            });
+            socket.on("died", () => addChatLine("<span class=\"ct\">NODE OFFLINE :: RESPAWNED AT SAFE POINT</span>", "sys"));
+            socket.on("attackResult", ({ monsterId, dmg }) => {
+                const m = monsterMap[monsterId];
+                if (m) spawnDmgNum(m.x, m.y - m.r - 8, String(dmg), "#67ffb8");
+            });
+            socket.on("monsterDied", ({ monsterId, killerId, xp }) => {
+                delete monsterMap[monsterId];
+                if (killerId === myId) addChatLine(`<span class="ct">TARGET DOWN :: +${xp} XP</span>`, "sys");
+            });
+            socket.on("levelUp", ({ id, level, name }) => {
+                if (id === myId) showLevelUpFlash(level);
+                addChatLine(`<span class="ct"><b>${escHtml(name)}</b> :: LEVEL <b>${level}</b></span>`, "lvlup");
+            });
+            socket.on("chat", ({ id, name, text }) => {
+                bubbles[id] = { text, expiry: Date.now() + 3000 };
+                addChatLine(`<span class="cn">${escHtml(name)}</span><span class="ct">${escHtml(text)}</span>`);
+            });
+            if (rafId) cancelAnimationFrame(rafId);
+            lastTime = performance.now();
+            rafId = requestAnimationFrame(loop);
+        }
+
+        function doLogout() {
+            gameRunning = false;
+            if (rafId) {
+                cancelAnimationFrame(rafId);
+                rafId = null;
+            }
+            keys.up = keys.down = keys.left = keys.right = false;
+            lastKeys = {};
+            myId = null;
+            playerMap = {};
+            orbMap = {};
+            monsterMap = {};
+            dmgNums.length = 0;
+            if (socket) {
+                socket.disconnect();
+                socket = null;
+            }
+            document.getElementById("hud").style.display = "none";
+            document.getElementById("logout-btn").style.display = "none";
+            document.getElementById("chat-wrap").style.display = "none";
+            controlsCard.style.display = "none";
+            document.getElementById("auth-screen").style.display = "flex";
+            document.getElementById("i-pass").value = "";
+            document.getElementById("i-cfm").value = "";
+            chatLog.innerHTML = "";
+            levelupFlash.classList.remove("show");
+            elHpFill.style.background = "linear-gradient(90deg,rgba(255,106,125,.42),#d65c68)";
+            camX = camY = 0;
+            lastPosStr = "";
+            setMsg("INFO :: disconnected", "info");
+        }
+
+        let camX = 0,
+            camY = 0,
+            lastPosStr = "",
+            lastTime = 0;
+        const CAM_SPEED = 8,
+            C = {
+                bgTop: "#eef4f7",
+                bgBottom: "#dbe5ed",
+                grid: "rgba(93,119,146,.12)",
+                gridMaj: "rgba(82,108,135,.18)",
+                axis: "rgba(87,113,140,.38)",
+                border: "rgba(74,98,123,.54)",
+                blue: "#2d6ff3",
+                blueDeep: "#1748b8",
+                muted: "#6a7d91",
+                text: "#162433",
+                shadow: "rgba(24,39,57,.18)",
+                orb: "#f4b84a",
+                orbStroke: "#d28c12"
+            };
+
+        function updateCam(me, dt) {
+            const tx = me.x - viewW / 2,
+                ty = me.y - viewH / 2,
+                f = 1 - Math.exp(-CAM_SPEED * dt);
+            camX += (tx - camX) * f;
+            camY += (ty - camY) * f;
+            camX = Math.max(0, Math.min(Math.max(0, worldW - viewW), camX));
+            camY = Math.max(0, Math.min(Math.max(0, worldH - viewH), camY));
+        }
+
+        const toMath = (x, y) => ({ mx: Math.round(x - worldW / 2), my: Math.round(worldH / 2 - y) });
+
+        function updateHudPos(me) {
+            const { mx, my } = toMath(me.x, me.y),
+                pos = `(${mx},${my})`;
+            if (pos !== lastPosStr) {
+                elPos.textContent = pos;
+                lastPosStr = pos;
+            }
+        }
+
+        function hexToRgba(hex, a) {
+            let value = hex.replace("#", "");
+            if (value.length === 3) value = value.split("").map(ch => ch + ch).join("");
+            const n = Number.parseInt(value, 16);
+            return `rgba(${n >> 16 & 255}, ${n >> 8 & 255}, ${n & 255}, ${a})`;
+        }
+
+        function roundRect(c, x, y, w, h, r) {
+            const radius = Math.min(r, w / 2, h / 2);
+            c.beginPath();
+            c.moveTo(x + radius, y);
+            c.lineTo(x + w - radius, y);
+            c.arcTo(x + w, y, x + w, y + radius, radius);
+            c.lineTo(x + w, y + h - radius);
+            c.arcTo(x + w, y + h, x + w - radius, y + h, radius);
+            c.lineTo(x + radius, y + h);
+            c.arcTo(x, y + h, x, y + h - radius, radius);
+            c.lineTo(x, y + radius);
+            c.arcTo(x, y, x + radius, y, radius);
+            c.closePath();
+        }
+
+        function drawBg() {
+            const base = ctx.createLinearGradient(0, 0, 0, viewH);
+            base.addColorStop(0, C.bgTop);
+            base.addColorStop(1, C.bgBottom);
+            ctx.fillStyle = base;
+            ctx.fillRect(0, 0, viewW, viewH);
+
+            const glowA = ctx.createRadialGradient(viewW * .2, viewH * .18, 0, viewW * .2, viewH * .18, viewW * .52);
+            glowA.addColorStop(0, "rgba(255,255,255,.38)");
+            glowA.addColorStop(1, "rgba(255,255,255,0)");
+            ctx.fillStyle = glowA;
+            ctx.fillRect(0, 0, viewW, viewH);
+
+            const glowB = ctx.createRadialGradient(viewW * .82, viewH * .8, 0, viewW * .82, viewH * .8, viewW * .38);
+            glowB.addColorStop(0, "rgba(122,168,255,.12)");
+            glowB.addColorStop(1, "rgba(122,168,255,0)");
+            ctx.fillStyle = glowB;
+            ctx.fillRect(0, 0, viewW, viewH);
+        }
+
+        function drawGrid() {
+            let sx0 = Math.floor(camX / TILE) * TILE,
+                sy0 = Math.floor(camY / TILE) * TILE;
+            ctx.strokeStyle = C.grid;
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            for (let x = sx0; x < camX + viewW + TILE; x += TILE) {
+                ctx.moveTo(x - camX, 0);
+                ctx.lineTo(x - camX, viewH);
+            }
+            for (let y = sy0; y < camY + viewH + TILE; y += TILE) {
+                ctx.moveTo(0, y - camY);
+                ctx.lineTo(viewW, y - camY);
+            }
+            ctx.stroke();
+
+            const major = TILE * 5;
+            ctx.strokeStyle = C.gridMaj;
+            ctx.lineWidth = 1.2;
+            sx0 = Math.floor(camX / major) * major;
+            sy0 = Math.floor(camY / major) * major;
+            ctx.beginPath();
+            for (let x = sx0; x < camX + viewW + major; x += major) {
+                ctx.moveTo(x - camX, 0);
+                ctx.lineTo(x - camX, viewH);
+            }
+            for (let y = sy0; y < camY + viewH + major; y += major) {
+                ctx.moveTo(0, y - camY);
+                ctx.lineTo(viewW, y - camY);
+            }
+            ctx.stroke();
+
+            const axisX = worldW / 2 - camX,
+                axisY = worldH / 2 - camY;
+            ctx.save();
+            ctx.strokeStyle = C.axis;
+            ctx.lineWidth = 1.6;
+            ctx.setLineDash([7, 5]);
+            ctx.beginPath();
+            ctx.moveTo(0, axisY);
+            ctx.lineTo(viewW, axisY);
+            ctx.moveTo(axisX, 0);
+            ctx.lineTo(axisX, viewH);
+            ctx.stroke();
+            ctx.restore();
+
+            ctx.fillStyle = C.muted;
+            ctx.font = "11px Consolas, monospace";
+            ctx.textAlign = "center";
+            for (let x = Math.floor(camX / major) * major; x < camX + viewW + major; x += major) {
+                const value = Math.round(x - worldW / 2);
+                if (value) ctx.fillText(String(value), x - camX, axisY + 15);
+            }
+            ctx.textAlign = "right";
+            for (let y = Math.floor(camY / major) * major; y < camY + viewH + major; y += major) {
+                const value = Math.round(worldH / 2 - y);
+                if (value) ctx.fillText(String(value), axisX - 8, y - camY + 4);
+            }
+            ctx.fillStyle = C.blueDeep;
+            ctx.font = "700 11px Consolas, monospace";
+            ctx.textAlign = "left";
+            ctx.fillText("0", axisX + 9, axisY - 10);
+            drawArrow(viewW - 18, axisY, 1, 0);
+            drawArrow(axisX, 18, 0, -1);
+        }
+
+        function drawArrow(x, y, dx, dy) {
+            const size = 7;
+            ctx.save();
+            ctx.fillStyle = C.axis;
+            ctx.translate(x, y);
+            ctx.rotate(Math.atan2(dy, dx));
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.lineTo(-size, -size / 2);
+            ctx.lineTo(-size, size / 2);
+            ctx.closePath();
+            ctx.fill();
+            ctx.restore();
+        }
+
+        function drawBorder() {
+            ctx.strokeStyle = C.border;
+            ctx.lineWidth = 2.5;
+            ctx.strokeRect(-camX, -camY, worldW, worldH);
+            const hw = Math.round(worldW / 2),
+                hh = Math.round(worldH / 2);
+            ctx.fillStyle = "rgba(74,98,123,.62)";
+            ctx.font = "11px Consolas, monospace";
+            [
+                { x: -camX + 8, y: -camY + 16, text: `(-${hw}, +${hh})`, align: "left" },
+                { x: -camX + worldW - 8, y: -camY + 16, text: `(+${hw}, +${hh})`, align: "right" },
+                { x: -camX + 8, y: -camY + worldH - 10, text: `(-${hw}, -${hh})`, align: "left" },
+                { x: -camX + worldW - 8, y: -camY + worldH - 10, text: `(+${hw}, -${hh})`, align: "right" }
+            ].forEach(c => {
+                ctx.textAlign = c.align;
+                ctx.fillText(c.text, c.x, c.y);
+            });
+        }
+
+        function drawOrbs() {
+            const now = Date.now();
+            for (const orb of Object.values(orbMap)) {
+                const sx = orb.x - camX,
+                    sy = orb.y - camY;
+                if (sx < -24 || sx > viewW + 24 || sy < -24 || sy > viewH + 24) continue;
+                const pulse = 1 + .12 * Math.sin(now * .004 + orb.id),
+                    glow = ctx.createRadialGradient(sx, sy, 2, sx, sy, 18 * pulse);
+                glow.addColorStop(0, "rgba(255,233,190,.95)");
+                glow.addColorStop(.35, "rgba(244,184,74,.32)");
+                glow.addColorStop(1, "rgba(244,184,74,0)");
+                ctx.fillStyle = glow;
+                ctx.fillRect(sx - 18, sy - 18, 36, 36);
+
+                const core = ctx.createRadialGradient(sx - 2, sy - 3, 0, sx, sy, 8 * pulse);
+                core.addColorStop(0, "#fff8da");
+                core.addColorStop(.45, "#f9ca6e");
+                core.addColorStop(1, C.orb);
+                ctx.beginPath();
+                ctx.arc(sx, sy, 6.4 * pulse, 0, Math.PI * 2);
+                ctx.fillStyle = core;
+                ctx.strokeStyle = C.orbStroke;
+                ctx.lineWidth = 1.5;
+                ctx.fill();
+                ctx.stroke();
+            }
+        }
+
+        function drawMonster(monster) {
+            const sx = monster.x - camX,
+                sy = monster.y - camY;
+            if (sx < -100 || sx > viewW + 100 || sy < -100 || sy > viewH + 100) return;
+            const now = Date.now();
+            ctx.save();
+            ctx.translate(sx, sy);
+            ctx.shadowColor = hexToRgba(monster.color, .26);
+            ctx.shadowBlur = 14;
+            switch (monster.type) {
+                case "dot":
+                    ctx.fillStyle = monster.color;
+                    ctx.beginPath();
+                    ctx.arc(0, 0, monster.r, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.fillStyle = "rgba(255,255,255,.32)";
+                    ctx.beginPath();
+                    ctx.arc(-monster.r * .28, -monster.r * .32, monster.r * .42, 0, Math.PI * 2);
+                    ctx.fill();
+                    break;
+                case "line":
+                    ctx.rotate(now * .002 % (Math.PI * 2));
+                    ctx.strokeStyle = monster.color;
+                    ctx.lineWidth = 4;
+                    ctx.lineCap = "round";
+                    ctx.beginPath();
+                    ctx.moveTo(-monster.r, 0);
+                    ctx.lineTo(monster.r, 0);
+                    ctx.stroke();
+                    break;
+                case "triangle":
+                    ctx.rotate(now * .001);
+                    ctx.beginPath();
+                    for (let i = 0; i < 3; i++) {
+                        const a = i / 3 * Math.PI * 2 - Math.PI / 2,
+                            px = Math.cos(a) * monster.r,
+                            py = Math.sin(a) * monster.r;
+                        i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+                    }
+                    ctx.closePath();
+                    ctx.fillStyle = hexToRgba(monster.color, .18);
+                    ctx.strokeStyle = monster.color;
+                    ctx.lineWidth = 2.5;
+                    ctx.fill();
+                    ctx.stroke();
+                    break;
+                case "square":
+                    ctx.rotate(now * .0007);
+                    ctx.fillStyle = hexToRgba(monster.color, .18);
+                    ctx.strokeStyle = monster.color;
+                    ctx.lineWidth = 2.5;
+                    ctx.fillRect(-monster.r, -monster.r, monster.r * 2, monster.r * 2);
+                    ctx.strokeRect(-monster.r, -monster.r, monster.r * 2, monster.r * 2);
+                    break;
+            }
+            ctx.restore();
+
+            const barW = monster.r * 2 + 14,
+                barH = 6,
+                hpPct = Math.max(0, monster.hp / monster.maxHp),
+                bx = sx - barW / 2,
+                by = sy - monster.r - 14;
+            ctx.fillStyle = "rgba(5,14,10,.92)";
+            roundRect(ctx, bx, by, barW, barH, 2);
+            ctx.fill();
+            ctx.strokeStyle = "rgba(103,255,184,.16)";
+            ctx.stroke();
+            ctx.fillStyle = hpPct > .5 ? "#67ffb8" : hpPct > .25 ? "#ffcf70" : "#ff6a7d";
+            roundRect(ctx, bx + 1, by + 1, Math.max(0, barW * hpPct - 2), barH - 2, 1);
+            ctx.fill();
+        }
+
+        function drawPill(text, x, y, {
+            font = "700 11px Consolas, monospace",
+            bg = "rgba(5,14,10,.9)",
+            border = "rgba(103,255,184,.22)",
+            color = "#d6ffe8",
+            padX = 10,
+            height = 20,
+            radius = 3
+        } = {}) {
+            ctx.save();
+            ctx.font = font;
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            const width = ctx.measureText(text).width + padX * 2;
+            ctx.fillStyle = bg;
+            ctx.strokeStyle = border;
+            ctx.lineWidth = 1;
+            roundRect(ctx, x - width / 2, y - height / 2, width, height, radius);
+            ctx.fill();
+            ctx.stroke();
+            ctx.fillStyle = color;
+            ctx.fillText(text, x, y);
+            ctx.restore();
+        }
+
+        function drawPlayer(player, isMe) {
+            const sx = player.x - camX,
+                sy = player.y - camY;
+            if (sx < -100 || sx > viewW + 100 || sy < -100 || sy > viewH + 100) return;
+            ctx.save();
+            ctx.beginPath();
+            ctx.arc(sx + 2, sy + 4, player.r, 0, Math.PI * 2);
+            ctx.fillStyle = C.shadow;
+            ctx.fill();
+
+            const g = ctx.createRadialGradient(sx - player.r * .34, sy - player.r * .45, 2, sx, sy, player.r * 1.15);
+            if (isMe) {
+                g.addColorStop(0, "#f4f8ff");
+                g.addColorStop(.32, "#9ec2ff");
+                g.addColorStop(1, C.blue);
+            } else {
+                g.addColorStop(0, "#f7f9ff");
+                g.addColorStop(.32, "#bfd1ff");
+                g.addColorStop(1, "#6d88d8");
+            }
+            ctx.shadowColor = isMe ? "rgba(45,111,243,.28)" : "rgba(94,117,168,.18)";
+            ctx.shadowBlur = 18;
+            ctx.beginPath();
+            ctx.arc(sx, sy, player.r, 0, Math.PI * 2);
+            ctx.fillStyle = g;
+            ctx.fill();
+            ctx.shadowBlur = 0;
+            ctx.strokeStyle = isMe ? C.blueDeep : "#4767b4";
+            ctx.lineWidth = isMe ? 3 : 2.5;
+            ctx.stroke();
+            if (isMe) {
+                ctx.beginPath();
+                ctx.arc(sx, sy, player.r + 6, 0, Math.PI * 2);
+                ctx.strokeStyle = "rgba(45,111,243,.22)";
+                ctx.lineWidth = 3;
+                ctx.stroke();
+            }
+            ctx.restore();
+
+            drawPill(player.name, sx, sy - player.r - 28);
+            ctx.save();
+            ctx.fillStyle = isMe ? "#67ffb8" : "#88c9aa";
+            ctx.font = "700 11px Consolas, monospace";
+            ctx.textAlign = "center";
+            ctx.fillText(`Lv.${player.level}`, sx, sy - player.r - 8);
+            ctx.restore();
+
+            const bubble = bubbles[player.id];
+            if (bubble && Date.now() < bubble.expiry) {
+                const bx = sx,
+                    by = sy - player.r - 56;
+                ctx.save();
+                ctx.font = "12px Consolas, monospace";
+                ctx.textAlign = "center";
+                ctx.textBaseline = "middle";
+                const tw = Math.min(ctx.measureText(bubble.text).width + 18, 220),
+                    bh = 28;
+                ctx.fillStyle = "rgba(5,14,10,.92)";
+                ctx.strokeStyle = "rgba(103,255,184,.18)";
+                roundRect(ctx, bx - tw / 2, by - bh / 2, tw, bh, 3);
+                ctx.fill();
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.rect(bx - tw / 2 + 6, by - bh / 2, tw - 12, bh);
+                ctx.clip();
+                ctx.fillStyle = "#d6ffe8";
+                ctx.fillText(bubble.text, bx, by + .5);
+                ctx.restore();
+            }
+        }
+
+        function loop(timestamp) {
+            if (!gameRunning) {
+                rafId = null;
+                return;
+            }
+            const dt = Math.min((timestamp - lastTime) / 1000, .1);
+            lastTime = timestamp;
+            drawBg();
+            const me = playerMap[myId];
+            if (me) {
+                updateCam(me, dt);
+                updateHudPos(me);
+            }
+            drawGrid();
+            drawBorder();
+            drawOrbs();
+            Object.values(monsterMap).forEach(drawMonster);
+            Object.values(playerMap).forEach(player => drawPlayer(player, player.id === myId));
+            drawDmgNums(dt);
+            rafId = requestAnimationFrame(loop);
+        }
     </script>
 </body>
 
