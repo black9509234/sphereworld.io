@@ -1392,8 +1392,8 @@
             }
             ctx.stroke();
 
-            const axisX = viewW / 2,
-                axisY = viewH / 2;
+            const axisX = worldW / 2 - camX,
+                axisY = worldH / 2 - camY;
             ctx.save();
             ctx.strokeStyle = C.axis;
             ctx.lineWidth = 1.6;
@@ -1421,8 +1421,7 @@
             ctx.fillStyle = C.text;
             ctx.font = "700 11px Consolas, monospace";
             ctx.textAlign = "left";
-            ctx.fillText("X", viewW - 30, axisY - 10);
-            ctx.fillText("Y", axisX + 10, 30);
+            ctx.fillText("0", axisX + 9, axisY - 10);
             drawArrow(viewW - 18, axisY, 1, 0);
             drawArrow(axisX, 18, 0, -1);
         }
