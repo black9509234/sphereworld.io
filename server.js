@@ -8,10 +8,10 @@ const path = require('path');
 
 const app = express();
 const server = http.createServer(app);
-const io = new Server(server, { cors: { origin: '*' } });
 
 app.set('trust proxy', 1);
 app.use(express.json());
+app.use('/api', apiCorsGuard);
 app.use(express.static(path.join(__dirname, 'public')));
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
 
@@ -48,6 +48,31 @@ const SESSION_COOKIE = 'sphere_sid';
 const SESSION_TTL_MS = 1000 * 60 * 60 * 24 * 7;
 const STORAGE_FLUSH_MS = 200;
 const DATABASE_URL = process.env.DATABASE_URL || '';
+const DEFAULT_ALLOWED_ORIGINS = [
+  'https://sphereio-production.up.railway.app',
+  'http://localhost:3000',
+  'http://127.0.0.1:3000',
+];
+const ALLOWED_ORIGINS = new Set(
+  (process.env.ALLOWED_ORIGINS || '')
+    .split(',')
+    .map(value => value.trim())
+    .filter(Boolean)
+    .concat(DEFAULT_ALLOWED_ORIGINS)
+);
+const AUTH_RATE_LIMIT_WINDOW_MS = Number(process.env.AUTH_RATE_LIMIT_WINDOW_MS) || 1000 * 60 * 10;
+const AUTH_RATE_LIMIT_MAX = Number(process.env.AUTH_RATE_LIMIT_MAX) || 12;
+const CHAT_RATE_LIMIT_WINDOW_MS = Number(process.env.CHAT_RATE_LIMIT_WINDOW_MS) || 8000;
+const CHAT_RATE_LIMIT_MAX = Number(process.env.CHAT_RATE_LIMIT_MAX) || 8;
+
+const io = new Server(server, {
+  cors: {
+    origin(origin, callback) {
+      callback(null, isAllowedOrigin(origin));
+    },
+    credentials: true,
+  },
+});
 
 const MONSTER_TYPES = [
   { type: 'dot', hp: 20, speed: 1.2, r: 6, xp: 8, color: '#ef4444', dmg: 5, atkR: 22, atkCD: 1500 },
@@ -182,6 +207,54 @@ function cloneProfile(profile) {
   return profile ? JSON.parse(JSON.stringify(profile)) : null;
 }
 
+function isAllowedOrigin(origin) {
+  if (!origin) return true;
+  return ALLOWED_ORIGINS.has(String(origin).trim());
+}
+
+function applyCorsHeaders(req, res) {
+  const origin = req.headers.origin;
+  if (!origin) return true;
+  if (!isAllowedOrigin(origin)) return false;
+  res.setHeader('Vary', 'Origin');
+  res.setHeader('Access-Control-Allow-Origin', origin);
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
+  return true;
+}
+
+function apiCorsGuard(req, res, next) {
+  if (!applyCorsHeaders(req, res)) {
+    return res.status(403).json({ ok: false, error: 'origin_blocked' });
+  }
+  if (req.method === 'OPTIONS') {
+    return res.status(204).end();
+  }
+  next();
+}
+
+function cleanupRateBucket(bucket, now, windowMs) {
+  while (bucket.length && now - bucket[0] >= windowMs) bucket.shift();
+}
+
+function rateLimitState(scope, key, { windowMs, max }) {
+  const bucketKey = `${scope}:${key}`;
+  const now = Date.now();
+  const bucket = rateLimitBuckets.get(bucketKey) || [];
+  cleanupRateBucket(bucket, now, windowMs);
+  if (bucket.length >= max) {
+    rateLimitBuckets.set(bucketKey, bucket);
+    return {
+      ok: false,
+      retryAfterMs: Math.max(0, windowMs - (now - bucket[0])),
+    };
+  }
+  bucket.push(now);
+  rateLimitBuckets.set(bucketKey, bucket);
+  return { ok: true, retryAfterMs: 0 };
+}
+
 const usePostgres = !!DATABASE_URL;
 const pgPool = usePostgres ? new Pool({
   connectionString: DATABASE_URL,
@@ -200,6 +273,7 @@ const dirtyProfileKeys = new Set();
 const dirtyUserKeys = new Set();
 const sessions = new Map();
 const userSessions = new Map();
+const rateLimitBuckets = new Map();
 
 function normalizePlayerName(raw) {
   return (raw || 'Player').trim().slice(0, 16) || 'Player';
@@ -896,6 +970,14 @@ app.get('/api/auth/session', (req, res) => {
 });
 
 app.post('/api/auth/register', async (req, res) => {
+  const authLimit = rateLimitState('auth', req.ip || req.headers['x-forwarded-for'] || 'unknown', {
+    windowMs: AUTH_RATE_LIMIT_WINDOW_MS,
+    max: AUTH_RATE_LIMIT_MAX,
+  });
+  if (!authLimit.ok) {
+    res.setHeader('Retry-After', Math.ceil(authLimit.retryAfterMs / 1000));
+    return res.status(429).json({ ok: false, error: 'rate_limited' });
+  }
   const userCheck = validateAuthName(req.body?.user);
   if (!userCheck.ok) return res.status(400).json({ ok: false, error: userCheck.error });
   const passwordCheck = validatePassword(req.body?.pass);
@@ -917,6 +999,14 @@ app.post('/api/auth/register', async (req, res) => {
 });
 
 app.post('/api/auth/login', (req, res) => {
+  const authLimit = rateLimitState('auth', req.ip || req.headers['x-forwarded-for'] || 'unknown', {
+    windowMs: AUTH_RATE_LIMIT_WINDOW_MS,
+    max: AUTH_RATE_LIMIT_MAX,
+  });
+  if (!authLimit.ok) {
+    res.setHeader('Retry-After', Math.ceil(authLimit.retryAfterMs / 1000));
+    return res.status(429).json({ ok: false, error: 'rate_limited' });
+  }
   const userCheck = validateAuthName(req.body?.user);
   if (!userCheck.ok) return res.status(400).json({ ok: false, error: userCheck.error });
   const passwordCheck = validatePassword(req.body?.pass);
@@ -1566,6 +1656,11 @@ io.on('connection', socket => {
   socket.on('chat', raw => {
     const p = players[socket.id];
     if (!p) return;
+    const chatLimit = rateLimitState('chat', socket.data.authUserKey || socket.id, {
+      windowMs: CHAT_RATE_LIMIT_WINDOW_MS,
+      max: CHAT_RATE_LIMIT_MAX,
+    });
+    if (!chatLimit.ok) return;
     const text = String(raw).trim().slice(0, 80);
     if (!text) return;
     io.emit('chat', { id: p.id, name: p.name, text });
