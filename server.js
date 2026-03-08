@@ -50,6 +50,7 @@ const STORAGE_FLUSH_MS = 200;
 const DATABASE_URL = process.env.DATABASE_URL || '';
 const DEFAULT_ALLOWED_ORIGINS = [
   'https://sphereio-production.up.railway.app',
+  'https://sphereworldio-production.up.railway.app',
   'http://localhost:3000',
   'http://127.0.0.1:3000',
 ];
