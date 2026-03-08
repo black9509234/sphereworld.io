@@ -1555,7 +1555,7 @@
                 <span class="settings-item-label" data-i18n="settings_lang">LANGUAGE</span>
                 <span id="settings-lang-value">KO</span>
             </button>
-            <button class="settings-item" type="button" onclick="doLogout()">
+            <button class="settings-item" type="button" onclick="logoutAccount()">
                 <span class="settings-item-label" data-i18n="settings_logout">DISCONNECT</span>
                 <span data-i18n="btn_disconnect">DISCONNECT</span>
             </button>
@@ -1772,10 +1772,7 @@
     </div>
     <div id="levelup-flash"></div>
     <script>
-        const UKEY = "sphere_users_v1",
-            LANG_KEY = "sphere_lang_v1",
-            getDB = () => { try { return JSON.parse(localStorage.getItem(UKEY)) || {} } catch { return {} } },
-            saveDB = db => localStorage.setItem(UKEY, JSON.stringify(db));
+        const LANG_KEY = "sphere_lang_v1";
 
         const I18N = {
             ko: {
@@ -1823,10 +1820,13 @@
                 auth_err_password: "ERR :: 비밀번호를 입력하세요",
                 auth_err_mismatch: "ERR :: 비밀번호가 일치하지 않습니다",
                 auth_err_minpw: "ERR :: 비밀번호는 4자 이상이어야 합니다",
+                auth_err_baduser: "ERR :: 아이디는 영문, 숫자, _, - 만 사용할 수 있습니다",
+                auth_err_badpass: "ERR :: 비밀번호 형식이 올바르지 않습니다",
                 auth_err_exists: "ERR :: \"{user}\" 계정이 이미 존재합니다",
                 auth_ok_welcome: "OK :: 환영합니다, {user}",
                 auth_err_notfound: "ERR :: 계정을 찾을 수 없습니다",
                 auth_err_wrongpass: "ERR :: 비밀번호가 올바르지 않습니다",
+                auth_err_server: "ERR :: 서버 인증 처리에 실패했습니다",
                 auth_ok_connecting: "OK :: {user}(으)로 접속 중",
                 auth_info_disconnected: "INFO :: 연결이 종료되었습니다",
                 sys_link_established: "연결 완료 :: 이동=WASD :: 공격=좌클릭 :: 채팅=ENTER",
@@ -1921,10 +1921,13 @@
                 auth_err_password: "ERR :: password required",
                 auth_err_mismatch: "ERR :: passwords do not match",
                 auth_err_minpw: "ERR :: password min 4 chars",
+                auth_err_baduser: "ERR :: username may use letters, numbers, _ and - only",
+                auth_err_badpass: "ERR :: invalid password format",
                 auth_err_exists: "ERR :: \"{user}\" already exists",
                 auth_ok_welcome: "OK :: welcome, {user}",
                 auth_err_notfound: "ERR :: user not found",
                 auth_err_wrongpass: "ERR :: wrong password",
+                auth_err_server: "ERR :: server authentication failed",
                 auth_ok_connecting: "OK :: connecting as {user}",
                 auth_info_disconnected: "INFO :: disconnected",
                 sys_link_established: "LINK ESTABLISHED :: MOVE=WASD :: ATTACK=LMB :: CHAT=ENTER",
@@ -2166,7 +2169,8 @@
         };
 
         let authMode = "login",
-            currentLang = localStorage.getItem(LANG_KEY) === "ko" ? "ko" : "en";
+            currentLang = localStorage.getItem(LANG_KEY) === "ko" ? "ko" : "en",
+            currentAccountName = "";
 
         const t = (key, vars = {}) => {
             const source = (I18N[currentLang] && I18N[currentLang][key]) || I18N.en[key] || key;
@@ -2368,26 +2372,85 @@
             elMsg.className = "auth-msg " + (cls || "");
         }
 
-        function handleAuth() {
+        function authErrorMessage(code, user = "") {
+            switch (code) {
+                case "username_required": return t("auth_err_username");
+                case "password_required": return t("auth_err_password");
+                case "bad_username": return t("auth_err_baduser");
+                case "bad_password": return t("auth_err_badpass");
+                case "user_exists": return t("auth_err_exists", { user });
+                case "user_not_found": return t("auth_err_notfound");
+                case "wrong_password": return t("auth_err_wrongpass");
+                default: return t("auth_err_server");
+            }
+        }
+
+        async function authRequest(path, body) {
+            const res = await fetch(path, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                credentials: "include",
+                body: JSON.stringify(body),
+            });
+            let payload = {};
+            try {
+                payload = await res.json();
+            } catch {
+                payload = {};
+            }
+            if (!res.ok || payload?.ok === false) {
+                throw new Error(payload?.error || `http_${res.status}`);
+            }
+            return payload;
+        }
+
+        async function restoreAuthSession() {
+            try {
+                const res = await fetch("/api/auth/session", { credentials: "include" });
+                if (!res.ok) return;
+                const payload = await res.json();
+                if (!payload?.ok || !payload?.user) return;
+                currentAccountName = payload.user;
+                startGame(payload.user);
+            } catch {
+            }
+        }
+
+        async function handleAuth() {
             const user = document.getElementById("i-user").value.trim(),
                 pass = document.getElementById("i-pass").value,
                 confirm = document.getElementById("i-cfm").value;
             if (!user) return setMsg(t("auth_err_username"), "err");
             if (!pass) return setMsg(t("auth_err_password"), "err");
-            const db = getDB();
             if (authMode === "signup") {
                 if (pass !== confirm) return setMsg(t("auth_err_mismatch"), "err");
                 if (pass.length < 4) return setMsg(t("auth_err_minpw"), "err");
-                if (db[user]) return setMsg(t("auth_err_exists", { user }), "err");
-                db[user] = { pw: pass, ts: Date.now() };
-                saveDB(db);
-                setMsg(t("auth_ok_welcome", { user }), "ok");
-                return setTimeout(() => startGame(user), 600);
             }
-            if (!db[user]) return setMsg(t("auth_err_notfound"), "err");
-            if (db[user].pw !== pass) return setMsg(t("auth_err_wrongpass"), "err");
-            setMsg(t("auth_ok_connecting", { user }), "ok");
-            setTimeout(() => startGame(user), 400);
+            try {
+                const payload = await authRequest(authMode === "signup" ? "/api/auth/register" : "/api/auth/login", { user, pass });
+                currentAccountName = payload.user || user;
+                setMsg(
+                    authMode === "signup"
+                        ? t("auth_ok_welcome", { user: currentAccountName })
+                        : t("auth_ok_connecting", { user: currentAccountName }),
+                    "ok"
+                );
+                setTimeout(() => startGame(currentAccountName), authMode === "signup" ? 450 : 250);
+            } catch (err) {
+                setMsg(authErrorMessage(err?.message, user), "err");
+            }
+        }
+
+        async function logoutAccount() {
+            try {
+                await fetch("/api/auth/logout", {
+                    method: "POST",
+                    credentials: "include",
+                });
+            } catch {
+            }
+            currentAccountName = "";
+            doLogout();
         }
 
         const authFieldIds = ["i-user", "i-pass", "i-cfm"];
@@ -2464,6 +2527,7 @@
         applyUiScale(uiScaleMode, { persist: false });
         renderStaticI18n();
         Object.keys(panelBodies).forEach(applyPanelState);
+        restoreAuthSession();
 
         addEventListener("keydown", e => {
             if ((e.key === "z" || e.key === "Z") && gameRunning && !chatFocused()) {
@@ -3333,12 +3397,13 @@
             flashTimer = setTimeout(() => levelupFlash.classList.remove("show"), 2200);
         }
 
-        function startGame(username) {
+        function startGame(username = currentAccountName) {
             if (gameRunning) return;
             if (typeof io !== "function") {
                 setMsg("ERR :: socket client failed to load", "err");
                 return;
             }
+            currentAccountName = username || currentAccountName;
             gameRunning = true;
             document.getElementById("auth-screen").style.display = "none";
             document.getElementById("hud").style.display = "flex";
@@ -3352,12 +3417,19 @@
             toggleCraftPanel(false);
             document.getElementById("chat-wrap").style.display = "flex";
             controlsCard.style.display = "block";
-            elUser.textContent = username;
-            socket = io();
-            socket.on("connect_error", () => {
-                doLogout(currentLang === "ko" ? "ERR :: 서버 연결에 실패했습니다" : "ERR :: server connection failed", "err");
+            elUser.textContent = currentAccountName || "guest";
+            socket = io({ withCredentials: true });
+            socket.on("connect_error", err => {
+                const authFailed = err?.message === "auth_required";
+                if (authFailed) currentAccountName = "";
+                doLogout(
+                    authFailed
+                        ? t("auth_info_disconnected")
+                        : (currentLang === "ko" ? "ERR :: 서버 연결에 실패했습니다" : "ERR :: server connection failed"),
+                    authFailed ? "info" : "err"
+                );
             });
-            socket.on("connect", () => socket.emit("join", { name: username }));
+            socket.on("connect", () => socket.emit("join"));
             socket.on("welcome", d => {
                 myId = d.id;
                 worldW = d.worldW;

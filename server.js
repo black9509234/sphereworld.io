@@ -1,6 +1,7 @@
 const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
+const crypto = require('crypto');
 const fs = require('fs');
 const path = require('path');
 
@@ -8,6 +9,8 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, { cors: { origin: '*' } });
 
+app.set('trust proxy', 1);
+app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
 
@@ -39,6 +42,9 @@ const MAX_RARITY = 10;
 
 const SAVE_DIR = path.join(__dirname, 'data');
 const SAVE_FILE = path.join(SAVE_DIR, 'profiles.json');
+const USER_FILE = path.join(SAVE_DIR, 'users.json');
+const SESSION_COOKIE = 'sphere_sid';
+const SESSION_TTL_MS = 1000 * 60 * 60 * 24 * 7;
 
 const MONSTER_TYPES = [
   { type: 'dot', hp: 20, speed: 1.2, r: 6, xp: 8, color: '#ef4444', dmg: 5, atkR: 22, atkCD: 1500 },
@@ -159,6 +165,7 @@ let itemSerial = Date.now();
 
 if (!fs.existsSync(SAVE_DIR)) fs.mkdirSync(SAVE_DIR, { recursive: true });
 if (!fs.existsSync(SAVE_FILE)) fs.writeFileSync(SAVE_FILE, '{}', 'utf8');
+if (!fs.existsSync(USER_FILE)) fs.writeFileSync(USER_FILE, '{}', 'utf8');
 
 function loadProfiles() {
   try {
@@ -170,6 +177,19 @@ function loadProfiles() {
 
 let savedProfiles = loadProfiles();
 let saveTimer = null;
+let userSaveTimer = null;
+
+function loadUsers() {
+  try {
+    return JSON.parse(fs.readFileSync(USER_FILE, 'utf8')) || {};
+  } catch {
+    return {};
+  }
+}
+
+let savedUsers = loadUsers();
+const sessions = new Map();
+const userSessions = new Map();
 
 function normalizePlayerName(raw) {
   return (raw || 'Player').trim().slice(0, 16) || 'Player';
@@ -177,6 +197,109 @@ function normalizePlayerName(raw) {
 
 function playerNameKey(name) {
   return normalizePlayerName(name).toLowerCase();
+}
+
+function validateAuthName(raw) {
+  const trimmed = String(raw || '').trim();
+  if (!trimmed) return { ok: false, error: 'username_required' };
+  if (trimmed.length > 16) return { ok: false, error: 'bad_username' };
+  if (!/^[A-Za-z0-9_-]+$/.test(trimmed)) return { ok: false, error: 'bad_username' };
+  return { ok: true, name: normalizePlayerName(trimmed), key: playerNameKey(trimmed) };
+}
+
+function validatePassword(raw) {
+  const password = String(raw || '');
+  if (!password) return { ok: false, error: 'password_required' };
+  if (password.length < 4 || password.length > 72) return { ok: false, error: 'bad_password' };
+  return { ok: true, password };
+}
+
+function makePasswordHash(password, salt = crypto.randomBytes(16).toString('hex')) {
+  const hash = crypto.scryptSync(password, salt, 64).toString('hex');
+  return { salt, hash };
+}
+
+function verifyPassword(password, user) {
+  if (!user?.passwordSalt || !user?.passwordHash) return false;
+  const actual = Buffer.from(makePasswordHash(password, user.passwordSalt).hash, 'hex');
+  const expected = Buffer.from(String(user.passwordHash), 'hex');
+  return actual.length === expected.length && crypto.timingSafeEqual(actual, expected);
+}
+
+function findUserByName(name) {
+  const key = playerNameKey(name);
+  return savedUsers[key] || null;
+}
+
+function persistUser(user, { immediate = false } = {}) {
+  const key = playerNameKey(user.username);
+  savedUsers[key] = {
+    username: user.username,
+    passwordSalt: user.passwordSalt,
+    passwordHash: user.passwordHash,
+    createdAt: user.createdAt || Date.now(),
+    updatedAt: Date.now(),
+  };
+  if (immediate) {
+    flushSaveUsersSync();
+    return;
+  }
+  scheduleSaveUsers();
+}
+
+function currentSessionFromHeader(cookieHeader) {
+  const cookies = parseCookies(cookieHeader);
+  const token = cookies[SESSION_COOKIE];
+  if (!token) return null;
+  const session = sessions.get(token);
+  if (!session) return null;
+  if (session.expiresAt <= Date.now()) {
+    sessions.delete(token);
+    const owned = userSessions.get(session.userKey);
+    if (owned) {
+      owned.delete(token);
+      if (owned.size === 0) userSessions.delete(session.userKey);
+    }
+    return null;
+  }
+  return { token, ...session };
+}
+
+function currentSessionFromReq(req) {
+  return currentSessionFromHeader(req.headers.cookie || '');
+}
+
+function destroySession(token) {
+  if (!token) return;
+  const session = sessions.get(token);
+  if (!session) return;
+  sessions.delete(token);
+  const owned = userSessions.get(session.userKey);
+  if (!owned) return;
+  owned.delete(token);
+  if (owned.size === 0) userSessions.delete(session.userKey);
+}
+
+function destroyAllSessionsForUser(userKey) {
+  const owned = userSessions.get(userKey);
+  if (!owned) return;
+  for (const token of owned) sessions.delete(token);
+  userSessions.delete(userKey);
+}
+
+function createSession(username) {
+  const normalized = normalizePlayerName(username);
+  const userKey = playerNameKey(normalized);
+  destroyAllSessionsForUser(userKey);
+  disconnectActivePlayerByName(userKey);
+  const token = crypto.randomBytes(24).toString('hex');
+  sessions.set(token, {
+    userKey,
+    username: normalized,
+    expiresAt: Date.now() + SESSION_TTL_MS,
+  });
+  userSessions.set(userKey, new Set([token]));
+  return token;
 }
 
 function scheduleSaveProfiles() {
@@ -194,6 +317,72 @@ function flushSaveProfilesSync() {
     saveTimer = null;
   }
   fs.writeFileSync(SAVE_FILE, JSON.stringify(savedProfiles, null, 2), 'utf8');
+}
+
+function scheduleSaveUsers() {
+  if (userSaveTimer) return;
+  userSaveTimer = setTimeout(() => {
+    userSaveTimer = null;
+    fs.writeFile(USER_FILE, JSON.stringify(savedUsers, null, 2), () => {});
+  }, 200);
+  if (typeof userSaveTimer.unref === 'function') userSaveTimer.unref();
+}
+
+function flushSaveUsersSync() {
+  if (userSaveTimer) {
+    clearTimeout(userSaveTimer);
+    userSaveTimer = null;
+  }
+  fs.writeFileSync(USER_FILE, JSON.stringify(savedUsers, null, 2), 'utf8');
+}
+
+function parseCookies(header = '') {
+  const cookies = {};
+  for (const chunk of String(header || '').split(';')) {
+    const raw = chunk.trim();
+    if (!raw) continue;
+    const idx = raw.indexOf('=');
+    const key = idx >= 0 ? raw.slice(0, idx) : raw;
+    const value = idx >= 0 ? raw.slice(idx + 1) : '';
+    cookies[key] = decodeURIComponent(value);
+  }
+  return cookies;
+}
+
+function serializeCookie(name, value, options = {}) {
+  const parts = [`${name}=${encodeURIComponent(value)}`];
+  if (options.maxAge != null) parts.push(`Max-Age=${Math.max(0, Math.floor(options.maxAge))}`);
+  if (options.path) parts.push(`Path=${options.path}`);
+  if (options.httpOnly) parts.push('HttpOnly');
+  if (options.sameSite) parts.push(`SameSite=${options.sameSite}`);
+  if (options.secure) parts.push('Secure');
+  return parts.join('; ');
+}
+
+function requestIsSecure(req) {
+  return req.secure || String(req.headers['x-forwarded-proto'] || '').split(',')[0].trim() === 'https';
+}
+
+function setSessionCookie(req, res, token) {
+  const secure = requestIsSecure(req);
+  res.setHeader('Set-Cookie', serializeCookie(SESSION_COOKIE, token, {
+    maxAge: SESSION_TTL_MS / 1000,
+    path: '/',
+    httpOnly: true,
+    sameSite: secure ? 'None' : 'Lax',
+    secure,
+  }));
+}
+
+function clearSessionCookie(req, res) {
+  const secure = requestIsSecure(req);
+  res.setHeader('Set-Cookie', serializeCookie(SESSION_COOKIE, '', {
+    maxAge: 0,
+    path: '/',
+    httpOnly: true,
+    sameSite: secure ? 'None' : 'Lax',
+    secure,
+  }));
 }
 
 function clamp(v, lo, hi) {
@@ -555,6 +744,60 @@ function persistPlayerProfile(p, { immediate = false } = {}) {
   scheduleSaveProfiles();
 }
 
+app.get('/api/auth/session', (req, res) => {
+  const session = currentSessionFromReq(req);
+  if (!session) {
+    clearSessionCookie(req, res);
+    return res.status(401).json({ ok: false, error: 'not_authenticated' });
+  }
+  res.json({ ok: true, user: session.username });
+});
+
+app.post('/api/auth/register', (req, res) => {
+  const userCheck = validateAuthName(req.body?.user);
+  if (!userCheck.ok) return res.status(400).json({ ok: false, error: userCheck.error });
+  const passwordCheck = validatePassword(req.body?.pass);
+  if (!passwordCheck.ok) return res.status(400).json({ ok: false, error: passwordCheck.error });
+  if (findUserByName(userCheck.name)) return res.status(409).json({ ok: false, error: 'user_exists' });
+
+  const passwordData = makePasswordHash(passwordCheck.password);
+  const user = {
+    username: userCheck.name,
+    passwordSalt: passwordData.salt,
+    passwordHash: passwordData.hash,
+    createdAt: Date.now(),
+  };
+  persistUser(user, { immediate: true });
+
+  const token = createSession(user.username);
+  setSessionCookie(req, res, token);
+  res.json({ ok: true, user: user.username });
+});
+
+app.post('/api/auth/login', (req, res) => {
+  const userCheck = validateAuthName(req.body?.user);
+  if (!userCheck.ok) return res.status(400).json({ ok: false, error: userCheck.error });
+  const passwordCheck = validatePassword(req.body?.pass);
+  if (!passwordCheck.ok) return res.status(400).json({ ok: false, error: passwordCheck.error });
+
+  const user = findUserByName(userCheck.name);
+  if (!user) return res.status(404).json({ ok: false, error: 'user_not_found' });
+  if (!verifyPassword(passwordCheck.password, user)) {
+    return res.status(401).json({ ok: false, error: 'wrong_password' });
+  }
+
+  const token = createSession(user.username);
+  setSessionCookie(req, res, token);
+  res.json({ ok: true, user: user.username });
+});
+
+app.post('/api/auth/logout', (req, res) => {
+  const session = currentSessionFromReq(req);
+  if (session) destroySession(session.token);
+  clearSessionCookie(req, res);
+  res.json({ ok: true });
+});
+
 function makePlayerState(socketId, name, saved = {}) {
   const normalizedName = normalizePlayerName(name);
   const stats = normalizeStats(saved.stats || DEFAULT_STATS);
@@ -686,6 +929,17 @@ const orbs = {};
 const monsters = {};
 const loots = {};
 const activePlayersByName = {};
+
+function disconnectActivePlayerByName(userKey) {
+  const activeId = activePlayersByName[userKey];
+  if (!activeId) return;
+  const oldSocket = io.sockets.sockets.get(activeId);
+  if (oldSocket) {
+    oldSocket.emit('sessionReplaced');
+    oldSocket.disconnect(true);
+  }
+  removePlayer(activeId, { save: true });
+}
 
 function removePlayer(socketId, { save = true } = {}) {
   const p = players[socketId];
@@ -976,13 +1230,21 @@ setInterval(() => {
   }
 }, TICK_MS);
 
+io.use((socket, next) => {
+  const session = currentSessionFromHeader(socket.handshake.headers.cookie || '');
+  if (!session) return next(new Error('auth_required'));
+  socket.data.authUser = session.username;
+  socket.data.authUserKey = session.userKey;
+  next();
+});
+
 io.on('connection', socket => {
   console.log('[+]', socket.id);
 
-  socket.on('join', ({ name }) => {
+  socket.on('join', () => {
     if (players[socket.id]) return;
 
-    const trimmed = normalizePlayerName(name);
+    const trimmed = normalizePlayerName(socket.data.authUser);
     const nameKey = playerNameKey(trimmed);
     const activeId = activePlayersByName[nameKey];
     let handoffProfile = readSavedProfile(trimmed) || {};
@@ -1177,6 +1439,7 @@ for (const signal of ['SIGINT', 'SIGTERM']) {
   process.on(signal, () => {
     try {
       flushSaveProfilesSync();
+      flushSaveUsersSync();
     } finally {
       process.exit(0);
     }
