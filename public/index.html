@@ -39,7 +39,10 @@
     </div>
     <canvas id="canvas"></canvas>
     <button id="settings-btn" type="button" onclick="toggleSettingsMenu()" data-i18n="btn_settings">SETTINGS</button>
-    <div id="settings-menu">
+    <div id="settings-menu" data-window="settings">
+        <div class="window-head settings-head" data-window-handle>
+            <div class="window-title" data-i18n="btn_settings">SETTINGS</div>
+        </div>
         <div class="settings-list">
             <div class="settings-block">
                 <div class="settings-item-label" data-i18n="settings_ui_scale">UI SIZE</div>
@@ -59,8 +62,8 @@
             </button>
         </div>
     </div>
-    <div id="hud" class="panel-shell">
-        <div class="panel-head tight">
+    <div id="hud" class="panel-shell" data-window="hud">
+        <div class="panel-head tight" data-window-handle>
             <div class="panel-title">TACTICAL FEED</div>
             <button class="panel-toggle" type="button" id="hud-toggle" onclick="togglePanel('hud')">-</button>
         </div>
@@ -149,8 +152,8 @@
     </div>
     <button id="inventory-toggle" onclick="toggleInventory()" data-i18n="btn_inventory">INVENTORY</button>
     <button id="bestiary-toggle" onclick="toggleBestiary()" data-i18n="btn_bestiary">BESTIARY</button>
-    <div id="inventory-panel">
-        <div class="inventory-head">
+    <div id="inventory-panel" data-window="inventory">
+        <div class="inventory-head" data-window-handle>
             <div>
                 <div class="chat-kicker" data-i18n="hud_gear">GEAR</div>
                 <div class="control-title" data-i18n="hud_inventory">INVENTORY</div>
@@ -178,8 +181,8 @@
             <div class="gear-note" data-i18n="hud_penalty">Death can cost XP, a stat point, and one owned item.</div>
         </div>
     </div>
-    <div id="bestiary-panel">
-        <div class="inventory-head">
+    <div id="bestiary-panel" data-window="bestiary">
+        <div class="inventory-head" data-window-handle>
             <div>
                 <div class="chat-kicker" data-i18n="bestiary_title">BESTIARY</div>
                 <div class="control-title" data-i18n="bestiary_title">BESTIARY</div>
@@ -196,8 +199,8 @@
             <div class="bestiary-list" id="bestiary-list"></div>
         </div>
     </div>
-    <div id="tutorial-box">
-        <div class="tutorial-head">
+    <div id="tutorial-box" data-window="tutorial">
+        <div class="tutorial-head" data-window-handle>
             <div class="tutorial-title" id="tutorial-title">TUTORIAL</div>
             <button class="tutorial-close" type="button" onclick="closeTutorial()">X</button>
         </div>
@@ -208,8 +211,8 @@
         </div>
     </div>
     <button id="craft-toggle" type="button" onclick="toggleCraftPanel()" data-i18n="btn_craft">CRAFT</button>
-    <div id="craft-panel">
-        <div class="craft-head">
+    <div id="craft-panel" data-window="craft">
+        <div class="craft-head" data-window-handle>
             <div>
                 <div class="chat-kicker" data-i18n="craft_kicker">CRAFT</div>
                 <div class="control-title" data-i18n="craft_title">SYNTHESIS</div>
@@ -231,8 +234,8 @@
             <button class="craft-btn primary" type="button" id="craft-action" onclick="craftSelectedItems()" data-i18n="btn_craft_action" disabled>COMBINE</button>
         </div>
     </div>
-    <div id="controls-card" class="panel-shell">
-        <div class="panel-head tight">
+    <div id="controls-card" class="panel-shell" data-window="controls">
+        <div class="panel-head tight" data-window-handle>
             <div>
                 <div class="control-kicker" data-i18n="controls_kicker">CONTROLS</div>
                 <div class="control-title" data-i18n="controls_title">KEYMAP</div>
@@ -251,8 +254,8 @@
             </div>
         </div>
     </div>
-    <div id="chat-wrap" class="panel-shell">
-        <div class="chat-head">
+    <div id="chat-wrap" class="panel-shell" data-window="chat">
+        <div class="chat-head" data-window-handle>
             <div>
                 <div class="chat-kicker" data-i18n="chat_kicker">WORLD CHAT</div>
                 <div class="chat-title" data-i18n="chat_title">realtime.log</div>

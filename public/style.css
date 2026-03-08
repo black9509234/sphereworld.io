@@ -285,6 +285,44 @@
             box-shadow: 0 10px 24px rgba(18, 18, 18, .08);
         }
 
+        [data-window-handle] {
+            cursor: move;
+            user-select: none;
+            touch-action: none;
+        }
+
+        [data-window-handle] button {
+            cursor: pointer;
+        }
+
+        .window-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 8px 9px;
+            border: 1px solid rgba(17, 17, 17, .08);
+            border-radius: 2px;
+            background: rgba(255, 255, 255, .64);
+        }
+
+        .window-title {
+            color: var(--muted);
+            font: 10px var(--mono);
+            letter-spacing: .16em;
+            text-transform: uppercase;
+        }
+
+        .dragging-window {
+            opacity: .96;
+            box-shadow: 0 22px 48px rgba(18, 18, 18, .16) !important;
+        }
+
+        .ui-dragging,
+        .ui-dragging * {
+            user-select: none !important;
+        }
+
         .panel-head.tight {
             padding: 7px 9px;
         }
@@ -657,6 +695,10 @@
             min-width: 156px;
             padding: 8px;
             border-radius: 3px;
+        }
+
+        .settings-head {
+            margin-bottom: 6px;
         }
 
         .settings-list {

@@ -381,6 +381,7 @@
         const PANEL_STATE_KEY = "sphere_panel_state_v1";
         const UI_SCALE_KEY = "sphere_ui_scale_v1";
         const TUTORIAL_KEY = "sphere_tutorial_done_v1";
+        const WINDOW_LAYOUT_KEY = "sphere_window_layout_v1";
         const PERSISTENT_PANELS = new Set(["hud", "controls", "chat"]);
         const UI_SCALE_MAP = {
             small: .9,
@@ -488,8 +489,31 @@
                 return {};
             }
         };
+        const loadWindowLayout = () => {
+            try {
+                const raw = JSON.parse(localStorage.getItem(WINDOW_LAYOUT_KEY)) || {};
+                return Object.fromEntries(
+                    Object.entries(raw).filter(([, value]) => Number.isFinite(value?.left) && Number.isFinite(value?.top))
+                );
+            } catch {
+                return {};
+            }
+        };
         let panelState = loadPanelState();
+        let windowLayout = loadWindowLayout();
         let uiScaleMode = UI_SCALE_MAP[localStorage.getItem(UI_SCALE_KEY)] ? localStorage.getItem(UI_SCALE_KEY) : "normal";
+        let nextWindowZ = 40;
+        let activeWindowDrag = null;
+        const draggableWindows = {
+            settings: settingsMenu,
+            hud: panelShells.hud,
+            inventory: inventoryPanel,
+            bestiary: bestiaryPanel,
+            craft: craftPanel,
+            controls: controlsCard,
+            chat: document.getElementById("chat-wrap"),
+            tutorial: tutorialBox,
+        };
 
         function currentMapId() {
             return currentSelf?.mapId || playerMap[myId]?.mapId || "field";
@@ -522,6 +546,131 @@
             const next = typeof force === "boolean" ? force : !panelState[name];
             setPanelCollapsed(name, next);
         }
+
+        function saveWindowLayout() {
+            localStorage.setItem(WINDOW_LAYOUT_KEY, JSON.stringify(windowLayout));
+        }
+
+        function clampWindowPosition(element, left, top) {
+            const margin = 8;
+            const width = element.offsetWidth || element.getBoundingClientRect().width || 0;
+            const height = element.offsetHeight || element.getBoundingClientRect().height || 0;
+            const maxLeft = Math.max(margin, window.innerWidth - width - margin);
+            const maxTop = Math.max(margin, window.innerHeight - height - margin);
+            return {
+                left: Math.min(Math.max(margin, left), maxLeft),
+                top: Math.min(Math.max(margin, top), maxTop),
+            };
+        }
+
+        function bringWindowToFront(element) {
+            if (!element) return;
+            nextWindowZ += 1;
+            element.style.zIndex = String(nextWindowZ);
+        }
+
+        function primeFloatingWindow(element) {
+            if (!element || element.dataset.floatReady === "1") return;
+            const rect = element.getBoundingClientRect();
+            element.style.left = `${rect.left}px`;
+            element.style.top = `${rect.top}px`;
+            element.style.right = "auto";
+            element.style.bottom = "auto";
+            element.style.transform = "none";
+            element.dataset.floatReady = "1";
+        }
+
+        function applyWindowLayoutPosition(name) {
+            const element = draggableWindows[name];
+            const saved = windowLayout[name];
+            if (!element || !saved) return;
+            primeFloatingWindow(element);
+            const pos = clampWindowPosition(element, saved.left, saved.top);
+            element.style.left = `${pos.left}px`;
+            element.style.top = `${pos.top}px`;
+            element.style.right = "auto";
+            element.style.bottom = "auto";
+            element.style.transform = "none";
+        }
+
+        function activateWindow(name) {
+            const element = draggableWindows[name];
+            if (!element) return;
+            applyWindowLayoutPosition(name);
+            bringWindowToFront(element);
+        }
+
+        function registerDraggableWindow(name, element) {
+            if (!element) return;
+            const handle = element.querySelector("[data-window-handle]") || element;
+            const ignoreSelector = "button, input, textarea, select, option, a, label";
+
+            element.addEventListener("pointerdown", () => bringWindowToFront(element));
+            handle.addEventListener("pointerdown", event => {
+                if (window.innerWidth <= 720) return;
+                if (event.button !== 0) return;
+                if (event.target.closest(ignoreSelector)) return;
+                if (getComputedStyle(element).display === "none") return;
+                primeFloatingWindow(element);
+                bringWindowToFront(element);
+                const rect = element.getBoundingClientRect();
+                activeWindowDrag = {
+                    name,
+                    element,
+                    offsetX: event.clientX - rect.left,
+                    offsetY: event.clientY - rect.top,
+                };
+                element.classList.add("dragging-window");
+                document.documentElement.classList.add("ui-dragging");
+                handle.setPointerCapture?.(event.pointerId);
+                event.preventDefault();
+            });
+        }
+
+        function stopWindowDrag() {
+            if (!activeWindowDrag) return;
+            activeWindowDrag.element.classList.remove("dragging-window");
+            document.documentElement.classList.remove("ui-dragging");
+            activeWindowDrag = null;
+        }
+
+        document.addEventListener("pointermove", event => {
+            if (!activeWindowDrag) return;
+            const { name, element, offsetX, offsetY } = activeWindowDrag;
+            const pos = clampWindowPosition(element, event.clientX - offsetX, event.clientY - offsetY);
+            element.style.left = `${pos.left}px`;
+            element.style.top = `${pos.top}px`;
+            element.style.right = "auto";
+            element.style.bottom = "auto";
+            element.style.transform = "none";
+            windowLayout[name] = pos;
+        });
+
+        document.addEventListener("pointerup", () => {
+            if (!activeWindowDrag) return;
+            saveWindowLayout();
+            stopWindowDrag();
+        });
+
+        document.addEventListener("pointercancel", stopWindowDrag);
+
+        window.addEventListener("resize", () => {
+            let changed = false;
+            Object.keys(windowLayout).forEach(name => {
+                const element = draggableWindows[name];
+                if (!element) return;
+                const pos = clampWindowPosition(element, windowLayout[name].left, windowLayout[name].top);
+                windowLayout[name] = pos;
+                changed = true;
+                if (element.dataset.floatReady === "1") {
+                    element.style.left = `${pos.left}px`;
+                    element.style.top = `${pos.top}px`;
+                }
+            });
+            if (changed) saveWindowLayout();
+        });
+
+        Object.entries(draggableWindows).forEach(([name, element]) => registerDraggableWindow(name, element));
 
         function mapName(mapId) {
             return t(MAP_META[mapId]?.nameKey || "map_field");
@@ -934,7 +1083,10 @@
             inventoryOpen = typeof force === "boolean" ? force : !inventoryOpen;
             if (inventoryOpen) toggleBestiary(false);
             inventoryPanel.style.display = inventoryOpen && gameRunning ? "block" : "none";
-            if (inventoryOpen) setPanelCollapsed("inventory", false, { persist: false });
+            if (inventoryOpen) {
+                setPanelCollapsed("inventory", false, { persist: false });
+                activateWindow("inventory");
+            }
             if (inventoryOpen) {
                 tutorialInventorySeen = true;
                 syncTutorialProgress();
@@ -945,7 +1097,10 @@
             bestiaryOpen = typeof force === "boolean" ? force : !bestiaryOpen;
             if (bestiaryOpen) toggleInventory(false);
             bestiaryPanel.style.display = bestiaryOpen && gameRunning ? "block" : "none";
-            if (bestiaryOpen) setPanelCollapsed("bestiary", false, { persist: false });
+            if (bestiaryOpen) {
+                setPanelCollapsed("bestiary", false, { persist: false });
+                activateWindow("bestiary");
+            }
             if (bestiaryOpen) {
                 tutorialBestiarySeen = true;
                 syncTutorialProgress();
@@ -960,6 +1115,7 @@
         function toggleSettingsMenu(force) {
             settingsOpen = typeof force === "boolean" ? force : !settingsOpen;
             settingsMenu.style.display = settingsOpen && gameRunning ? "block" : "none";
+            if (settingsOpen) activateWindow("settings");
         }
 
         function craftErrorMessage(code) {
@@ -1017,7 +1173,10 @@
             craftOpen = typeof force === "boolean" ? force : !craftOpen;
             craftPanel.style.display = craftOpen ? "block" : "none";
             craftToggleBtn.classList.toggle("on", craftOpen);
-            if (craftOpen) syncCraftSelection();
+            if (craftOpen) {
+                syncCraftSelection();
+                activateWindow("craft");
+            }
             renderCraftPanel();
             renderLoadout(true);
         }
@@ -1491,6 +1650,7 @@
         function renderTutorial() {
             if (!tutorialBox) return;
             tutorialBox.style.display = tutorialOpen && gameRunning ? "block" : "none";
+            if (tutorialOpen && gameRunning) activateWindow("tutorial");
             if (!tutorialOpen || !gameRunning) return;
             const steps = tutorialSteps();
             const index = Math.max(0, Math.min(steps.length - 1, tutorialStep));
@@ -1638,6 +1798,9 @@
             toggleCraftPanel(false);
             document.getElementById("chat-wrap").style.display = "flex";
             controlsCard.style.display = "block";
+            activateWindow("hud");
+            activateWindow("controls");
+            activateWindow("chat");
             elUser.textContent = currentAccountName || "guest";
             socket = io({ withCredentials: true });
             socket.on("connect_error", err => {
