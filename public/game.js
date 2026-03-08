@@ -1,0 +1,2260 @@
+﻿        const LANG_KEY = "sphere_lang_v1";
+
+        const I18N = {
+            ko: {
+                btn_login: "로그인",
+                btn_register: "회원가입",
+                field_user: "아이디",
+                field_pass: "비밀번호",
+                field_confirm: "비밀번호 확인",
+                ph_user: "아이디",
+                ph_pass: "비밀번호",
+                ph_confirm: "비밀번호 확인",
+                auth_connect: "접속",
+                auth_create_account: "계정 생성",
+                hud_overline: "전술 피드",
+                hud_caption: "가볍고 또렷한 전투 정보를 한눈에 확인합니다.",
+                hud_player: "플레이어",
+                hud_player_sub: "현재 접속 캐릭터",
+                hud_level: "레벨",
+                hud_vital: "생명력",
+                hud_vital_sub: "피격과 회복 상태를 즉시 확인합니다.",
+                hud_world: "월드",
+                hud_coords: "좌표",
+                hud_online: "접속 수",
+                hud_stats: "능력치",
+                btn_disconnect: "연결 종료",
+                btn_settings: "설정",
+                btn_bestiary: "도감",
+                controls_kicker: "조작",
+                controls_title: "키맵",
+                controls_move: "이동",
+                controls_attack: "공격",
+                controls_chat: "채팅",
+                controls_craft: "조합",
+                controls_bestiary: "도감",
+                controls_close: "닫기",
+                chat_kicker: "월드 채팅",
+                chat_title: "실시간 로그",
+                ph_chat: "메시지",
+                btn_send: "전송",
+                auth_err_username: "ERR :: 아이디를 입력하세요",
+                auth_err_password: "ERR :: 비밀번호를 입력하세요",
+                auth_err_mismatch: "ERR :: 비밀번호가 일치하지 않습니다",
+                auth_err_minpw: "ERR :: 비밀번호는 4자 이상이어야 합니다",
+                auth_err_baduser: "ERR :: 아이디는 영문, 숫자, _, - 만 사용할 수 있습니다",
+                auth_err_badpass: "ERR :: 비밀번호 형식이 올바르지 않습니다",
+                auth_err_limited: "ERR :: 요청이 너무 많습니다. 잠시 후 다시 시도하세요",
+                auth_err_exists: "ERR :: \"{user}\" 계정이 이미 존재합니다",
+                auth_ok_welcome: "OK :: 환영합니다, {user}",
+                auth_err_notfound: "ERR :: 계정을 찾을 수 없습니다",
+                auth_err_wrongpass: "ERR :: 비밀번호가 올바르지 않습니다",
+                auth_err_server: "ERR :: 서버 인증 처리에 실패했습니다",
+                auth_ok_connecting: "OK :: {user}(으)로 접속 중",
+                auth_info_disconnected: "INFO :: 연결이 종료되었습니다",
+                sys_link_established: "연결 완료 :: 이동=WASD :: 공격=좌클릭 :: 채팅=ENTER",
+                sys_respawned: "리스폰 완료 :: 안전 지점에서 부활했습니다",
+                sys_target_down: "타겟 격파 :: +{xp} XP",
+                sys_no_points: "사용 가능한 스탯 포인트가 없습니다",
+                sys_stat_applied: "{stat} +1 적용",
+                sys_level_points: "레벨 업 :: +{points} 스탯 포인트 :: 총 {total}",
+                sys_level_broadcast: "레벨 {level}",
+                sys_session_replaced: "다른 로그인으로 인해 현재 세션이 종료되었습니다",
+                flash_level_up: "레벨 {level} 상승",
+                stat_points: "{count} PT",
+                stat_desc_str: "근접 공격력 증가",
+                stat_desc_agi: "이동 속도와 회피 확률 증가",
+                stat_desc_vit: "최대 체력 증가",
+                stat_desc_dex: "공격 속도와 사거리 증가",
+                stat_desc_wis: "XP와 회복 효율 증가",
+                stat_desc_luk: "치명타 확률과 배율 증가",
+                combat_evade: "회피",
+                portal_label: "차원 포탈",
+                portal_state: "비활성",
+                map_field: "기본 구역",
+                map_mono: "흑백 구역",
+                portal_hint: "{map} 이동",
+                sys_map_changed: "포탈 이동 :: {map}",
+                hud_gear: "장비",
+                hud_equipped: "장착",
+                hud_inventory: "인벤토리",
+                hud_penalty: "사망 시 XP, 스탯 포인트 1, 장비 1개를 잃을 수 있습니다.",
+                hud_loot_count: "개인 드랍 {count}",
+                inventory_count: "{count} / {limit}",
+                inventory_empty: "획득한 장비가 없습니다.",
+                equipment_empty: "비어 있음",
+                btn_inventory: "인벤토리",
+                btn_equip: "장착",
+                btn_unequip: "해제",
+                controls_inventory: "인벤토리",
+                sys_loot_drop: "드랍 생성 :: {item}",
+                sys_loot_pick: "획득 완료 :: {item}",
+                sys_equip: "장착 완료 :: {item}",
+                sys_unequip: "해제 완료 :: {item}",
+                sys_inventory_full: "인벤토리가 가득 차서 더 주울 수 없습니다.",
+                sys_death_penalty: "사망 패널티 :: XP -{xp} :: PT -{points} :: {item}",
+                sys_death_penalty_no_item: "잃은 장비 없음",
+                sys_equip_error_not_joined: "장착 실패 :: 캐릭터가 연결되지 않았습니다.",
+                sys_equip_error_item_missing: "장착 실패 :: 인벤토리에서 아이템을 찾지 못했습니다.",
+                sys_equip_error_bad_slot: "해제 실패 :: 잘못된 슬롯입니다.",
+                sys_equip_error_slot_empty: "해제 실패 :: 슬롯이 비어 있습니다.",
+            },
+            en: {
+                btn_login: "LOGIN",
+                btn_register: "REGISTER",
+                field_user: "USER_ID",
+                field_pass: "PASSWORD",
+                field_confirm: "CONFIRM_PASSWORD",
+                ph_user: "username",
+                ph_pass: "password",
+                ph_confirm: "confirm password",
+                auth_connect: "CONNECT",
+                auth_create_account: "CREATE ACCOUNT",
+                hud_overline: "TACTICAL FEED",
+                hud_caption: "Compact readout with angular panels and reduced obstruction.",
+                hud_player: "PLAYER",
+                hud_player_sub: "connected pilot",
+                hud_level: "LEVEL",
+                hud_vital: "VITAL",
+                hud_vital_sub: "Keep damage and recovery feedback visible at a glance.",
+                hud_world: "WORLD",
+                hud_coords: "Coords",
+                hud_online: "Online",
+                hud_stats: "STATS",
+                btn_disconnect: "DISCONNECT",
+                btn_settings: "SETTINGS",
+                btn_bestiary: "BESTIARY",
+                controls_kicker: "CONTROLS",
+                controls_title: "KEYMAP",
+                controls_move: "MOVE",
+                controls_attack: "ATTACK",
+                controls_chat: "CHAT",
+                controls_craft: "CRAFT",
+                controls_bestiary: "BESTIARY",
+                controls_close: "CLOSE",
+                chat_kicker: "WORLD CHAT",
+                chat_title: "realtime.log",
+                ph_chat: "message",
+                btn_send: "SEND",
+                auth_err_username: "ERR :: username required",
+                auth_err_password: "ERR :: password required",
+                auth_err_mismatch: "ERR :: passwords do not match",
+                auth_err_minpw: "ERR :: password min 4 chars",
+                auth_err_baduser: "ERR :: username may use letters, numbers, _ and - only",
+                auth_err_badpass: "ERR :: invalid password format",
+                auth_err_limited: "ERR :: too many requests, try again shortly",
+                auth_err_exists: "ERR :: \"{user}\" already exists",
+                auth_ok_welcome: "OK :: welcome, {user}",
+                auth_err_notfound: "ERR :: user not found",
+                auth_err_wrongpass: "ERR :: wrong password",
+                auth_err_server: "ERR :: server authentication failed",
+                auth_ok_connecting: "OK :: connecting as {user}",
+                auth_info_disconnected: "INFO :: disconnected",
+                sys_link_established: "LINK ESTABLISHED :: MOVE=WASD :: ATTACK=LMB :: CHAT=ENTER",
+                sys_respawned: "NODE OFFLINE :: RESPAWNED AT SAFE POINT",
+                sys_target_down: "TARGET DOWN :: +{xp} XP",
+                sys_no_points: "NO STAT POINTS AVAILABLE",
+                sys_stat_applied: "{stat} +1 APPLIED",
+                sys_level_points: "LEVEL UP :: +{points} STAT PTS :: TOTAL {total}",
+                sys_level_broadcast: "LEVEL {level}",
+                sys_session_replaced: "This session was replaced by another login",
+                flash_level_up: "LEVEL {level} UP",
+                stat_points: "{count} PT",
+                stat_desc_str: "Raises melee damage.",
+                stat_desc_agi: "Raises move speed and dodge chance.",
+                stat_desc_vit: "Raises max HP.",
+                stat_desc_dex: "Raises attack speed and melee reach.",
+                stat_desc_wis: "Raises XP gain and healing.",
+                stat_desc_luk: "Raises crit chance and crit multiplier.",
+                combat_evade: "EVADE",
+                portal_label: "DIMENSION PORTAL",
+                portal_state: "INACTIVE",
+                map_field: "FIELD",
+                map_mono: "MONO ZONE",
+                portal_hint: "TO {map}",
+                sys_map_changed: "PORTAL SHIFT :: {map}",
+                hud_gear: "GEAR",
+                hud_equipped: "EQUIPPED",
+                hud_inventory: "INVENTORY",
+                hud_penalty: "Death can cost XP, one spare stat point, and one owned item.",
+                hud_loot_count: "private drops {count}",
+                inventory_count: "{count} / {limit}",
+                inventory_empty: "No gear collected yet.",
+                equipment_empty: "Empty",
+                btn_inventory: "INVENTORY",
+                btn_equip: "EQUIP",
+                btn_unequip: "UNEQUIP",
+                controls_inventory: "INVENTORY",
+                sys_loot_drop: "DROP SPAWNED :: {item}",
+                sys_loot_pick: "LOOT SECURED :: {item}",
+                sys_equip: "EQUIPPED :: {item}",
+                sys_unequip: "UNEQUIPPED :: {item}",
+                sys_inventory_full: "Inventory full. Make room before picking up more gear.",
+                sys_death_penalty: "DEATH PENALTY :: XP -{xp} :: PT -{points} :: {item}",
+                sys_death_penalty_no_item: "no item lost",
+                sys_equip_error_not_joined: "EQUIP FAILED :: character is not connected.",
+                sys_equip_error_item_missing: "EQUIP FAILED :: item not found in inventory.",
+                sys_equip_error_bad_slot: "UNEQUIP FAILED :: invalid slot.",
+                sys_equip_error_slot_empty: "UNEQUIP FAILED :: slot is empty.",
+            }
+        };
+
+        Object.assign(I18N.ko, {
+            btn_craft: "조합",
+            craft_kicker: "조합",
+            craft_title: "합성",
+            craft_empty: "빈 슬롯",
+            craft_slot_hint: "인벤토리에서 같은 장비를 클릭하세요",
+            craft_slot_clear: "클릭해서 비우기",
+            craft_need_two: "같은 장비와 같은 등급 2개를 넣어야 합니다.",
+            craft_only_same: "같은 장비, 같은 등급만 조합할 수 있습니다.",
+            craft_result: "결과",
+            craft_result_fail: "실패 시 재료가 모두 사라집니다.",
+            craft_result_max: "더 이상 상승 불가",
+            craft_result_arrow: "{from} -> {to}",
+            craft_success_rate: "성공 {rate}%",
+            craft_pick_prompt: "조합 패널을 열고 인벤토리에서 재료를 선택하세요.",
+            btn_craft_clear: "초기화",
+            btn_craft_action: "조합",
+            sys_craft_pick: "조합 재료 선택 :: {item}",
+            sys_craft_mismatch: "조합 실패 :: 같은 장비와 같은 등급만 가능합니다",
+            sys_craft_error_not_joined: "조합 실패 :: 캐릭터가 연결되지 않았습니다.",
+            sys_craft_error_bad_recipe: "조합 실패 :: 재료 구성이 올바르지 않습니다.",
+            sys_craft_error_duplicate_item: "조합 실패 :: 같은 아이템을 두 번 넣을 수 없습니다.",
+            sys_craft_error_item_missing: "조합 실패 :: 인벤토리에서 재료를 찾을 수 없습니다.",
+            sys_craft_error_craft_mismatch: "조합 실패 :: 같은 장비와 같은 등급만 가능합니다.",
+            sys_craft_error_max_rarity: "조합 실패 :: 이미 최고 등급입니다.",
+            sys_craft_success: "조합 성공 :: {item}",
+            sys_craft_fail: "조합 실패 :: 재료가 소멸했습니다",
+            settings_lang: "언어",
+            settings_ui_scale: "UI 크기",
+            settings_logout: "연결 종료",
+            ui_scale_small: "작게",
+            ui_scale_normal: "보통",
+            ui_scale_large: "크게",
+            bestiary_title: "적 도감",
+            bestiary_summary: "현재 출현표 :: 총 처치 {total}",
+            bestiary_empty: "표시할 적 정보가 없습니다.",
+            bestiary_state_live: "출현 중",
+            bestiary_state_locked: "잠김",
+            bestiary_unlock_initial: "시작 시 바로 출현",
+            bestiary_unlock_progress: "{monster} 처치 {count}/{need}",
+            bestiary_spawn: "출현 {rate}",
+            bestiary_drop: "드랍 {rate}",
+            tutorial_label: "튜토리얼",
+            tutorial_close: "닫기",
+            tutorial_ready: "시작",
+            tutorial_next: "다음",
+            tutorial_done: "완료",
+            tutorial_progress: "{current} / {total}",
+            tutorial_step_1_title: "처음 온 플레이어를 위한 안내",
+            tutorial_step_1_body: "간단한 튜토리얼입니다. 시작 버튼을 누르면 기본 조작을 순서대로 확인합니다.",
+            tutorial_step_2_title: "이동",
+            tutorial_step_2_body: "WASD로 캐릭터를 움직이세요.",
+            tutorial_step_3_title: "공격",
+            tutorial_step_3_body: "적 근처에서 마우스 왼쪽 버튼으로 공격하세요.",
+            tutorial_step_4_title: "인벤토리",
+            tutorial_step_4_body: "E를 눌러 인벤토리를 열어 장비와 드랍을 확인하세요.",
+            tutorial_step_5_title: "도감",
+            tutorial_step_5_body: "B를 눌러 도감을 열고 적 정보와 확률표를 확인하세요.",
+            tutorial_step_6_title: "준비 완료",
+            tutorial_step_6_body: "이제 자유롭게 사냥하고 성장하면 됩니다.",
+        });
+
+        Object.assign(I18N.en, {
+            btn_craft: "CRAFT",
+            craft_kicker: "CRAFT",
+            craft_title: "SYNTHESIS",
+            craft_empty: "EMPTY SLOT",
+            craft_slot_hint: "Click matching items in the inventory",
+            craft_slot_clear: "Click to clear",
+            craft_need_two: "Insert two items with the same name and rarity.",
+            craft_only_same: "Only identical items of the same rarity can be combined.",
+            craft_result: "RESULT",
+            craft_result_fail: "Failure consumes both materials.",
+            craft_result_max: "MAX RARITY",
+            craft_result_arrow: "{from} -> {to}",
+            craft_success_rate: "SUCCESS {rate}%",
+            craft_pick_prompt: "Open the craft panel and click inventory items to assign materials.",
+            btn_craft_clear: "CLEAR",
+            btn_craft_action: "COMBINE",
+            sys_craft_pick: "CRAFT MATERIAL :: {item}",
+            sys_craft_mismatch: "CRAFT FAILED :: identical item and rarity required",
+            sys_craft_error_not_joined: "CRAFT FAILED :: character is not connected.",
+            sys_craft_error_bad_recipe: "CRAFT FAILED :: invalid recipe.",
+            sys_craft_error_duplicate_item: "CRAFT FAILED :: duplicate item selected.",
+            sys_craft_error_item_missing: "CRAFT FAILED :: material not found in inventory.",
+            sys_craft_error_craft_mismatch: "CRAFT FAILED :: identical item and rarity required.",
+            sys_craft_error_max_rarity: "CRAFT FAILED :: item is already at max rarity.",
+            sys_craft_success: "CRAFT SUCCESS :: {item}",
+            sys_craft_fail: "CRAFT FAILED :: materials were destroyed",
+            settings_lang: "LANGUAGE",
+            settings_ui_scale: "UI SIZE",
+            settings_logout: "DISCONNECT",
+            ui_scale_small: "SMALL",
+            ui_scale_normal: "NORMAL",
+            ui_scale_large: "LARGE",
+            bestiary_title: "BESTIARY",
+            bestiary_summary: "LIVE TABLE :: TOTAL KILLS {total}",
+            bestiary_empty: "No enemy entries to display.",
+            bestiary_state_live: "ACTIVE",
+            bestiary_state_locked: "LOCKED",
+            bestiary_unlock_initial: "Available from the start",
+            bestiary_unlock_progress: "Kill {monster} {count}/{need}",
+            bestiary_spawn: "SPAWN {rate}",
+            bestiary_drop: "DROP {rate}",
+            tutorial_label: "Tutorial",
+            tutorial_close: "Close",
+            tutorial_ready: "Ready",
+            tutorial_next: "Next",
+            tutorial_done: "Done",
+            tutorial_progress: "{current} / {total}",
+            tutorial_step_1_title: "Guide for new pilots",
+            tutorial_step_1_body: "This is a short starter guide. Press Ready to walk through the basics.",
+            tutorial_step_2_title: "Move",
+            tutorial_step_2_body: "Use WASD to move your character.",
+            tutorial_step_3_title: "Attack",
+            tutorial_step_3_body: "Attack near an enemy with the left mouse button.",
+            tutorial_step_4_title: "Inventory",
+            tutorial_step_4_body: "Press E to open your inventory and inspect gear and drops.",
+            tutorial_step_5_title: "Bestiary",
+            tutorial_step_5_body: "Press B to open the bestiary and inspect enemy stats and drop tables.",
+            tutorial_step_6_title: "Ready to hunt",
+            tutorial_step_6_body: "You are set. Start hunting and building up your character.",
+        });
+
+        const SLOT_ORDER = ["weapon", "armor", "boots", "gloves", "charm"];
+        const SLOT_META = {
+            weapon: { ko: "무기", en: "WEAPON" },
+            armor: { ko: "갑옷", en: "ARMOR" },
+            boots: { ko: "신발", en: "BOOTS" },
+            gloves: { ko: "장갑", en: "GLOVES" },
+            charm: { ko: "부적", en: "CHARM" },
+        };
+        const ITEM_META = {
+            iron_blade: { ko: "검", en: "Sword" },
+            guard_armor: { ko: "갑옷", en: "Armor" },
+            wind_boots: { ko: "신발", en: "Boots" },
+            focus_gloves: { ko: "장갑", en: "Gloves" },
+            lucky_charm: { ko: "부적", en: "Charm" },
+        };
+        const MONSTER_META = {
+            dot: { ko: "점", en: "DOT", color: "#ef4444" },
+            line: { ko: "선", en: "LINE", color: "#8b5cf6" },
+            triangle: { ko: "삼각형", en: "TRIANGLE", color: "#f59e0b" },
+            square: { ko: "사각형", en: "SQUARE", color: "#14b8a6" },
+        };
+        const MAX_RARITY = 10;
+        const RARITY_META = {
+            1: { ko: "하급", en: "Trash", color: "#9ca3af", featureKo: "상점 판매 및 분해용", featureEn: "Vendor or dismantle fodder", craftChance: 92 },
+            2: { ko: "일반", en: "Common", color: "#f8fafc", featureKo: "기초 장비", featureEn: "Baseline gear", craftChance: 86 },
+            3: { ko: "우수", en: "Uncommon", color: "#22c55e", featureKo: "초반 성장의 주축", featureEn: "Early growth core", craftChance: 78 },
+            4: { ko: "희귀", en: "Rare", color: "#3b82f6", featureKo: "유효 옵션이 붙기 시작", featureEn: "Useful options start here", craftChance: 68 },
+            5: { ko: "보물", en: "Unique", color: "#a855f7", featureKo: "특수 효과 중심", featureEn: "Special-effect focused", craftChance: 58 },
+            6: { ko: "전설", en: "Legendary", color: "#f97316", featureKo: "구하기 어렵고 강력함", featureEn: "Rare and powerful", craftChance: 48 },
+            7: { ko: "신화", en: "Mythic", color: "#ef4444", featureKo: "서버급 고성능", featureEn: "Server-tier power", craftChance: 38 },
+            8: { ko: "고대", en: "Ancient", color: "#14b8a6", featureKo: "잊혀진 유산", featureEn: "Forgotten legacy", craftChance: 28 },
+            9: { ko: "유물", en: "Relic", color: "#facc15", featureKo: "단 하나의 가치", featureEn: "Singular worth", craftChance: 18 },
+            10: { ko: "초월", en: "Ethereal", color: "#111111", featureKo: "시스템 한계 초월", featureEn: "Beyond system limits", craftChance: 0 },
+        };
+
+        const MAP_META = {
+            field: {
+                nameKey: "map_field",
+                theme: null,
+            },
+            mono: {
+                nameKey: "map_mono",
+                theme: {
+                    bgTop: "#efefec",
+                    bgBottom: "#d3d3cf",
+                    grid: "rgba(0,0,0,.07)",
+                    gridMaj: "rgba(0,0,0,.11)",
+                    axis: "rgba(0,0,0,.24)",
+                    border: "rgba(0,0,0,.26)",
+                    muted: "#5e5e5e",
+                    text: "#111111",
+                },
+            },
+        };
+        const DECOR_PORTAL_OFFSET_X = 96;
+        const PANEL_STATE_KEY = "sphere_panel_state_v1";
+        const UI_SCALE_KEY = "sphere_ui_scale_v1";
+        const TUTORIAL_KEY = "sphere_tutorial_done_v1";
+        const PERSISTENT_PANELS = new Set(["hud", "controls", "chat"]);
+        const UI_SCALE_MAP = {
+            small: .9,
+            normal: 1,
+            large: 1.12,
+        };
+
+        let authMode = "login",
+            currentLang = localStorage.getItem(LANG_KEY) === "ko" ? "ko" : "en",
+            currentAccountName = "";
+
+        const t = (key, vars = {}) => {
+            const source = (I18N[currentLang] && I18N[currentLang][key]) || I18N.en[key] || key;
+            return source.replace(/\{(\w+)\}/g, (_, name) => vars[name] ?? "");
+        };
+
+        const elMsg = document.getElementById("auth-msg"),
+            elUser = document.getElementById("h-user"),
+            elPos = document.getElementById("h-pos"),
+            elCnt = document.getElementById("h-cnt"),
+            elLv = document.getElementById("h-lv"),
+            elXp = document.getElementById("h-xp"),
+            elXpMax = document.getElementById("h-xpmax"),
+            elXpFill = document.getElementById("xp-fill"),
+            elHp = document.getElementById("h-hp"),
+            elHpFill = document.getElementById("hp-fill"),
+            elStatPts = document.getElementById("h-statpts"),
+            elStr = document.getElementById("h-str"),
+            elAgi = document.getElementById("h-agi"),
+            elVit = document.getElementById("h-vit"),
+            elDex = document.getElementById("h-dex"),
+            elWis = document.getElementById("h-wis"),
+            elLuk = document.getElementById("h-luk"),
+            btnStr = document.getElementById("btn-str"),
+            btnAgi = document.getElementById("btn-agi"),
+            btnVit = document.getElementById("btn-vit"),
+            btnDex = document.getElementById("btn-dex"),
+            btnWis = document.getElementById("btn-wis"),
+            btnLuk = document.getElementById("btn-luk"),
+            elLootCnt = document.getElementById("h-lootcnt"),
+            elInvCnt = document.getElementById("h-invcount"),
+            equipList = document.getElementById("equip-list"),
+            inventoryList = document.getElementById("inventory-list"),
+            bestiaryList = document.getElementById("bestiary-list"),
+            bestiarySummary = document.getElementById("bestiary-summary"),
+            bestiaryBody = document.getElementById("bestiary-body"),
+            hudBody = document.getElementById("hud-body"),
+            inventoryBody = document.getElementById("inventory-body"),
+            controlsBody = document.getElementById("controls-body"),
+            chatBody = document.getElementById("chat-body"),
+            settingsBtn = document.getElementById("settings-btn"),
+            settingsMenu = document.getElementById("settings-menu"),
+            settingsLangValue = document.getElementById("settings-lang-value"),
+            inventoryToggleBtn = document.getElementById("inventory-toggle"),
+            bestiaryToggleBtn = document.getElementById("bestiary-toggle"),
+            inventoryPanel = document.getElementById("inventory-panel"),
+            bestiaryPanel = document.getElementById("bestiary-panel"),
+            craftToggleBtn = document.getElementById("craft-toggle"),
+            craftPanel = document.getElementById("craft-panel"),
+            craftSlotA = document.getElementById("craft-slot-a"),
+            craftSlotB = document.getElementById("craft-slot-b"),
+            craftChance = document.getElementById("craft-chance"),
+            craftResult = document.getElementById("craft-result"),
+            craftStatus = document.getElementById("craft-status"),
+            craftActionBtn = document.getElementById("craft-action"),
+            chatLog = document.getElementById("chat-log"),
+            chatInput = document.getElementById("chat-input"),
+            controlsCard = document.getElementById("controls-card"),
+            levelupFlash = document.getElementById("levelup-flash"),
+            uiScaleSmallBtn = document.getElementById("ui-scale-small"),
+            uiScaleNormalBtn = document.getElementById("ui-scale-normal"),
+            uiScaleLargeBtn = document.getElementById("ui-scale-large"),
+            tutorialBox = document.getElementById("tutorial-box"),
+            tutorialTitle = document.getElementById("tutorial-title"),
+            tutorialProgress = document.getElementById("tutorial-progress"),
+            tutorialBody = document.getElementById("tutorial-body"),
+            tutorialAction = document.getElementById("tutorial-action"),
+            tutorialCloseBtn = tutorialBox.querySelector(".tutorial-close");
+        const panelBodies = {
+            hud: hudBody,
+            inventory: inventoryBody,
+            bestiary: bestiaryBody,
+            controls: controlsBody,
+            chat: chatBody,
+        };
+        const panelShells = {
+            hud: document.getElementById("hud"),
+            inventory: document.getElementById("inventory-panel"),
+            bestiary: document.getElementById("bestiary-panel"),
+            controls: document.getElementById("controls-card"),
+            chat: document.getElementById("chat-wrap"),
+        };
+        const panelButtons = {
+            hud: document.getElementById("hud-toggle"),
+            inventory: document.getElementById("inventory-collapse"),
+            bestiary: document.getElementById("bestiary-collapse"),
+            controls: document.getElementById("controls-toggle"),
+            chat: document.getElementById("chat-toggle"),
+        };
+        const loadPanelState = () => {
+            try {
+                const raw = JSON.parse(localStorage.getItem(PANEL_STATE_KEY)) || {};
+                return Object.fromEntries(Object.entries(raw).filter(([name]) => PERSISTENT_PANELS.has(name)));
+            } catch {
+                return {};
+            }
+        };
+        let panelState = loadPanelState();
+        let uiScaleMode = UI_SCALE_MAP[localStorage.getItem(UI_SCALE_KEY)] ? localStorage.getItem(UI_SCALE_KEY) : "normal";
+
+        function currentMapId() {
+            return currentSelf?.mapId || playerMap[myId]?.mapId || "field";
+        }
+
+        function applyPanelState(name) {
+            const body = panelBodies[name];
+            const shell = panelShells[name];
+            const button = panelButtons[name];
+            if (!body || !button) return;
+            const collapsed = !!panelState[name];
+            body.classList.toggle("collapsed", collapsed);
+            body.hidden = collapsed;
+            if (!collapsed) body.style.display = "";
+            if (shell) shell.classList.toggle("collapsed-shell", collapsed);
+            button.textContent = collapsed ? "+" : "-";
+            button.setAttribute("aria-expanded", collapsed ? "false" : "true");
+        }
+
+        function setPanelCollapsed(name, collapsed, { persist = PERSISTENT_PANELS.has(name) } = {}) {
+            panelState[name] = !!collapsed;
+            if (persist) {
+                const storedState = Object.fromEntries(Object.entries(panelState).filter(([panelName]) => PERSISTENT_PANELS.has(panelName)));
+                localStorage.setItem(PANEL_STATE_KEY, JSON.stringify(storedState));
+            }
+            applyPanelState(name);
+        }
+
+        function togglePanel(name, force) {
+            const next = typeof force === "boolean" ? force : !panelState[name];
+            setPanelCollapsed(name, next);
+        }
+
+        function mapName(mapId) {
+            return t(MAP_META[mapId]?.nameKey || "map_field");
+        }
+
+        function currentWorldStyle() {
+            const theme = MAP_META[currentMapId()]?.theme;
+            return theme ? { ...C, ...theme } : C;
+        }
+
+        function portalForMap(mapId = currentMapId()) {
+            if (mapId === "mono") {
+                return { x: DECOR_PORTAL_OFFSET_X, y: worldH / 2, targetMapId: "field" };
+            }
+            return { x: worldW - DECOR_PORTAL_OFFSET_X, y: worldH / 2, targetMapId: "mono" };
+        }
+
+        function renderStaticI18n() {
+            document.documentElement.lang = currentLang;
+            document.querySelectorAll("[data-i18n]").forEach(node => {
+                node.textContent = t(node.dataset.i18n);
+            });
+            document.querySelectorAll("[data-i18n-placeholder]").forEach(node => {
+                node.placeholder = t(node.dataset.i18nPlaceholder);
+            });
+            document.getElementById("sbtn-lbl").textContent = authMode === "signup" ? t("auth_create_account") : t("auth_connect");
+            elStatPts.textContent = t("stat_points", { count: Number.parseInt(elStatPts.textContent, 10) || 0 });
+            settingsLangValue.textContent = currentLang === "ko" ? "KO" : "EN";
+            applyUiScale(uiScaleMode, { persist: false });
+            renderLoadout(true);
+            renderTutorial();
+        }
+
+        function applyUiScale(mode, { persist = true } = {}) {
+            uiScaleMode = UI_SCALE_MAP[mode] ? mode : "normal";
+            document.documentElement.style.setProperty("--ui-scale", String(UI_SCALE_MAP[uiScaleMode]));
+            uiScaleSmallBtn.classList.toggle("active", uiScaleMode === "small");
+            uiScaleNormalBtn.classList.toggle("active", uiScaleMode === "normal");
+            uiScaleLargeBtn.classList.toggle("active", uiScaleMode === "large");
+            if (persist) {
+                localStorage.setItem(UI_SCALE_KEY, uiScaleMode);
+            }
+        }
+
+        function setUiScale(mode) {
+            applyUiScale(mode);
+        }
+
+        function toggleLanguage() {
+            currentLang = currentLang === "ko" ? "en" : "ko";
+            localStorage.setItem(LANG_KEY, currentLang);
+            renderStaticI18n();
+            toggleSettingsMenu(false);
+        }
+
+        function setMode(mode) {
+            authMode = mode;
+            const signup = mode === "signup";
+            document.getElementById("cfm-row").style.display = signup ? "" : "none";
+            document.getElementById("sbtn-lbl").textContent = signup ? t("auth_create_account") : t("auth_connect");
+            document.getElementById("btn-ln").className = "mbtn" + (signup ? "" : " on");
+            document.getElementById("btn-su").className = "mbtn" + (signup ? " on" : "");
+            setMsg("", "");
+        }
+
+        function setMsg(text, cls) {
+            elMsg.textContent = text ? `> ${text}` : "";
+            elMsg.className = "auth-msg " + (cls || "");
+        }
+
+        function authErrorMessage(code, user = "") {
+            switch (code) {
+                case "username_required": return t("auth_err_username");
+                case "password_required": return t("auth_err_password");
+                case "bad_username": return t("auth_err_baduser");
+                case "bad_password": return t("auth_err_badpass");
+                case "rate_limited": return t("auth_err_limited");
+                case "user_exists": return t("auth_err_exists", { user });
+                case "user_not_found": return t("auth_err_notfound");
+                case "wrong_password": return t("auth_err_wrongpass");
+                default: return t("auth_err_server");
+            }
+        }
+
+        async function authRequest(path, body) {
+            const res = await fetch(path, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                credentials: "include",
+                body: JSON.stringify(body),
+            });
+            let payload = {};
+            try {
+                payload = await res.json();
+            } catch {
+                payload = {};
+            }
+            if (!res.ok || payload?.ok === false) {
+                throw new Error(payload?.error || `http_${res.status}`);
+            }
+            return payload;
+        }
+
+        async function restoreAuthSession() {
+            try {
+                const res = await fetch("/api/auth/session", { credentials: "include" });
+                if (!res.ok) return;
+                const payload = await res.json();
+                if (!payload?.ok || !payload?.user) return;
+                currentAccountName = payload.user;
+                startGame(payload.user);
+            } catch {
+            }
+        }
+
+        async function handleAuth() {
+            const user = document.getElementById("i-user").value.trim(),
+                pass = document.getElementById("i-pass").value,
+                confirm = document.getElementById("i-cfm").value;
+            if (!user) return setMsg(t("auth_err_username"), "err");
+            if (!pass) return setMsg(t("auth_err_password"), "err");
+            if (authMode === "signup") {
+                if (pass !== confirm) return setMsg(t("auth_err_mismatch"), "err");
+                if (pass.length < 4) return setMsg(t("auth_err_minpw"), "err");
+            }
+            try {
+                const payload = await authRequest(authMode === "signup" ? "/api/auth/register" : "/api/auth/login", { user, pass });
+                currentAccountName = payload.user || user;
+                setMsg(
+                    authMode === "signup"
+                        ? t("auth_ok_welcome", { user: currentAccountName })
+                        : t("auth_ok_connecting", { user: currentAccountName }),
+                    "ok"
+                );
+                setTimeout(() => startGame(currentAccountName), authMode === "signup" ? 450 : 250);
+            } catch (err) {
+                setMsg(authErrorMessage(err?.message, user), "err");
+            }
+        }
+
+        async function logoutAccount() {
+            try {
+                await fetch("/api/auth/logout", {
+                    method: "POST",
+                    credentials: "include",
+                });
+            } catch {
+            }
+            currentAccountName = "";
+            doLogout();
+        }
+
+        const authFieldIds = ["i-user", "i-pass", "i-cfm"];
+
+        function visibleAuthFieldIds() {
+            return authMode === "signup" ? authFieldIds : authFieldIds.slice(0, 2);
+        }
+
+        authFieldIds.forEach(id => {
+            document.getElementById(id).addEventListener("keydown", e => {
+                if (e.key !== "Enter") return;
+                e.preventDefault();
+                const ids = visibleAuthFieldIds(),
+                    idx = ids.indexOf(id);
+                if (idx >= 0 && idx < ids.length - 1) {
+                    document.getElementById(ids[idx + 1]).focus();
+                    return;
+                }
+                handleAuth();
+            });
+        });
+
+        const canvas = document.getElementById("canvas"),
+            ctx = canvas.getContext("2d");
+        let viewW = innerWidth,
+            viewH = innerHeight;
+
+        function resize() {
+            const ratio = devicePixelRatio || 1;
+            viewW = innerWidth;
+            viewH = innerHeight;
+            canvas.width = Math.round(viewW * ratio);
+            canvas.height = Math.round(viewH * ratio);
+            canvas.style.width = `${viewW}px`;
+            canvas.style.height = `${viewH}px`;
+            ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+        }
+
+        resize();
+        addEventListener("resize", resize);
+
+        let socket,
+            myId = null,
+            worldW = 3000,
+            worldH = 3000,
+            playerMap = {},
+            orbMap = {},
+            monsterMap = {},
+            lootMap = {},
+            currentSelf = null,
+            renderPlayers = {},
+            renderMonsters = {};
+        const TILE = 60,
+            keys = { up: false, down: false, left: false, right: false };
+        let lastKeys = {},
+            gameRunning = false,
+            settingsOpen = false,
+            inventoryOpen = false,
+            bestiaryOpen = false,
+            selectedBestiaryType = "dot",
+            craftOpen = false,
+            craftSelection = [null, null],
+            lastLoadoutSignature = "",
+            rafId = null,
+            attackCooldown = false,
+            tutorialOpen = false,
+            tutorialStep = 0,
+            tutorialMoved = false,
+            tutorialAttacked = false,
+            tutorialInventorySeen = false,
+            tutorialBestiarySeen = false,
+            tutorialDone = localStorage.getItem(TUTORIAL_KEY) === "done";
+
+        applyUiScale(uiScaleMode, { persist: false });
+        renderStaticI18n();
+        Object.keys(panelBodies).forEach(applyPanelState);
+        restoreAuthSession();
+
+        addEventListener("keydown", e => {
+            if ((e.key === "z" || e.key === "Z") && gameRunning && !chatFocused()) {
+                toggleCraftPanel();
+                e.preventDefault();
+                return;
+            }
+            if ((e.key === "e" || e.key === "E") && gameRunning && !chatFocused()) {
+                toggleInventory();
+                e.preventDefault();
+                return;
+            }
+            if ((e.key === "b" || e.key === "B") && gameRunning && !chatFocused()) {
+                toggleBestiary();
+                e.preventDefault();
+                return;
+            }
+            if (e.key === "Escape" && settingsOpen) {
+                toggleSettingsMenu(false);
+                e.preventDefault();
+                return;
+            }
+            if (e.key === "Escape" && craftOpen) {
+                toggleCraftPanel(false);
+                e.preventDefault();
+                return;
+            }
+            if (e.key === "Escape" && bestiaryOpen) {
+                toggleBestiary(false);
+                e.preventDefault();
+                return;
+            }
+            if (e.key === "Escape" && inventoryOpen) {
+                toggleInventory(false);
+                e.preventDefault();
+                return;
+            }
+            if (e.key === "Enter" && !chatFocused() && gameRunning) {
+                chatInput.focus();
+                e.preventDefault();
+                return;
+            }
+            if (chatFocused()) return;
+            applyKey(e, true);
+            sendKeys();
+        });
+
+        addEventListener("keyup", e => {
+            if (chatFocused()) return;
+            applyKey(e, false);
+            sendKeys();
+        });
+
+        addEventListener("blur", () => {
+            keys.up = keys.down = keys.left = keys.right = false;
+            sendKeys();
+        });
+
+        addEventListener("mousedown", e => {
+            if (!settingsOpen) return;
+            if (settingsMenu.contains(e.target) || settingsBtn.contains(e.target)) return;
+            toggleSettingsMenu(false);
+        });
+
+        canvas.addEventListener("mousedown", e => {
+            if (e.button !== 0 || !gameRunning || chatFocused()) return;
+            tryAttackAt(e.clientX, e.clientY);
+        });
+
+        const chatFocused = () => document.activeElement === chatInput;
+
+        function applyKey(e, v) {
+            let dir = "";
+            if (e.key === "ArrowUp" || e.key === "w" || e.key === "W") dir = "up";
+            if (e.key === "ArrowDown" || e.key === "s" || e.key === "S") dir = "down";
+            if (e.key === "ArrowLeft" || e.key === "a" || e.key === "A") dir = "left";
+            if (e.key === "ArrowRight" || e.key === "d" || e.key === "D") dir = "right";
+            if (!dir) return;
+            keys[dir] = v;
+            if (v) {
+                tutorialMoved = true;
+                syncTutorialProgress();
+            }
+        }
+
+        function sendKeys() {
+            if (!socket) return;
+            const changed = keys.up !== lastKeys.up || keys.down !== lastKeys.down || keys.left !== lastKeys.left || keys.right !== lastKeys.right;
+            if (changed) {
+                socket.emit("keys", { ...keys });
+                lastKeys = { ...keys };
+            }
+        }
+
+        function attackRangeForPlayer(player) {
+            return player?.atkRange ?? 34;
+        }
+
+        function attackCooldownForPlayer(player) {
+            return player?.atkCd ?? 620;
+        }
+
+        const SIMPLE_ITEM_LABELS = {
+            iron_blade: { ko: "검", en: "Sword" },
+            guard_armor: { ko: "갑옷", en: "Armor" },
+            wind_boots: { ko: "신발", en: "Boots" },
+            focus_gloves: { ko: "장갑", en: "Gloves" },
+            lucky_charm: { ko: "부적", en: "Charm" },
+        };
+
+        function slotLabel(slot) {
+            return SLOT_META[slot]?.[currentLang] || slot.toUpperCase();
+        }
+
+        function rarityInfo(rarity) {
+            return RARITY_META[Math.max(1, Math.min(MAX_RARITY, Number(rarity) || 2))] || RARITY_META[2];
+        }
+
+        function rarityName(rarity) {
+            const info = rarityInfo(rarity);
+            return currentLang === "ko" ? info.ko : info.en;
+        }
+
+        function rarityFeature(rarity) {
+            const info = rarityInfo(rarity);
+            return currentLang === "ko" ? info.featureKo : info.featureEn;
+        }
+
+        function rarityColor(rarity) {
+            return rarityInfo(rarity).color;
+        }
+
+        function craftChanceForRarity(rarity) {
+            return rarityInfo(rarity).craftChance || 0;
+        }
+
+        function itemLabel(item) {
+            return SIMPLE_ITEM_LABELS[item?.key]?.[currentLang] || ITEM_META[item?.key]?.[currentLang] || item?.key || "UNKNOWN";
+        }
+
+        function itemFullName(item) {
+            return item ? `${rarityName(item.rarity)} ${itemLabel(item)}` : itemLabel(item);
+        }
+
+        function monsterName(type) {
+            return MONSTER_META[type]?.[currentLang] || String(type || "unknown").toUpperCase();
+        }
+
+        function bestiaryIconMarkup(type, { large = false } = {}) {
+            const color = MONSTER_META[type]?.color || "#111111";
+            const className = `bestiary-icon type-${type}`;
+            const style = type === "triangle"
+                ? `style="border-bottom-color:${color};"`
+                : `style="background:${color};"`;
+            return `<span class="bestiary-icon-wrap${large ? " large" : ""}"><span class="${className}" ${style}></span></span>`;
+        }
+
+        function percentText(value) {
+            const pct = Math.max(0, Number(value) || 0) * 100;
+            return `${pct >= 10 || pct === 0 ? pct.toFixed(0) : pct.toFixed(1)}%`;
+        }
+
+        function gearRowClass(item) {
+            return `gear-row slot-${item?.slot || "plain"}`;
+        }
+
+        function applyItemTone(row, item, nameNode) {
+            if (!item) return;
+            const tone = rarityColor(item.rarity);
+            row.style.borderColor = tone;
+            row.style.boxShadow = `inset 3px 0 0 ${tone}`;
+            if (nameNode) nameNode.style.color = tone;
+        }
+
+        function formatBonuses(bonuses) {
+            const parts = Object.entries(bonuses || {})
+                .filter(([, value]) => Number(value) > 0)
+                .map(([stat, value]) => `${stat.toUpperCase()}+${value}`);
+            return parts.join(" / ") || "-";
+        }
+
+        function toggleInventory(force) {
+            inventoryOpen = typeof force === "boolean" ? force : !inventoryOpen;
+            if (inventoryOpen) toggleBestiary(false);
+            inventoryPanel.style.display = inventoryOpen && gameRunning ? "block" : "none";
+            if (inventoryOpen) setPanelCollapsed("inventory", false, { persist: false });
+            if (inventoryOpen) {
+                tutorialInventorySeen = true;
+                syncTutorialProgress();
+            }
+        }
+
+        function toggleBestiary(force) {
+            bestiaryOpen = typeof force === "boolean" ? force : !bestiaryOpen;
+            if (bestiaryOpen) toggleInventory(false);
+            bestiaryPanel.style.display = bestiaryOpen && gameRunning ? "block" : "none";
+            if (bestiaryOpen) setPanelCollapsed("bestiary", false, { persist: false });
+            if (bestiaryOpen) {
+                tutorialBestiarySeen = true;
+                syncTutorialProgress();
+            }
+        }
+
+        function selectBestiaryType(type) {
+            selectedBestiaryType = type;
+            renderBestiary();
+        }
+
+        function toggleSettingsMenu(force) {
+            settingsOpen = typeof force === "boolean" ? force : !settingsOpen;
+            settingsMenu.style.display = settingsOpen && gameRunning ? "block" : "none";
+        }
+
+        function craftErrorMessage(code) {
+            const key = `sys_craft_error_${code || "bad_recipe"}`;
+            return t(key) === key ? code : t(key);
+        }
+
+        function inventoryItems() {
+            return Array.isArray(currentSelf?.inventory) ? currentSelf.inventory : [];
+        }
+
+        function findInventoryItem(itemId) {
+            return inventoryItems().find(item => String(item.id) === String(itemId)) || null;
+        }
+
+        function canCraftPair(firstItem, secondItem) {
+            return !!(
+                firstItem
+                && secondItem
+                && String(firstItem.id) !== String(secondItem.id)
+                && firstItem.key === secondItem.key
+                && Number(firstItem.rarity || 2) === Number(secondItem.rarity || 2)
+            );
+        }
+
+        function syncCraftSelection() {
+            const ids = craftSelection.filter(id => !!findInventoryItem(id));
+            let firstId = ids[0] || null;
+            let secondId = ids[1] || null;
+            const firstItem = findInventoryItem(firstId);
+            const secondItem = findInventoryItem(secondId);
+            if (!canCraftPair(firstItem, secondItem)) secondId = null;
+            craftSelection = [firstId, secondId];
+        }
+
+        function clearCraftSlot(index) {
+            if (index === 0) {
+                craftSelection = [craftSelection[1], null];
+            } else {
+                craftSelection[1] = null;
+            }
+            syncCraftSelection();
+            renderCraftPanel();
+            renderLoadout(true);
+        }
+
+        function clearCraftSelection() {
+            craftSelection = [null, null];
+            renderCraftPanel();
+            renderLoadout(true);
+        }
+
+        function toggleCraftPanel(force) {
+            if (!gameRunning) return;
+            craftOpen = typeof force === "boolean" ? force : !craftOpen;
+            craftPanel.style.display = craftOpen ? "block" : "none";
+            craftToggleBtn.classList.toggle("on", craftOpen);
+            if (craftOpen) syncCraftSelection();
+            renderCraftPanel();
+            renderLoadout(true);
+        }
+
+        function selectCraftItem(itemId) {
+            if (!craftOpen) {
+                addChatLine(`<span class="ct">${escHtml(t("craft_pick_prompt"))}</span>`, "sys");
+                return;
+            }
+            const item = findInventoryItem(itemId);
+            if (!item) return;
+            syncCraftSelection();
+            let [firstId, secondId] = craftSelection;
+            if (String(firstId) === String(itemId)) {
+                craftSelection = [secondId, null];
+            } else if (String(secondId) === String(itemId)) {
+                craftSelection = [firstId, null];
+            } else if (!firstId) {
+                craftSelection = [itemId, null];
+            } else if (!secondId) {
+                const firstItem = findInventoryItem(firstId);
+                if (!canCraftPair(firstItem, item)) {
+                    addChatLine(`<span class="ct">${escHtml(t("sys_craft_mismatch"))}</span>`, "sys");
+                    craftSelection = [itemId, null];
+                } else {
+                    craftSelection = [firstId, itemId];
+                }
+            } else {
+                const firstItem = findInventoryItem(firstId);
+                if (canCraftPair(firstItem, item)) {
+                    craftSelection = [firstId, itemId];
+                } else {
+                    craftSelection = [itemId, null];
+                }
+            }
+            syncCraftSelection();
+            const selected = findInventoryItem(itemId);
+            if (selected) addChatLine(`<span class="ct">${escHtml(t("sys_craft_pick", { item: itemFullName(selected) }))}</span>`, "sys");
+            renderCraftPanel();
+            renderLoadout(true);
+        }
+
+        function renderCraftSlot(node, item, fallbackKey) {
+            if (!node) return;
+            if (!item) {
+                node.innerHTML = `<strong>${escHtml(t("craft_empty"))}</strong><span>${escHtml(t(fallbackKey))}</span>`;
+                node.style.borderColor = "rgba(17, 17, 17, .16)";
+                node.style.boxShadow = "none";
+                return;
+            }
+            const tone = rarityColor(item.rarity);
+            node.innerHTML = `<strong>${escHtml(itemFullName(item))}</strong><span>${escHtml(formatBonuses(item.bonuses))} :: ${escHtml(rarityFeature(item.rarity))}</span>`;
+            node.style.borderColor = tone;
+            node.style.boxShadow = `inset 3px 0 0 ${tone}`;
+        }
+
+        function renderCraftPanel() {
+            syncCraftSelection();
+            const firstItem = findInventoryItem(craftSelection[0]);
+            const secondItem = findInventoryItem(craftSelection[1]);
+            renderCraftSlot(craftSlotA, firstItem, "craft_slot_hint");
+            renderCraftSlot(craftSlotB, secondItem, firstItem ? "craft_slot_clear" : "craft_slot_hint");
+
+            const canCraft = canCraftPair(firstItem, secondItem) && Number(firstItem?.rarity || 0) < MAX_RARITY;
+            const rate = firstItem ? craftChanceForRarity(firstItem.rarity) : 0;
+            craftChance.textContent = t("craft_success_rate", { rate });
+            if (firstItem && Number(firstItem.rarity) >= MAX_RARITY) {
+                craftResult.textContent = t("craft_result_max");
+            } else if (firstItem) {
+                craftResult.textContent = t("craft_result_arrow", {
+                    from: rarityName(firstItem.rarity),
+                    to: rarityName((Number(firstItem.rarity) || 0) + 1),
+                });
+            } else {
+                craftResult.textContent = t("craft_result");
+            }
+            craftStatus.textContent = canCraft ? t("craft_result_fail") : (firstItem ? t("craft_only_same") : t("craft_need_two"));
+            craftActionBtn.disabled = !canCraft || !socket;
+        }
+
+        function craftSelectedItems() {
+            const firstItem = findInventoryItem(craftSelection[0]);
+            const secondItem = findInventoryItem(craftSelection[1]);
+            if (!canCraftPair(firstItem, secondItem) || !socket) return;
+            socket.emit("craftItems", { itemIds: [firstItem.id, secondItem.id] }, res => {
+                if (!res?.ok) {
+                    addChatLine(`<span class="ct">${escHtml(craftErrorMessage(res?.error))}</span>`, "sys");
+                    return;
+                }
+                applySelfState(res.self);
+                clearCraftSelection();
+                if (res.success && res.item) {
+                    addChatLine(`<span class="ct">${escHtml(t("sys_craft_success", { item: itemFullName(res.item) }))}</span>`, "lvlup");
+                } else {
+                    addChatLine(`<span class="ct">${escHtml(t("sys_craft_fail"))}</span>`, "sys");
+                }
+            });
+        }
+
+        function equipErrorMessage(code) {
+            const key = `sys_equip_error_${code || "item_missing"}`;
+            return t(key) === key ? code : t(key);
+        }
+
+        function getLoadoutSignature() {
+            return JSON.stringify({
+                lang: currentLang,
+                craftOpen,
+                craftSelection,
+                lootCount: currentSelf?.lootCount || 0,
+                inventoryLimit: currentSelf?.inventoryLimit || 12,
+                inventory: currentSelf?.inventory || [],
+                equipment: currentSelf?.equipment || {},
+                bestiary: currentSelf?.bestiary || null,
+            });
+        }
+
+        function renderBestiary() {
+            const bestiary = currentSelf?.bestiary || null;
+            const entries = Array.isArray(bestiary?.entries) ? bestiary.entries : [];
+            bestiarySummary.textContent = t("bestiary_summary", { total: bestiary?.totalKills || 0 });
+            bestiaryList.innerHTML = "";
+            if (entries.length === 0) {
+                const emptyNode = document.createElement("div");
+                emptyNode.className = "bestiary-empty";
+                emptyNode.textContent = t("bestiary_empty");
+                bestiaryList.appendChild(emptyNode);
+                return;
+            }
+            const activeEntry = entries.find(entry => entry.type === selectedBestiaryType) || entries[0];
+            selectedBestiaryType = activeEntry.type;
+
+            const browser = document.createElement("div");
+            browser.className = "bestiary-browser";
+
+            const grid = document.createElement("div");
+            grid.className = "bestiary-grid";
+            for (const entry of entries) {
+                const token = document.createElement("button");
+                token.type = "button";
+                token.className = `bestiary-token${entry.type === selectedBestiaryType ? " active" : ""}`;
+                token.innerHTML = `${bestiaryIconMarkup(entry.type)}<span class="bestiary-token-name">${escHtml(monsterName(entry.type))}</span><span class="bestiary-token-kills">KILLS ${entry.kills || 0}</span>`;
+                token.onclick = () => selectBestiaryType(entry.type);
+                grid.appendChild(token);
+            }
+
+            const detail = document.createElement("div");
+            detail.className = "bestiary-detail";
+            detail.innerHTML = `
+                <div class="bestiary-top">
+                    ${bestiaryIconMarkup(activeEntry.type, { large: true })}
+                    <div>
+                        <div class="bestiary-name" style="color:${MONSTER_META[activeEntry.type]?.color || "#101010"}">${escHtml(monsterName(activeEntry.type))}</div>
+                        <div class="bestiary-copy">KILLS ${activeEntry.kills || 0}</div>
+                    </div>
+                </div>
+                <div class="bestiary-copy">HP ${activeEntry.hp} · DMG ${activeEntry.dmg} · XP ${activeEntry.xp}</div>
+                <div class="bestiary-copy">${t("bestiary_spawn", { rate: percentText(activeEntry.spawnChance) })} · ${t("bestiary_drop", { rate: percentText(activeEntry.dropChance) })}</div>
+                <div class="bestiary-rarity">${(Array.isArray(activeEntry.rarityTable) ? activeEntry.rarityTable : []).map(row => `${rarityName(row.rarity)} ${percentText(row.chance)}`).join(" · ")}</div>
+            `;
+
+            browser.appendChild(grid);
+            browser.appendChild(detail);
+            bestiaryList.appendChild(browser);
+        }
+
+        function renderLoadout(force = false) {
+            syncCraftSelection();
+            const signature = getLoadoutSignature();
+            if (!force && signature === lastLoadoutSignature) return;
+            lastLoadoutSignature = signature;
+
+            const inventory = Array.isArray(currentSelf?.inventory) ? currentSelf.inventory : [];
+            const equipment = currentSelf?.equipment || {};
+
+            elLootCnt.textContent = t("hud_loot_count", { count: currentSelf?.lootCount || 0 });
+            elInvCnt.textContent = t("inventory_count", { count: inventory.length, limit: currentSelf?.inventoryLimit || 12 });
+
+            equipList.innerHTML = "";
+            for (const slot of SLOT_ORDER) {
+                const row = document.createElement("div");
+                row.className = gearRowClass({ slot });
+
+                const main = document.createElement("div");
+                main.className = "gear-main";
+
+                const slotNode = document.createElement("div");
+                slotNode.className = "gear-slot";
+                slotNode.textContent = slotLabel(slot);
+                main.appendChild(slotNode);
+
+                const item = equipment[slot];
+                if (item) {
+                    const nameNode = document.createElement("div");
+                    nameNode.className = "gear-name";
+                    nameNode.textContent = itemFullName(item);
+                    main.appendChild(nameNode);
+
+                    const copyNode = document.createElement("div");
+                    copyNode.className = "gear-copy";
+                    copyNode.textContent = formatBonuses(item.bonuses);
+                    main.appendChild(copyNode);
+
+                    const rarityNode = document.createElement("div");
+                    rarityNode.className = "gear-copy rarity-copy";
+                    rarityNode.textContent = `${rarityName(item.rarity)} :: ${rarityFeature(item.rarity)}`;
+                    main.appendChild(rarityNode);
+
+                    const button = document.createElement("button");
+                    button.type = "button";
+                    button.className = "gear-btn";
+                    button.textContent = t("btn_unequip");
+                    button.onclick = () => unequipItem(slot);
+                    row.appendChild(main);
+                    row.appendChild(button);
+                    applyItemTone(row, item, nameNode);
+                } else {
+                    const emptyNode = document.createElement("div");
+                    emptyNode.className = "gear-empty";
+                    emptyNode.textContent = t("equipment_empty");
+                    main.appendChild(emptyNode);
+                    row.appendChild(main);
+                }
+
+                equipList.appendChild(row);
+            }
+
+            inventoryList.innerHTML = "";
+            if (inventory.length === 0) {
+                const emptyNode = document.createElement("div");
+                emptyNode.className = "gear-empty";
+                emptyNode.textContent = t("inventory_empty");
+                inventoryList.appendChild(emptyNode);
+            } else {
+                for (const item of inventory) {
+                    const row = document.createElement("div");
+                    row.className = gearRowClass(item);
+                    if (craftOpen) row.classList.add("craft-pickable");
+                    if (craftSelection.includes(item.id)) row.classList.add("craft-selected");
+
+                    const main = document.createElement("div");
+                    main.className = "gear-main";
+
+                    const nameNode = document.createElement("div");
+                    nameNode.className = "gear-name";
+                    nameNode.textContent = `${itemFullName(item)} [${slotLabel(item.slot)}]`;
+                    main.appendChild(nameNode);
+
+                    const copyNode = document.createElement("div");
+                    copyNode.className = "gear-copy";
+                    copyNode.textContent = formatBonuses(item.bonuses);
+                    main.appendChild(copyNode);
+
+                    const rarityNode = document.createElement("div");
+                    rarityNode.className = "gear-copy rarity-copy";
+                    rarityNode.textContent = `${rarityName(item.rarity)} :: ${rarityFeature(item.rarity)}`;
+                    main.appendChild(rarityNode);
+
+                    const button = document.createElement("button");
+                    button.type = "button";
+                    button.className = "gear-btn";
+                    button.textContent = t("btn_equip");
+                    button.onclick = e => {
+                        e.stopPropagation();
+                        equipItem(item.id);
+                    };
+
+                    row.appendChild(main);
+                    row.appendChild(button);
+                    row.onclick = craftOpen ? () => selectCraftItem(item.id) : null;
+                    applyItemTone(row, item, nameNode);
+                    inventoryList.appendChild(row);
+                }
+            }
+            renderBestiary();
+            renderCraftPanel();
+        }
+
+        function applySelfState(self) {
+            currentSelf = self || null;
+            const me = myId ? playerMap[myId] : null;
+            const renderMe = myId ? renderPlayers[myId] : null;
+            if (me && self) {
+                if (typeof self.level === "number") me.level = self.level;
+                if (typeof self.xp === "number") me.xp = self.xp;
+                if (typeof self.xpMax === "number") me.xpMax = self.xpMax;
+                if (typeof self.hp === "number") me.hp = self.hp;
+                if (typeof self.maxHp === "number") me.maxHp = self.maxHp;
+                if (typeof self.statPoints === "number") me.statPoints = self.statPoints;
+                if (self.stats) me.stats = { ...self.stats };
+                if (typeof self.atkRange === "number") me.atkRange = self.atkRange;
+                if (typeof self.atkCd === "number") me.atkCd = self.atkCd;
+                if (self.mapId) me.mapId = self.mapId;
+            }
+            if (renderMe && self) {
+                if (typeof self.level === "number") renderMe.level = self.level;
+                if (typeof self.hp === "number") renderMe.hp = self.hp;
+                if (typeof self.maxHp === "number") renderMe.maxHp = self.maxHp;
+                if (typeof self.atkRange === "number") renderMe.atkRange = self.atkRange;
+                if (self.mapId) renderMe.mapId = self.mapId;
+            }
+            renderLoadout();
+            renderCraftPanel();
+        }
+
+        function tryAttackAt(clientX, clientY) {
+            if (attackCooldown || !socket) return;
+            const me = playerMap[myId];
+            if (!me) return;
+            const rect = canvas.getBoundingClientRect(),
+                mx = clientX - rect.left,
+                my = clientY - rect.top;
+            let nearest = null,
+                nearScore = Infinity;
+            for (const monster of Object.values(renderMonsters)) {
+                const worldDist = Math.hypot(me.x - monster.x, me.y - monster.y),
+                    maxWorldDist = attackRangeForPlayer(me) + monster.r;
+                if (worldDist > maxWorldDist) continue;
+                const sx = monster.x - camX,
+                    sy = monster.y - camY,
+                    cursorDist = Math.hypot(mx - sx, my - sy),
+                    score = cursorDist <= monster.r + 18 ? cursorDist - 80 : worldDist + cursorDist * .15;
+                if (score < nearScore) {
+                    nearScore = score;
+                    nearest = monster;
+                }
+            }
+            if (!nearest) return;
+            socket.emit("attack", { monsterId: nearest.id });
+            attackCooldown = true;
+            setTimeout(() => attackCooldown = false, attackCooldownForPlayer(me));
+        }
+
+        function updateStatControls(points) {
+            const disabled = !gameRunning || points <= 0;
+            btnStr.disabled = disabled;
+            btnAgi.disabled = disabled;
+            btnVit.disabled = disabled;
+            btnDex.disabled = disabled;
+            btnWis.disabled = disabled;
+            btnLuk.disabled = disabled;
+        }
+
+        function allocateStat(stat) {
+            if (!socket) return;
+            socket.emit("allocateStat", { stat }, res => {
+                if (!res?.ok) {
+                    if (res?.error === "no_points") addChatLine(`<span class="ct">${escHtml(t("sys_no_points"))}</span>`, "sys");
+                    return;
+                }
+                elStatPts.textContent = t("stat_points", { count: res.statPoints });
+                elStr.textContent = res.stats?.str ?? elStr.textContent;
+                elAgi.textContent = res.stats?.agi ?? elAgi.textContent;
+                elVit.textContent = res.stats?.vit ?? elVit.textContent;
+                elDex.textContent = res.stats?.dex ?? elDex.textContent;
+                elWis.textContent = res.stats?.wis ?? elWis.textContent;
+                elLuk.textContent = res.stats?.luk ?? elLuk.textContent;
+                elHp.textContent = res.hp ?? elHp.textContent;
+                if (typeof res.hp === "number" && typeof res.maxHp === "number") {
+                    elHpFill.style.width = `${(res.hp / res.maxHp * 100).toFixed(1)}%`;
+                }
+                updateStatControls(res.statPoints);
+                addChatLine(`<span class="ct">${escHtml(t("sys_stat_applied", { stat: stat.toUpperCase() }))}</span>`, "sys");
+            });
+        }
+
+        function equipItem(itemId) {
+            if (!socket) return;
+            socket.emit("equipItem", { itemId }, res => {
+                if (!res?.ok) {
+                    if (res?.error === "inventory_full") {
+                        addChatLine(`<span class="ct">${escHtml(t("sys_inventory_full"))}</span>`, "sys");
+                    } else {
+                        addChatLine(`<span class="ct">${escHtml(equipErrorMessage(res?.error))}</span>`, "sys");
+                    }
+                    return;
+                }
+                applySelfState(res.self);
+                addChatLine(`<span class="ct">${escHtml(t("sys_equip", { item: itemFullName(res.item) }))}</span>`, "sys");
+            });
+        }
+
+        function unequipItem(slot) {
+            if (!socket) return;
+            socket.emit("unequipItem", { slot }, res => {
+                if (!res?.ok) {
+                    if (res?.error === "inventory_full") {
+                        addChatLine(`<span class="ct">${escHtml(t("sys_inventory_full"))}</span>`, "sys");
+                    } else {
+                        addChatLine(`<span class="ct">${escHtml(equipErrorMessage(res?.error))}</span>`, "sys");
+                    }
+                    return;
+                }
+                applySelfState(res.self);
+                addChatLine(`<span class="ct">${escHtml(t("sys_unequip", { item: itemFullName(res.item) }))}</span>`, "sys");
+            });
+        }
+
+        function syncRenderEntities(nextMap, renderMap, snapDistance = 220) {
+            for (const id in renderMap) {
+                if (!nextMap[id]) delete renderMap[id];
+            }
+            for (const id in nextMap) {
+                const next = nextMap[id];
+                const current = renderMap[id];
+                if (!current) {
+                    renderMap[id] = {
+                        ...next,
+                        x: next.x,
+                        y: next.y,
+                        tx: next.x,
+                        ty: next.y,
+                        angle: typeof next.facing === "number" ? next.facing : 0,
+                        ta: typeof next.facing === "number" ? next.facing : 0,
+                    };
+                    continue;
+                }
+                const jumped = Math.hypot(next.x - current.x, next.y - current.y) > snapDistance;
+                current.tx = next.x;
+                current.ty = next.y;
+                if (typeof next.facing === "number") current.ta = next.facing;
+                if (jumped) {
+                    current.x = next.x;
+                    current.y = next.y;
+                    if (typeof current.ta === "number") current.angle = current.ta;
+                }
+                for (const key in next) {
+                    if (key !== "x" && key !== "y") current[key] = next[key];
+                }
+            }
+        }
+
+        function angleDelta(from, to) {
+            let delta = to - from;
+            while (delta > Math.PI) delta -= Math.PI * 2;
+            while (delta < -Math.PI) delta += Math.PI * 2;
+            return delta;
+        }
+
+        function stepRenderEntities(renderMap, dt, speed) {
+            const blend = 1 - Math.exp(-speed * dt);
+            for (const entity of Object.values(renderMap)) {
+                entity.x += (entity.tx - entity.x) * blend;
+                entity.y += (entity.ty - entity.y) * blend;
+                if (typeof entity.ta === "number") {
+                    const base = typeof entity.angle === "number" ? entity.angle : entity.ta;
+                    entity.angle = base + angleDelta(base, entity.ta) * blend;
+                }
+            }
+        }
+
+        const bubbles = {},
+            MAX_CHAT_LINES = 80,
+            dmgNums = [];
+
+        function escHtml(value) {
+            return String(value).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        }
+
+        function tutorialSteps() {
+            return [
+                { title: t("tutorial_step_1_title"), body: t("tutorial_step_1_body"), action: "ready" },
+                { title: t("tutorial_step_2_title"), body: t("tutorial_step_2_body"), action: "auto", done: () => tutorialMoved },
+                { title: t("tutorial_step_3_title"), body: t("tutorial_step_3_body"), action: "auto", done: () => tutorialAttacked },
+                { title: t("tutorial_step_4_title"), body: t("tutorial_step_4_body"), action: "auto", done: () => tutorialInventorySeen },
+                { title: t("tutorial_step_5_title"), body: t("tutorial_step_5_body"), action: "auto", done: () => tutorialBestiarySeen },
+                { title: t("tutorial_step_6_title"), body: t("tutorial_step_6_body"), action: "done" },
+            ];
+        }
+
+        function renderTutorial() {
+            if (!tutorialBox) return;
+            tutorialBox.style.display = tutorialOpen && gameRunning ? "block" : "none";
+            if (!tutorialOpen || !gameRunning) return;
+            const steps = tutorialSteps();
+            const index = Math.max(0, Math.min(steps.length - 1, tutorialStep));
+            const step = steps[index];
+            tutorialTitle.textContent = `${t("tutorial_label")} :: ${step.title}`;
+            tutorialProgress.textContent = t("tutorial_progress", { current: index + 1, total: steps.length });
+            tutorialBody.textContent = step.body;
+            tutorialAction.textContent = step.action === "done"
+                ? t("tutorial_done")
+                : step.action === "ready"
+                    ? t("tutorial_ready")
+                    : t("tutorial_next");
+            tutorialAction.style.display = step.action === "auto" ? "none" : "inline-flex";
+            const closeLabel = t("tutorial_close");
+            tutorialCloseBtn.setAttribute("aria-label", closeLabel);
+            tutorialCloseBtn.title = closeLabel;
+        }
+
+        function advanceTutorial() {
+            if (!gameRunning) return;
+            const steps = tutorialSteps();
+            if (tutorialStep >= steps.length - 1) {
+                completeTutorial();
+                return;
+            }
+            tutorialStep += 1;
+            renderTutorial();
+            syncTutorialProgress();
+        }
+
+        function syncTutorialProgress() {
+            if (!tutorialOpen || !gameRunning) return;
+            const steps = tutorialSteps();
+            let changed = false;
+            while (tutorialStep < steps.length - 1 && steps[tutorialStep].action === "auto" && steps[tutorialStep].done?.()) {
+                tutorialStep += 1;
+                changed = true;
+            }
+            if (changed) renderTutorial();
+        }
+
+        function openTutorial({ reset = false } = {}) {
+            if (tutorialDone && !reset) return;
+            if (reset) {
+                tutorialStep = 0;
+                tutorialMoved = false;
+                tutorialAttacked = false;
+                tutorialInventorySeen = false;
+                tutorialBestiarySeen = false;
+            }
+            tutorialOpen = true;
+            renderTutorial();
+            syncTutorialProgress();
+        }
+
+        function completeTutorial() {
+            tutorialDone = true;
+            tutorialOpen = false;
+            localStorage.setItem(TUTORIAL_KEY, "done");
+            renderTutorial();
+        }
+
+        function closeTutorial() {
+            completeTutorial();
+        }
+
+        function addChatLine(safeHtml, cls = "") {
+            const div = document.createElement("div");
+            div.className = "chat-line" + (cls ? ` ${cls}` : "");
+            div.innerHTML = safeHtml;
+            chatLog.appendChild(div);
+            while (chatLog.children.length > MAX_CHAT_LINES) chatLog.removeChild(chatLog.firstChild);
+            chatLog.scrollTop = chatLog.scrollHeight;
+        }
+
+        function sendChat() {
+            const text = chatInput.value.trim();
+            if (!text || !socket) return;
+            socket.emit("chat", text);
+            chatInput.value = "";
+            chatInput.blur();
+        }
+
+        chatInput.addEventListener("keydown", e => {
+            if (e.key === "Enter") {
+                sendChat();
+                e.preventDefault();
+            }
+            if (e.key === "Escape") chatInput.blur();
+        });
+
+        const spawnDmgNum = (wx, wy, text, color) => dmgNums.push({ wx, wy, text, color, elapsed: 0, duration: 1.1 });
+
+        function drawDmgNums(dt) {
+            for (let i = dmgNums.length - 1; i >= 0; i--) {
+                const item = dmgNums[i];
+                item.elapsed += dt;
+                if (item.elapsed >= item.duration) {
+                    dmgNums.splice(i, 1);
+                    continue;
+                }
+                const t = item.elapsed / item.duration,
+                    sx = item.wx - camX,
+                    sy = item.wy - camY - t * 50;
+                ctx.save();
+                ctx.globalAlpha = 1 - t;
+                ctx.font = "700 15px Consolas, monospace";
+                ctx.textAlign = "center";
+                ctx.textBaseline = "middle";
+                ctx.lineWidth = 3;
+                ctx.strokeStyle = "rgba(255,255,255,.96)";
+                ctx.strokeText(item.text, sx, sy);
+                ctx.fillStyle = item.color;
+                ctx.fillText(item.text, sx, sy);
+                ctx.restore();
+            }
+        }
+
+        let flashTimer = null;
+
+        function showLevelUpFlash(level) {
+            levelupFlash.textContent = t("flash_level_up", { level });
+            levelupFlash.classList.add("show");
+            if (flashTimer) clearTimeout(flashTimer);
+            flashTimer = setTimeout(() => levelupFlash.classList.remove("show"), 2200);
+        }
+
+        function startGame(username = currentAccountName) {
+            if (gameRunning) return;
+            if (typeof io !== "function") {
+                setMsg("ERR :: socket client failed to load", "err");
+                return;
+            }
+            currentAccountName = username || currentAccountName;
+            gameRunning = true;
+            document.getElementById("auth-screen").style.display = "none";
+            document.getElementById("hud").style.display = "flex";
+            settingsBtn.style.display = "block";
+            inventoryToggleBtn.style.display = "block";
+            bestiaryToggleBtn.style.display = "block";
+            craftToggleBtn.style.display = "block";
+            toggleSettingsMenu(false);
+            toggleInventory(false);
+            toggleBestiary(false);
+            toggleCraftPanel(false);
+            document.getElementById("chat-wrap").style.display = "flex";
+            controlsCard.style.display = "block";
+            elUser.textContent = currentAccountName || "guest";
+            socket = io({ withCredentials: true });
+            socket.on("connect_error", err => {
+                const authFailed = err?.message === "auth_required";
+                if (authFailed) currentAccountName = "";
+                doLogout(
+                    authFailed
+                        ? t("auth_info_disconnected")
+                        : (currentLang === "ko" ? "ERR :: 서버 연결에 실패했습니다" : "ERR :: server connection failed"),
+                    authFailed ? "info" : "err"
+                );
+            });
+            socket.on("connect", () => socket.emit("join"));
+            socket.on("welcome", d => {
+                myId = d.id;
+                worldW = d.worldW;
+                worldH = d.worldH;
+                addChatLine(`<span class="ct">${escHtml(t("sys_link_established"))}</span>`, "sys");
+                if (!tutorialDone) openTutorial({ reset: true });
+            });
+            socket.on("sessionReplaced", () => {
+                doLogout(t("sys_session_replaced"), "err");
+            });
+            socket.on("state", d => {
+                playerMap = {};
+                (d.players || []).forEach(p => playerMap[p.id] = p);
+                monsterMap = {};
+                (d.monsters || []).forEach(m => monsterMap[m.id] = m);
+                orbMap = {};
+                (d.orbs || []).forEach(o => orbMap[o.id] = o);
+                lootMap = {};
+                (d.loots || []).forEach(loot => lootMap[loot.id] = loot);
+                applySelfState(d.self || null);
+                syncRenderEntities(playerMap, renderPlayers, 260);
+                syncRenderEntities(monsterMap, renderMonsters, 180);
+                elCnt.textContent = d.players.length;
+                const me = playerMap[myId];
+                if (!me) return;
+                elLv.textContent = me.level;
+                elXp.textContent = me.xp;
+                elXpMax.textContent = me.xpMax;
+                elXpFill.style.width = `${(me.xp / me.xpMax * 100).toFixed(1)}%`;
+                elHp.textContent = me.hp;
+                elHpFill.style.width = `${(me.hp / me.maxHp * 100).toFixed(1)}%`;
+                elStatPts.textContent = t("stat_points", { count: me.statPoints || 0 });
+                elStr.textContent = me.stats?.str ?? 0;
+                elAgi.textContent = me.stats?.agi ?? 0;
+                elVit.textContent = me.stats?.vit ?? 0;
+                elDex.textContent = me.stats?.dex ?? 0;
+                elWis.textContent = me.stats?.wis ?? 0;
+                elLuk.textContent = me.stats?.luk ?? 0;
+                updateStatControls(me.statPoints || 0);
+            });
+            socket.on("selfSync", self => {
+                applySelfState(self);
+            });
+            socket.on("mapChanged", ({ mapId }) => {
+                attackCooldown = false;
+                addChatLine(`<span class="ct">${escHtml(t("sys_map_changed", { map: mapName(mapId) }))}</span>`, "sys");
+            });
+            socket.on("damaged", ({ dmg }) => {
+                elHpFill.style.background = "linear-gradient(90deg,rgba(252,165,165,.5),#ef4444)";
+                setTimeout(() => elHpFill.style.background = "linear-gradient(90deg,rgba(248,113,113,.4),#dc2626)", 260);
+                const me = playerMap[myId];
+                if (me) spawnDmgNum(me.x, me.y - me.r - 10, `-${dmg}`, "#dc2626");
+            });
+            socket.on("dodged", () => {
+                const me = playerMap[myId];
+                if (me) spawnDmgNum(me.x, me.y - me.r - 10, t("combat_evade"), "#059669");
+            });
+            socket.on("died", ({ xpLost = 0, statPointsLost = 0, lostItem = null } = {}) => {
+                attackCooldown = false;
+                addChatLine(`<span class="ct">${escHtml(t("sys_respawned"))}</span>`, "sys");
+                addChatLine(`<span class="ct">${escHtml(t("sys_death_penalty", { xp: xpLost, points: statPointsLost, item: lostItem ? itemFullName(lostItem) : t("sys_death_penalty_no_item") }))}</span>`, "sys");
+            });
+            socket.on("attackResult", ({ monsterId, dmg, crit }) => {
+                const m = monsterMap[monsterId];
+                if (m) spawnDmgNum(m.x, m.y - m.r - 8, crit ? `CRIT ${dmg}` : String(dmg), crit ? "#f59e0b" : "#2563eb");
+                tutorialAttacked = true;
+                syncTutorialProgress();
+            });
+            socket.on("monsterDied", ({ monsterId, killerId, xp }) => {
+                delete monsterMap[monsterId];
+                delete renderMonsters[monsterId];
+                if (killerId === myId) addChatLine(`<span class="ct">${escHtml(t("sys_target_down", { xp }))}</span>`, "sys");
+            });
+            socket.on("lootDropped", ({ item }) => {
+                addChatLine(`<span class="ct">${escHtml(t("sys_loot_drop", { item: itemFullName(item) }))}</span>`, "sys");
+            });
+            socket.on("lootPicked", ({ item }) => {
+                addChatLine(`<span class="ct">${escHtml(t("sys_loot_pick", { item: itemFullName(item) }))}</span>`, "sys");
+            });
+            socket.on("levelUp", ({ id, level, name, gained, statPoints }) => {
+                if (id === myId) {
+                    showLevelUpFlash(level);
+                    addChatLine(`<span class="ct">${escHtml(t("sys_level_points", { points: gained * 3, total: statPoints }))}</span>`, "lvlup");
+                }
+                addChatLine(`<span class="ct"><b>${escHtml(name)}</b> :: ${escHtml(t("sys_level_broadcast", { name: "", level }))}</span>`, "lvlup");
+            });
+            socket.on("chat", ({ id, name, text }) => {
+                bubbles[id] = { text, expiry: Date.now() + 3000 };
+                addChatLine(`<span class="cn">${escHtml(name)}</span><span class="ct">${escHtml(text)}</span>`);
+            });
+            if (rafId) cancelAnimationFrame(rafId);
+            lastTime = performance.now();
+            rafId = requestAnimationFrame(loop);
+        }
+
+        function doLogout(infoText = t("auth_info_disconnected"), infoClass = "info") {
+            gameRunning = false;
+            if (rafId) {
+                cancelAnimationFrame(rafId);
+                rafId = null;
+            }
+            keys.up = keys.down = keys.left = keys.right = false;
+            lastKeys = {};
+            attackCooldown = false;
+            myId = null;
+            playerMap = {};
+            orbMap = {};
+            monsterMap = {};
+            lootMap = {};
+            currentSelf = null;
+            renderPlayers = {};
+            renderMonsters = {};
+            dmgNums.length = 0;
+            settingsOpen = false;
+            inventoryOpen = false;
+            bestiaryOpen = false;
+            craftOpen = false;
+            craftSelection = [null, null];
+            lastLoadoutSignature = "";
+            tutorialOpen = false;
+            tutorialStep = 0;
+            tutorialMoved = false;
+            tutorialAttacked = false;
+            tutorialInventorySeen = false;
+            tutorialBestiarySeen = false;
+            if (socket) {
+                socket.disconnect();
+                socket = null;
+            }
+            document.getElementById("hud").style.display = "none";
+            settingsBtn.style.display = "none";
+            settingsMenu.style.display = "none";
+            inventoryToggleBtn.style.display = "none";
+            bestiaryToggleBtn.style.display = "none";
+            craftToggleBtn.style.display = "none";
+            inventoryPanel.style.display = "none";
+            bestiaryPanel.style.display = "none";
+            craftPanel.style.display = "none";
+            document.getElementById("chat-wrap").style.display = "none";
+            controlsCard.style.display = "none";
+            document.getElementById("auth-screen").style.display = "flex";
+            document.getElementById("i-pass").value = "";
+            document.getElementById("i-cfm").value = "";
+            chatLog.innerHTML = "";
+            levelupFlash.classList.remove("show");
+            tutorialBox.style.display = "none";
+            elHpFill.style.background = "linear-gradient(90deg,rgba(248,113,113,.4),#dc2626)";
+            elStatPts.textContent = t("stat_points", { count: 0 });
+            elStr.textContent = "0";
+            elAgi.textContent = "0";
+            elVit.textContent = "0";
+            elDex.textContent = "0";
+            elWis.textContent = "0";
+            elLuk.textContent = "0";
+            renderLoadout();
+            updateStatControls(0);
+            camX = camY = 0;
+            lastPosStr = "";
+            setMsg(infoText, infoClass);
+        }
+
+        let camX = 0,
+            camY = 0,
+            lastPosStr = "",
+            lastTime = 0;
+        const CAM_SPEED = 8,
+            PLAYER_RENDER_SPEED = 14,
+            MONSTER_RENDER_SPEED = 12,
+            C = {
+                bgTop: "#fcfcfa",
+                bgBottom: "#efefea",
+                grid: "rgba(0,0,0,.05)",
+                gridMaj: "rgba(0,0,0,.08)",
+                axis: "rgba(0,0,0,.14)",
+                border: "rgba(0,0,0,.18)",
+                player: "#2563eb",
+                playerStroke: "#ffffff",
+                playerOther: "#64748b",
+                muted: "#7d7d7d",
+                text: "#101010",
+                orb: "#fbbf24",
+                orbStroke: "#b45309",
+                hpHi: "#ef4444",
+                hpMid: "#dc2626",
+                hpLow: "#991b1b"
+            };
+
+        function updateCam(me, dt) {
+            const tx = me.x - viewW / 2,
+                ty = me.y - viewH / 2,
+                f = 1 - Math.exp(-CAM_SPEED * dt);
+            camX += (tx - camX) * f;
+            camY += (ty - camY) * f;
+            camX = Math.max(0, Math.min(Math.max(0, worldW - viewW), camX));
+            camY = Math.max(0, Math.min(Math.max(0, worldH - viewH), camY));
+        }
+
+        const toMath = (x, y) => ({ mx: Math.round(x - worldW / 2), my: Math.round(worldH / 2 - y) });
+
+        function updateHudPos(me) {
+            const { mx, my } = toMath(me.x, me.y),
+                pos = `X:${mx} Y:${my}`;
+            if (pos !== lastPosStr) {
+                elPos.textContent = pos;
+                lastPosStr = pos;
+            }
+        }
+
+        function roundRect(c, x, y, w, h, r) {
+            const radius = Math.min(r, w / 2, h / 2);
+            c.beginPath();
+            c.moveTo(x + radius, y);
+            c.lineTo(x + w - radius, y);
+            c.arcTo(x + w, y, x + w, y + radius, radius);
+            c.lineTo(x + w, y + h - radius);
+            c.arcTo(x + w, y + h, x + w - radius, y + h, radius);
+            c.lineTo(x + radius, y + h);
+            c.arcTo(x, y + h, x, y + h - radius, radius);
+            c.lineTo(x, y + radius);
+            c.arcTo(x, y, x + radius, y, radius);
+            c.closePath();
+        }
+
+        function drawBg() {
+            const worldStyle = currentWorldStyle();
+            const base = ctx.createLinearGradient(0, 0, 0, viewH);
+            base.addColorStop(0, worldStyle.bgTop);
+            base.addColorStop(1, worldStyle.bgBottom);
+            ctx.fillStyle = base;
+            ctx.fillRect(0, 0, viewW, viewH);
+        }
+
+        function drawGrid() {
+            const worldStyle = currentWorldStyle();
+            let sx0 = Math.floor(camX / TILE) * TILE,
+                sy0 = Math.floor(camY / TILE) * TILE;
+            ctx.strokeStyle = worldStyle.grid;
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            for (let x = sx0; x < camX + viewW + TILE; x += TILE) {
+                ctx.moveTo(x - camX, 0);
+                ctx.lineTo(x - camX, viewH);
+            }
+            for (let y = sy0; y < camY + viewH + TILE; y += TILE) {
+                ctx.moveTo(0, y - camY);
+                ctx.lineTo(viewW, y - camY);
+            }
+            ctx.stroke();
+
+            const major = TILE * 5;
+            ctx.strokeStyle = worldStyle.gridMaj;
+            ctx.lineWidth = 1.2;
+            sx0 = Math.floor(camX / major) * major;
+            sy0 = Math.floor(camY / major) * major;
+            ctx.beginPath();
+            for (let x = sx0; x < camX + viewW + major; x += major) {
+                ctx.moveTo(x - camX, 0);
+                ctx.lineTo(x - camX, viewH);
+            }
+            for (let y = sy0; y < camY + viewH + major; y += major) {
+                ctx.moveTo(0, y - camY);
+                ctx.lineTo(viewW, y - camY);
+            }
+            ctx.stroke();
+
+            const axisX = worldW / 2 - camX,
+                axisY = worldH / 2 - camY;
+            ctx.save();
+            ctx.strokeStyle = worldStyle.axis;
+            ctx.lineWidth = 1.6;
+            ctx.setLineDash([7, 5]);
+            ctx.beginPath();
+            ctx.moveTo(0, axisY);
+            ctx.lineTo(viewW, axisY);
+            ctx.moveTo(axisX, 0);
+            ctx.lineTo(axisX, viewH);
+            ctx.stroke();
+            ctx.restore();
+
+            ctx.fillStyle = worldStyle.muted;
+            ctx.font = "11px Consolas, monospace";
+            ctx.textAlign = "center";
+            for (let x = Math.floor(camX / major) * major; x < camX + viewW + major; x += major) {
+                const value = Math.round(x - worldW / 2);
+                if (value) ctx.fillText(String(value), x - camX, axisY + 15);
+            }
+            ctx.textAlign = "right";
+            for (let y = Math.floor(camY / major) * major; y < camY + viewH + major; y += major) {
+                const value = Math.round(worldH / 2 - y);
+                if (value) ctx.fillText(String(value), axisX - 8, y - camY + 4);
+            }
+            ctx.fillStyle = worldStyle.text;
+            ctx.font = "700 11px Consolas, monospace";
+            ctx.textAlign = "left";
+            ctx.fillText("0", axisX + 9, axisY - 10);
+            drawArrow(viewW - 18, axisY, 1, 0);
+            drawArrow(axisX, 18, 0, -1);
+        }
+
+        function drawArrow(x, y, dx, dy) {
+            const size = 7;
+            const worldStyle = currentWorldStyle();
+            ctx.save();
+            ctx.fillStyle = worldStyle.axis;
+            ctx.translate(x, y);
+            ctx.rotate(Math.atan2(dy, dx));
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.lineTo(-size, -size / 2);
+            ctx.lineTo(-size, size / 2);
+            ctx.closePath();
+            ctx.fill();
+            ctx.restore();
+        }
+
+        function drawBorder() {
+            const worldStyle = currentWorldStyle();
+            ctx.strokeStyle = worldStyle.border;
+            ctx.lineWidth = 2.5;
+            ctx.strokeRect(-camX, -camY, worldW, worldH);
+            const hw = Math.round(worldW / 2),
+                hh = Math.round(worldH / 2);
+            ctx.fillStyle = worldStyle.muted;
+            ctx.font = "11px Consolas, monospace";
+            [
+                { x: -camX + 8, y: -camY + 16, text: `(-${hw}, +${hh})`, align: "left" },
+                { x: -camX + worldW - 8, y: -camY + 16, text: `(+${hw}, +${hh})`, align: "right" },
+                { x: -camX + 8, y: -camY + worldH - 10, text: `(-${hw}, -${hh})`, align: "left" },
+                { x: -camX + worldW - 8, y: -camY + worldH - 10, text: `(+${hw}, -${hh})`, align: "right" }
+            ].forEach(c => {
+                ctx.textAlign = c.align;
+                ctx.fillText(c.text, c.x, c.y);
+            });
+        }
+
+        function drawPortal() {
+            const portal = { ...portalForMap(), r: 34 };
+            const sx = portal.x - camX,
+                sy = portal.y - camY;
+            if (sx < -120 || sx > viewW + 120 || sy < -120 || sy > viewH + 120) return;
+
+            const pulse = .86 + .14 * Math.sin(performance.now() * .0032);
+
+            ctx.save();
+            ctx.fillStyle = "rgba(17,17,17,.08)";
+            roundRect(ctx, sx - 52, sy + 34, 104, 16, 3);
+            ctx.fill();
+
+            ctx.beginPath();
+            ctx.arc(sx, sy, portal.r + 10, 0, Math.PI * 2);
+            ctx.fillStyle = "rgba(37,99,235,.08)";
+            ctx.fill();
+
+            ctx.beginPath();
+            ctx.arc(sx, sy, portal.r * pulse, 0, Math.PI * 2);
+            ctx.fillStyle = "rgba(96,165,250,.18)";
+            ctx.fill();
+
+            ctx.beginPath();
+            ctx.arc(sx, sy, portal.r, 0, Math.PI * 2);
+            ctx.strokeStyle = "rgba(37,99,235,.58)";
+            ctx.lineWidth = 6;
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.arc(sx, sy, portal.r - 11, 0, Math.PI * 2);
+            ctx.strokeStyle = "rgba(59,130,246,.75)";
+            ctx.lineWidth = 3;
+            ctx.setLineDash([8, 6]);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            drawPill(`${t("portal_label")} :: ${t("portal_hint", { map: mapName(portal.targetMapId) })}`, sx, sy - portal.r - 20, {
+                font: "700 10px Consolas, monospace",
+                bg: "rgba(255,255,255,.92)",
+            });
+            ctx.restore();
+        }
+
+        function drawOrbs() {
+            for (const orb of Object.values(orbMap)) {
+                const sx = orb.x - camX,
+                    sy = orb.y - camY;
+                if (sx < -24 || sx > viewW + 24 || sy < -24 || sy > viewH + 24) continue;
+                const pulse = 1 + .08 * Math.sin(Date.now() * .004 + orb.id);
+                ctx.beginPath();
+                ctx.arc(sx, sy, 6.4 * pulse, 0, Math.PI * 2);
+                ctx.fillStyle = C.orb;
+                ctx.strokeStyle = C.orbStroke;
+                ctx.lineWidth = 1.5;
+                ctx.fill();
+                ctx.stroke();
+            }
+        }
+
+        function drawLoots() {
+            const me = playerMap[myId];
+            for (const loot of Object.values(lootMap)) {
+                const sx = loot.x - camX,
+                    sy = loot.y - camY;
+                if (sx < -40 || sx > viewW + 40 || sy < -40 || sy > viewH + 40) continue;
+
+                ctx.save();
+                ctx.translate(sx, sy);
+                ctx.rotate(Math.PI / 4);
+                ctx.fillStyle = loot.item?.color || "#111827";
+                ctx.strokeStyle = "rgba(17,17,17,.7)";
+                ctx.lineWidth = 2;
+                ctx.fillRect(-8, -8, 16, 16);
+                ctx.strokeRect(-8, -8, 16, 16);
+                ctx.restore();
+
+                if (me && Math.hypot(me.x - loot.x, me.y - loot.y) < 110) {
+                    drawPill(itemFullName(loot.item), sx, sy - 18, {
+                        font: "700 10px Consolas, monospace",
+                        bg: "rgba(255,255,255,.92)",
+                    });
+                }
+            }
+        }
+
+        function drawMonster(monster) {
+            const sx = monster.x - camX,
+                sy = monster.y - camY;
+            if (sx < -100 || sx > viewW + 100 || sy < -100 || sy > viewH + 100) return;
+            const facing = typeof monster.angle === "number" ? monster.angle : (typeof monster.facing === "number" ? monster.facing : 0);
+            ctx.save();
+            ctx.translate(sx, sy);
+            switch (monster.type) {
+                case "dot":
+                    ctx.rotate(facing);
+                    ctx.fillStyle = monster.color;
+                    ctx.beginPath();
+                    ctx.arc(0, 0, monster.r, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.lineWidth = 2;
+                    ctx.strokeStyle = "#111";
+                    ctx.stroke();
+                    break;
+                case "line":
+                    ctx.rotate(facing);
+                    ctx.strokeStyle = monster.color;
+                    ctx.lineWidth = 4;
+                    ctx.lineCap = "square";
+                    ctx.beginPath();
+                    ctx.moveTo(-monster.r, 0);
+                    ctx.lineTo(monster.r, 0);
+                    ctx.stroke();
+                    break;
+                case "triangle":
+                    ctx.rotate(facing);
+                    ctx.beginPath();
+                    ctx.moveTo(monster.r, 0);
+                    ctx.lineTo(-monster.r * .8, monster.r * .76);
+                    ctx.lineTo(-monster.r * .8, -monster.r * .76);
+                    ctx.closePath();
+                    ctx.fillStyle = monster.color;
+                    ctx.strokeStyle = "#2a2a2a";
+                    ctx.lineWidth = 2;
+                    ctx.fill();
+                    ctx.stroke();
+                    break;
+                case "square":
+                    ctx.rotate(facing);
+                    ctx.fillStyle = monster.color;
+                    ctx.strokeStyle = "#2a2a2a";
+                    ctx.lineWidth = 2;
+                    ctx.fillRect(-monster.r, -monster.r, monster.r * 2, monster.r * 2);
+                    ctx.strokeRect(-monster.r, -monster.r, monster.r * 2, monster.r * 2);
+                    break;
+            }
+            ctx.restore();
+
+            const barW = monster.r * 2 + 14,
+                barH = 6,
+                hpPct = Math.max(0, monster.hp / monster.maxHp),
+                bx = sx - barW / 2,
+                by = sy - monster.r - 14;
+            ctx.fillStyle = "rgba(255,255,255,.92)";
+            roundRect(ctx, bx, by, barW, barH, 2);
+            ctx.fill();
+            ctx.strokeStyle = "rgba(17,17,17,.1)";
+            ctx.stroke();
+            ctx.fillStyle = hpPct > .5 ? C.hpHi : hpPct > .25 ? C.hpMid : C.hpLow;
+            roundRect(ctx, bx + 1, by + 1, Math.max(0, barW * hpPct - 2), barH - 2, 1);
+            ctx.fill();
+        }
+
+        function drawPill(text, x, y, {
+            font = "700 11px Consolas, monospace",
+            bg = "rgba(255,255,255,.9)",
+            border = "rgba(17,17,17,.12)",
+            color = "#101010",
+            padX = 10,
+            height = 20,
+            radius = 3
+        } = {}) {
+            ctx.save();
+            ctx.font = font;
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            const width = ctx.measureText(text).width + padX * 2;
+            ctx.fillStyle = bg;
+            ctx.strokeStyle = border;
+            ctx.lineWidth = 1;
+            roundRect(ctx, x - width / 2, y - height / 2, width, height, radius);
+            ctx.fill();
+            ctx.stroke();
+            ctx.fillStyle = color;
+            ctx.fillText(text, x, y);
+            ctx.restore();
+        }
+
+        function drawPlayerBody(player, isMe, sx, sy) {
+            const fill = isMe ? C.player : C.playerOther;
+            const stroke = isMe ? C.playerStroke : "#e2e8f0";
+
+            ctx.save();
+            ctx.translate(sx, sy);
+            ctx.fillStyle = fill;
+            ctx.strokeStyle = stroke;
+            ctx.lineWidth = isMe ? 3 : 2.5;
+            ctx.beginPath();
+            ctx.arc(0, 0, player.r, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.restore();
+        }
+
+        function drawPlayer(player, isMe) {
+            const sx = player.x - camX,
+                sy = player.y - camY;
+            if (sx < -100 || sx > viewW + 100 || sy < -100 || sy > viewH + 100) return;
+            ctx.save();
+            if (isMe && player.atkRange) {
+                ctx.beginPath();
+                ctx.arc(sx, sy, player.atkRange, 0, Math.PI * 2);
+                ctx.strokeStyle = "rgba(220,38,38,.22)";
+                ctx.lineWidth = 1.5;
+                ctx.setLineDash([6, 6]);
+                ctx.stroke();
+                ctx.setLineDash([]);
+            }
+            drawPlayerBody(player, isMe, sx, sy);
+            ctx.restore();
+
+            drawPill(player.name, sx, sy - player.r - 28);
+            ctx.save();
+            ctx.fillStyle = isMe ? "#1d4ed8" : "#475569";
+            ctx.font = "700 11px Consolas, monospace";
+            ctx.textAlign = "center";
+            ctx.fillText(`Lv.${player.level}`, sx, sy - player.r - 8);
+            ctx.restore();
+
+            const bubble = bubbles[player.id];
+            if (bubble && Date.now() < bubble.expiry) {
+                const bx = sx,
+                    by = sy - player.r - 56;
+                ctx.save();
+                ctx.font = "12px Consolas, monospace";
+                ctx.textAlign = "center";
+                ctx.textBaseline = "middle";
+                const tw = Math.min(ctx.measureText(bubble.text).width + 18, 220),
+                    bh = 28;
+                ctx.fillStyle = "rgba(255,255,255,.94)";
+                ctx.strokeStyle = "rgba(17,17,17,.1)";
+                roundRect(ctx, bx - tw / 2, by - bh / 2, tw, bh, 3);
+                ctx.fill();
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.rect(bx - tw / 2 + 6, by - bh / 2, tw - 12, bh);
+                ctx.clip();
+                ctx.fillStyle = "#101010";
+                ctx.fillText(bubble.text, bx, by + .5);
+                ctx.restore();
+            }
+        }
+
+        function loop(timestamp) {
+            if (!gameRunning) {
+                rafId = null;
+                return;
+            }
+            const dt = Math.min((timestamp - lastTime) / 1000, .1);
+            lastTime = timestamp;
+            stepRenderEntities(renderPlayers, dt, PLAYER_RENDER_SPEED);
+            stepRenderEntities(renderMonsters, dt, MONSTER_RENDER_SPEED);
+            drawBg();
+            const me = playerMap[myId];
+            const renderMe = renderPlayers[myId];
+            if (renderMe) {
+                updateCam(renderMe, dt);
+            }
+            if (me) {
+                updateHudPos(me);
+            }
+            drawGrid();
+            drawBorder();
+            drawPortal();
+            drawOrbs();
+            drawLoots();
+            Object.values(renderMonsters).forEach(drawMonster);
+            Object.values(renderPlayers).forEach(player => drawPlayer(player, player.id === myId));
+            drawDmgNums(dt);
+            rafId = requestAnimationFrame(loop);
+        }

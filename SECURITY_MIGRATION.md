@@ -1,6 +1,6 @@
 ## Goal
 
-Move `sphere.io` to a server-authoritative model where:
+Move `sphereworld.io` to a server-authoritative model where:
 
 - account login is verified on the server
 - passwords are never stored in client storage
@@ -173,4 +173,3 @@ Before each phase ships, verify:
 
 - restart the server and confirm progress remains
 - deploy a new build and confirm progress remains
-

@@ -1,5 +1,5 @@
 {
-  "name": "sphere.io",
+  "name": "sphereworld.io",
   "version": "1.0.0",
   "description": "웹 기반 실시간 채팅 앱",
   "main": "server.js",

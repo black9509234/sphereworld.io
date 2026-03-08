@@ -1683,7 +1683,7 @@ for (const signal of ['SIGINT', 'SIGTERM']) {
 
 const PORT = process.env.PORT || 3000;
 initStorage()
-  .then(() => server.listen(PORT, () => console.log(`sphere.io @ http://localhost:${PORT}`)))
+  .then(() => server.listen(PORT, () => console.log(`sphereworld.io @ http://localhost:${PORT}`)))
   .catch(err => {
     console.error('[storage] init failed', err);
     process.exit(1);
