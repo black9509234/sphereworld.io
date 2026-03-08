@@ -755,7 +755,7 @@
             bottom: 12px;
             z-index: 10;
             display: none;
-            width: min(196px, calc(100vw - 24px));
+            width: min(228px, calc(100vw - 24px));
             padding: 10px;
             border-radius: 3px;
         }
@@ -771,16 +771,21 @@
         .control-list {
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 9px;
         }
 
         .control-row {
-            display: flex;
-            justify-content: space-between;
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
             align-items: center;
             gap: 12px;
             font-size: 12px;
             text-transform: uppercase;
+        }
+
+        .control-row span:first-child {
+            min-width: 0;
+            white-space: nowrap;
         }
 
         .kbd,
@@ -788,13 +793,163 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            min-width: 38px;
+            min-width: 52px;
             padding: 5px 8px;
             border: 1px solid rgba(17, 17, 17, .12);
             border-radius: 2px;
             background: rgba(17, 17, 17, .04);
             color: var(--accent);
             font: 700 11px var(--mono);
+        }
+
+        .gear-row.craft-pickable {
+            cursor: pointer;
+        }
+
+        .gear-row.craft-pickable:hover {
+            border-color: rgba(37, 99, 235, .3);
+            box-shadow: inset 0 0 0 1px rgba(37, 99, 235, .12);
+        }
+
+        .gear-row.craft-selected {
+            box-shadow: inset 0 0 0 1px rgba(37, 99, 235, .24), 0 0 0 2px rgba(37, 99, 235, .08);
+        }
+
+        .gear-copy.rarity-copy {
+            margin-top: 3px;
+        }
+
+        #craft-toggle {
+            position: fixed;
+            left: 50%;
+            bottom: 12px;
+            z-index: 22;
+            display: none;
+            min-width: 116px;
+            padding: 10px 14px;
+            border: 1px solid rgba(17, 17, 17, .12);
+            border-radius: 3px;
+            background: rgba(255, 255, 255, .9);
+            box-shadow: 0 12px 24px rgba(18, 18, 18, .08);
+            color: var(--accent);
+            font: 700 11px var(--mono);
+            letter-spacing: .12em;
+            text-transform: uppercase;
+            transform: translateX(-50%);
+        }
+
+        #craft-toggle.on {
+            background: rgba(37, 99, 235, .08);
+            border-color: rgba(37, 99, 235, .24);
+        }
+
+        #craft-panel {
+            position: fixed;
+            left: 50%;
+            bottom: 60px;
+            z-index: 23;
+            display: none;
+            width: min(420px, calc(100vw - 24px));
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: 3px;
+            background: var(--panel);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 18px 40px rgba(18, 18, 18, .08);
+            transform: translateX(-50%);
+        }
+
+        .craft-head {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .craft-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .craft-slot {
+            min-height: 78px;
+            padding: 10px;
+            border: 1px dashed rgba(17, 17, 17, .16);
+            border-radius: 3px;
+            background: rgba(255, 255, 255, .62);
+            color: var(--text);
+            text-align: left;
+        }
+
+        .craft-slot strong,
+        .craft-slot span {
+            display: block;
+        }
+
+        .craft-slot strong {
+            font-size: 12px;
+            line-height: 1.45;
+        }
+
+        .craft-slot span {
+            margin-top: 4px;
+            color: var(--muted);
+            font-size: 10px;
+            line-height: 1.4;
+        }
+
+        .craft-plus {
+            color: var(--accent);
+            font: 700 20px var(--mono);
+        }
+
+        .craft-meta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 10px;
+            color: var(--muted);
+            font-size: 11px;
+        }
+
+        .craft-status {
+            min-height: 32px;
+            margin-bottom: 10px;
+            color: var(--muted);
+            font-size: 11px;
+            line-height: 1.45;
+        }
+
+        .craft-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+        }
+
+        .craft-btn {
+            min-width: 84px;
+            padding: 9px 12px;
+            border: 1px solid rgba(17, 17, 17, .12);
+            border-radius: 2px;
+            background: rgba(17, 17, 17, .04);
+            color: var(--accent);
+            font: 700 11px var(--mono);
+            letter-spacing: .08em;
+            text-transform: uppercase;
+        }
+
+        .craft-btn.primary {
+            background: rgba(37, 99, 235, .08);
+        }
+
+        .craft-btn:disabled {
+            opacity: .45;
+            cursor: default;
         }
 
         #chat-wrap {
@@ -978,13 +1133,17 @@
             }
 
             #controls-card {
-                width: min(188px, calc(100vw - 24px));
+                width: min(220px, calc(100vw - 24px));
             }
 
             #chat-wrap {
                 right: 12px;
                 bottom: 12px;
                 width: min(240px, calc(100vw - 24px));
+            }
+
+            #craft-panel {
+                bottom: 58px;
             }
         }
 
@@ -1165,6 +1324,30 @@
             <div class="gear-note" data-i18n="hud_penalty">Death can cost XP, a stat point, and one owned item.</div>
         </div>
     </div>
+    <button id="craft-toggle" type="button" onclick="toggleCraftPanel()" data-i18n="btn_craft">CRAFT</button>
+    <div id="craft-panel">
+        <div class="craft-head">
+            <div>
+                <div class="chat-kicker" data-i18n="craft_kicker">CRAFT</div>
+                <div class="control-title" data-i18n="craft_title">SYNTHESIS</div>
+            </div>
+            <button class="panel-toggle" type="button" onclick="toggleCraftPanel(false)">X</button>
+        </div>
+        <div class="craft-grid">
+            <button class="craft-slot" type="button" id="craft-slot-a" onclick="clearCraftSlot(0)"><strong>[]</strong><span>-</span></button>
+            <div class="craft-plus">+</div>
+            <button class="craft-slot" type="button" id="craft-slot-b" onclick="clearCraftSlot(1)"><strong>[]</strong><span>-</span></button>
+        </div>
+        <div class="craft-meta">
+            <span id="craft-chance">SUCCESS 0%</span>
+            <span id="craft-result">-</span>
+        </div>
+        <div class="craft-status" id="craft-status"></div>
+        <div class="craft-actions">
+            <button class="craft-btn" type="button" id="craft-reset" onclick="clearCraftSelection()" data-i18n="btn_craft_clear">CLEAR</button>
+            <button class="craft-btn primary" type="button" id="craft-action" onclick="craftSelectedItems()" data-i18n="btn_craft_action" disabled>COMBINE</button>
+        </div>
+    </div>
     <button id="logout-btn" onclick="doLogout()" data-i18n="btn_disconnect">DISCONNECT</button>
     <div id="controls-card" class="panel-shell">
         <div class="panel-head tight">
@@ -1180,6 +1363,7 @@
                 <div class="control-row"><span data-i18n="controls_attack">ATTACK</span><span class="kbd">LMB</span></div>
                 <div class="control-row"><span data-i18n="controls_chat">CHAT</span><span class="kbd">ENTER</span></div>
                 <div class="control-row"><span data-i18n="controls_inventory">INVENTORY</span><span class="kbd">E</span></div>
+                <div class="control-row"><span data-i18n="controls_craft">CRAFT</span><span class="kbd">Z</span></div>
                 <div class="control-row"><span data-i18n="controls_close">CLOSE</span><span class="kbd">ESC</span></div>
             </div>
         </div>
@@ -1208,7 +1392,7 @@
             getDB = () => { try { return JSON.parse(localStorage.getItem(UKEY)) || {} } catch { return {} } },
             saveDB = db => localStorage.setItem(UKEY, JSON.stringify(db));
 
-                const I18N = {
+        const I18N = {
             ko: {
                 auth_titlebar: "SPHERE.IO // 접속 노드",
                 auth_kicker: "월드 접속",
@@ -1241,6 +1425,7 @@
                 controls_move: "이동",
                 controls_attack: "공격",
                 controls_chat: "채팅",
+                controls_craft: "조합",
                 controls_close: "닫기",
                 chat_kicker: "월드 채팅",
                 chat_title: "실시간 로그",
@@ -1335,6 +1520,7 @@
                 controls_move: "MOVE",
                 controls_attack: "ATTACK",
                 controls_chat: "CHAT",
+                controls_craft: "CRAFT",
                 controls_close: "CLOSE",
                 chat_kicker: "WORLD CHAT",
                 chat_title: "realtime.log",
@@ -1399,6 +1585,64 @@
             }
         };
 
+        Object.assign(I18N.ko, {
+            btn_craft: "조합",
+            craft_kicker: "조합",
+            craft_title: "합성",
+            craft_empty: "[]",
+            craft_slot_hint: "인벤토리에서 같은 장비를 클릭하세요",
+            craft_slot_clear: "클릭해서 비우기",
+            craft_need_two: "같은 장비와 같은 등급 2개를 넣어야 합니다.",
+            craft_only_same: "같은 장비, 같은 등급만 조합할 수 있습니다.",
+            craft_result: "결과",
+            craft_result_fail: "실패 시 재료가 모두 사라집니다.",
+            craft_result_max: "더 이상 상승 불가",
+            craft_result_arrow: "{from} -> {to}",
+            craft_success_rate: "성공 {rate}%",
+            craft_pick_prompt: "조합 패널을 열고 인벤토리에서 재료를 선택하세요.",
+            btn_craft_clear: "초기화",
+            btn_craft_action: "조합",
+            sys_craft_pick: "조합 재료 선택 :: {item}",
+            sys_craft_mismatch: "조합 실패 :: 같은 장비와 같은 등급만 가능합니다",
+            sys_craft_error_not_joined: "조합 실패 :: 캐릭터가 연결되지 않았습니다.",
+            sys_craft_error_bad_recipe: "조합 실패 :: 재료 구성이 올바르지 않습니다.",
+            sys_craft_error_duplicate_item: "조합 실패 :: 같은 아이템을 두 번 넣을 수 없습니다.",
+            sys_craft_error_item_missing: "조합 실패 :: 인벤토리에서 재료를 찾을 수 없습니다.",
+            sys_craft_error_craft_mismatch: "조합 실패 :: 같은 장비와 같은 등급만 가능합니다.",
+            sys_craft_error_max_rarity: "조합 실패 :: 이미 최고 등급입니다.",
+            sys_craft_success: "조합 성공 :: {item}",
+            sys_craft_fail: "조합 실패 :: 재료가 소멸했습니다",
+        });
+
+        Object.assign(I18N.en, {
+            btn_craft: "CRAFT",
+            craft_kicker: "CRAFT",
+            craft_title: "SYNTHESIS",
+            craft_empty: "[]",
+            craft_slot_hint: "Click matching items in the inventory",
+            craft_slot_clear: "Click to clear",
+            craft_need_two: "Insert two items with the same name and rarity.",
+            craft_only_same: "Only identical items of the same rarity can be combined.",
+            craft_result: "RESULT",
+            craft_result_fail: "Failure consumes both materials.",
+            craft_result_max: "MAX RARITY",
+            craft_result_arrow: "{from} -> {to}",
+            craft_success_rate: "SUCCESS {rate}%",
+            craft_pick_prompt: "Open the craft panel and click inventory items to assign materials.",
+            btn_craft_clear: "CLEAR",
+            btn_craft_action: "COMBINE",
+            sys_craft_pick: "CRAFT MATERIAL :: {item}",
+            sys_craft_mismatch: "CRAFT FAILED :: identical item and rarity required",
+            sys_craft_error_not_joined: "CRAFT FAILED :: character is not connected.",
+            sys_craft_error_bad_recipe: "CRAFT FAILED :: invalid recipe.",
+            sys_craft_error_duplicate_item: "CRAFT FAILED :: duplicate item selected.",
+            sys_craft_error_item_missing: "CRAFT FAILED :: material not found in inventory.",
+            sys_craft_error_craft_mismatch: "CRAFT FAILED :: identical item and rarity required.",
+            sys_craft_error_max_rarity: "CRAFT FAILED :: item is already at max rarity.",
+            sys_craft_success: "CRAFT SUCCESS :: {item}",
+            sys_craft_fail: "CRAFT FAILED :: materials were destroyed",
+        });
+
         const SLOT_ORDER = ["weapon", "armor", "boots", "gloves", "charm"];
         const SLOT_META = {
             weapon: { ko: "무기", en: "WEAPON" },
@@ -1413,6 +1657,19 @@
             wind_boots: { ko: "신발", en: "Boots" },
             focus_gloves: { ko: "장갑", en: "Gloves" },
             lucky_charm: { ko: "부적", en: "Charm" },
+        };
+        const MAX_RARITY = 10;
+        const RARITY_META = {
+            1: { ko: "하급", en: "Trash", color: "#9ca3af", featureKo: "상점 판매 및 분해용", featureEn: "Vendor or dismantle fodder", craftChance: 92 },
+            2: { ko: "일반", en: "Common", color: "#f8fafc", featureKo: "기초 장비", featureEn: "Baseline gear", craftChance: 86 },
+            3: { ko: "우수", en: "Uncommon", color: "#22c55e", featureKo: "초반 성장의 주축", featureEn: "Early growth core", craftChance: 78 },
+            4: { ko: "희귀", en: "Rare", color: "#3b82f6", featureKo: "유효 옵션이 붙기 시작", featureEn: "Useful options start here", craftChance: 68 },
+            5: { ko: "보물", en: "Unique", color: "#a855f7", featureKo: "특수 효과 중심", featureEn: "Special-effect focused", craftChance: 58 },
+            6: { ko: "전설", en: "Legendary", color: "#f97316", featureKo: "구하기 어렵고 강력함", featureEn: "Rare and powerful", craftChance: 48 },
+            7: { ko: "신화", en: "Mythic", color: "#ef4444", featureKo: "서버급 고성능", featureEn: "Server-tier power", craftChance: 38 },
+            8: { ko: "고대", en: "Ancient", color: "#14b8a6", featureKo: "잊혀진 유산", featureEn: "Forgotten legacy", craftChance: 28 },
+            9: { ko: "유물", en: "Relic", color: "#facc15", featureKo: "단 하나의 가치", featureEn: "Singular worth", craftChance: 18 },
+            10: { ko: "초월", en: "Ethereal", color: "#111111", featureKo: "시스템 한계 초월", featureEn: "Beyond system limits", craftChance: 0 },
         };
 
         const MAP_META = {
@@ -1479,6 +1736,14 @@
             chatBody = document.getElementById("chat-body"),
             inventoryToggleBtn = document.getElementById("inventory-toggle"),
             inventoryPanel = document.getElementById("inventory-panel"),
+            craftToggleBtn = document.getElementById("craft-toggle"),
+            craftPanel = document.getElementById("craft-panel"),
+            craftSlotA = document.getElementById("craft-slot-a"),
+            craftSlotB = document.getElementById("craft-slot-b"),
+            craftChance = document.getElementById("craft-chance"),
+            craftResult = document.getElementById("craft-result"),
+            craftStatus = document.getElementById("craft-status"),
+            craftActionBtn = document.getElementById("craft-action"),
             langBtn = document.getElementById("lang-btn"),
             chatLog = document.getElementById("chat-log"),
             chatInput = document.getElementById("chat-input"),
@@ -1672,6 +1937,8 @@
         let lastKeys = {},
             gameRunning = false,
             inventoryOpen = false,
+            craftOpen = false,
+            craftSelection = [null, null],
             lastLoadoutSignature = "",
             rafId = null,
             attackCooldown = false;
@@ -1680,8 +1947,18 @@
         Object.keys(panelBodies).forEach(applyPanelState);
 
         addEventListener("keydown", e => {
+            if ((e.key === "z" || e.key === "Z") && gameRunning && !chatFocused()) {
+                toggleCraftPanel();
+                e.preventDefault();
+                return;
+            }
             if ((e.key === "e" || e.key === "E") && gameRunning && !chatFocused()) {
                 toggleInventory();
+                e.preventDefault();
+                return;
+            }
+            if (e.key === "Escape" && craftOpen) {
+                toggleCraftPanel(false);
                 e.preventDefault();
                 return;
             }
@@ -1757,12 +2034,46 @@
             return SLOT_META[slot]?.[currentLang] || slot.toUpperCase();
         }
 
+        function rarityInfo(rarity) {
+            return RARITY_META[Math.max(1, Math.min(MAX_RARITY, Number(rarity) || 2))] || RARITY_META[2];
+        }
+
+        function rarityName(rarity) {
+            const info = rarityInfo(rarity);
+            return currentLang === "ko" ? info.ko : info.en;
+        }
+
+        function rarityFeature(rarity) {
+            const info = rarityInfo(rarity);
+            return currentLang === "ko" ? info.featureKo : info.featureEn;
+        }
+
+        function rarityColor(rarity) {
+            return rarityInfo(rarity).color;
+        }
+
+        function craftChanceForRarity(rarity) {
+            return rarityInfo(rarity).craftChance || 0;
+        }
+
         function itemLabel(item) {
             return SIMPLE_ITEM_LABELS[item?.key]?.[currentLang] || ITEM_META[item?.key]?.[currentLang] || item?.key || "UNKNOWN";
         }
 
+        function itemFullName(item) {
+            return item ? `${rarityName(item.rarity)} ${itemLabel(item)}` : itemLabel(item);
+        }
+
         function gearRowClass(item) {
             return `gear-row slot-${item?.slot || "plain"}`;
+        }
+
+        function applyItemTone(row, item, nameNode) {
+            if (!item) return;
+            const tone = rarityColor(item.rarity);
+            row.style.borderColor = tone;
+            row.style.boxShadow = `inset 3px 0 0 ${tone}`;
+            if (nameNode) nameNode.style.color = tone;
         }
 
         function formatBonuses(bonuses) {
@@ -1778,6 +2089,161 @@
             if (inventoryOpen) setPanelCollapsed("inventory", false, { persist: false });
         }
 
+        function craftErrorMessage(code) {
+            const key = `sys_craft_error_${code || "bad_recipe"}`;
+            return t(key) === key ? code : t(key);
+        }
+
+        function inventoryItems() {
+            return Array.isArray(currentSelf?.inventory) ? currentSelf.inventory : [];
+        }
+
+        function findInventoryItem(itemId) {
+            return inventoryItems().find(item => String(item.id) === String(itemId)) || null;
+        }
+
+        function canCraftPair(firstItem, secondItem) {
+            return !!(
+                firstItem
+                && secondItem
+                && String(firstItem.id) !== String(secondItem.id)
+                && firstItem.key === secondItem.key
+                && Number(firstItem.rarity || 2) === Number(secondItem.rarity || 2)
+            );
+        }
+
+        function syncCraftSelection() {
+            const ids = craftSelection.filter(id => !!findInventoryItem(id));
+            let firstId = ids[0] || null;
+            let secondId = ids[1] || null;
+            const firstItem = findInventoryItem(firstId);
+            const secondItem = findInventoryItem(secondId);
+            if (!canCraftPair(firstItem, secondItem)) secondId = null;
+            craftSelection = [firstId, secondId];
+        }
+
+        function clearCraftSlot(index) {
+            if (index === 0) {
+                craftSelection = [craftSelection[1], null];
+            } else {
+                craftSelection[1] = null;
+            }
+            syncCraftSelection();
+            renderCraftPanel();
+            renderLoadout(true);
+        }
+
+        function clearCraftSelection() {
+            craftSelection = [null, null];
+            renderCraftPanel();
+            renderLoadout(true);
+        }
+
+        function toggleCraftPanel(force) {
+            if (!gameRunning) return;
+            craftOpen = typeof force === "boolean" ? force : !craftOpen;
+            craftPanel.style.display = craftOpen ? "block" : "none";
+            craftToggleBtn.classList.toggle("on", craftOpen);
+            if (craftOpen) syncCraftSelection();
+            renderCraftPanel();
+            renderLoadout(true);
+        }
+
+        function selectCraftItem(itemId) {
+            if (!craftOpen) {
+                addChatLine(`<span class="ct">${escHtml(t("craft_pick_prompt"))}</span>`, "sys");
+                return;
+            }
+            const item = findInventoryItem(itemId);
+            if (!item) return;
+            syncCraftSelection();
+            let [firstId, secondId] = craftSelection;
+            if (String(firstId) === String(itemId)) {
+                craftSelection = [secondId, null];
+            } else if (String(secondId) === String(itemId)) {
+                craftSelection = [firstId, null];
+            } else if (!firstId) {
+                craftSelection = [itemId, null];
+            } else if (!secondId) {
+                const firstItem = findInventoryItem(firstId);
+                if (!canCraftPair(firstItem, item)) {
+                    addChatLine(`<span class="ct">${escHtml(t("sys_craft_mismatch"))}</span>`, "sys");
+                    craftSelection = [itemId, null];
+                } else {
+                    craftSelection = [firstId, itemId];
+                }
+            } else {
+                const firstItem = findInventoryItem(firstId);
+                if (canCraftPair(firstItem, item)) {
+                    craftSelection = [firstId, itemId];
+                } else {
+                    craftSelection = [itemId, null];
+                }
+            }
+            syncCraftSelection();
+            const selected = findInventoryItem(itemId);
+            if (selected) addChatLine(`<span class="ct">${escHtml(t("sys_craft_pick", { item: itemFullName(selected) }))}</span>`, "sys");
+            renderCraftPanel();
+            renderLoadout(true);
+        }
+
+        function renderCraftSlot(node, item, fallbackKey) {
+            if (!node) return;
+            if (!item) {
+                node.innerHTML = `<strong>${escHtml(t("craft_empty"))}</strong><span>${escHtml(t(fallbackKey))}</span>`;
+                node.style.borderColor = "rgba(17, 17, 17, .16)";
+                node.style.boxShadow = "none";
+                return;
+            }
+            const tone = rarityColor(item.rarity);
+            node.innerHTML = `<strong>${escHtml(itemFullName(item))}</strong><span>${escHtml(formatBonuses(item.bonuses))} :: ${escHtml(rarityFeature(item.rarity))}</span>`;
+            node.style.borderColor = tone;
+            node.style.boxShadow = `inset 3px 0 0 ${tone}`;
+        }
+
+        function renderCraftPanel() {
+            syncCraftSelection();
+            const firstItem = findInventoryItem(craftSelection[0]);
+            const secondItem = findInventoryItem(craftSelection[1]);
+            renderCraftSlot(craftSlotA, firstItem, "craft_slot_hint");
+            renderCraftSlot(craftSlotB, secondItem, firstItem ? "craft_slot_clear" : "craft_slot_hint");
+
+            const canCraft = canCraftPair(firstItem, secondItem) && Number(firstItem?.rarity || 0) < MAX_RARITY;
+            const rate = firstItem ? craftChanceForRarity(firstItem.rarity) : 0;
+            craftChance.textContent = t("craft_success_rate", { rate });
+            if (firstItem && Number(firstItem.rarity) >= MAX_RARITY) {
+                craftResult.textContent = t("craft_result_max");
+            } else if (firstItem) {
+                craftResult.textContent = t("craft_result_arrow", {
+                    from: rarityName(firstItem.rarity),
+                    to: rarityName((Number(firstItem.rarity) || 0) + 1),
+                });
+            } else {
+                craftResult.textContent = t("craft_result");
+            }
+            craftStatus.textContent = canCraft ? t("craft_result_fail") : (firstItem ? t("craft_only_same") : t("craft_need_two"));
+            craftActionBtn.disabled = !canCraft || !socket;
+        }
+
+        function craftSelectedItems() {
+            const firstItem = findInventoryItem(craftSelection[0]);
+            const secondItem = findInventoryItem(craftSelection[1]);
+            if (!canCraftPair(firstItem, secondItem) || !socket) return;
+            socket.emit("craftItems", { itemIds: [firstItem.id, secondItem.id] }, res => {
+                if (!res?.ok) {
+                    addChatLine(`<span class="ct">${escHtml(craftErrorMessage(res?.error))}</span>`, "sys");
+                    return;
+                }
+                applySelfState(res.self);
+                clearCraftSelection();
+                if (res.success && res.item) {
+                    addChatLine(`<span class="ct">${escHtml(t("sys_craft_success", { item: itemFullName(res.item) }))}</span>`, "lvlup");
+                } else {
+                    addChatLine(`<span class="ct">${escHtml(t("sys_craft_fail"))}</span>`, "sys");
+                }
+            });
+        }
+
         function equipErrorMessage(code) {
             const key = `sys_equip_error_${code || "item_missing"}`;
             return t(key) === key ? code : t(key);
@@ -1786,6 +2252,8 @@
         function getLoadoutSignature() {
             return JSON.stringify({
                 lang: currentLang,
+                craftOpen,
+                craftSelection,
                 lootCount: currentSelf?.lootCount || 0,
                 inventoryLimit: currentSelf?.inventoryLimit || 12,
                 inventory: currentSelf?.inventory || [],
@@ -1794,6 +2262,7 @@
         }
 
         function renderLoadout(force = false) {
+            syncCraftSelection();
             const signature = getLoadoutSignature();
             if (!force && signature === lastLoadoutSignature) return;
             lastLoadoutSignature = signature;
@@ -1821,13 +2290,18 @@
                 if (item) {
                     const nameNode = document.createElement("div");
                     nameNode.className = "gear-name";
-                    nameNode.textContent = itemLabel(item);
+                    nameNode.textContent = itemFullName(item);
                     main.appendChild(nameNode);
 
                     const copyNode = document.createElement("div");
                     copyNode.className = "gear-copy";
                     copyNode.textContent = formatBonuses(item.bonuses);
                     main.appendChild(copyNode);
+
+                    const rarityNode = document.createElement("div");
+                    rarityNode.className = "gear-copy rarity-copy";
+                    rarityNode.textContent = `${rarityName(item.rarity)} :: ${rarityFeature(item.rarity)}`;
+                    main.appendChild(rarityNode);
 
                     const button = document.createElement("button");
                     button.type = "button";
@@ -1836,6 +2310,7 @@
                     button.onclick = () => unequipItem(slot);
                     row.appendChild(main);
                     row.appendChild(button);
+                    applyItemTone(row, item, nameNode);
                 } else {
                     const emptyNode = document.createElement("div");
                     emptyNode.className = "gear-empty";
@@ -1859,13 +2334,15 @@
             for (const item of inventory) {
                 const row = document.createElement("div");
                 row.className = gearRowClass(item);
+                if (craftOpen) row.classList.add("craft-pickable");
+                if (craftSelection.includes(item.id)) row.classList.add("craft-selected");
 
                 const main = document.createElement("div");
                 main.className = "gear-main";
 
                 const nameNode = document.createElement("div");
                 nameNode.className = "gear-name";
-                nameNode.textContent = `${itemLabel(item)} [${slotLabel(item.slot)}]`;
+                nameNode.textContent = `${itemFullName(item)} [${slotLabel(item.slot)}]`;
                 main.appendChild(nameNode);
 
                 const copyNode = document.createElement("div");
@@ -1873,16 +2350,27 @@
                 copyNode.textContent = formatBonuses(item.bonuses);
                 main.appendChild(copyNode);
 
+                const rarityNode = document.createElement("div");
+                rarityNode.className = "gear-copy rarity-copy";
+                rarityNode.textContent = `${rarityName(item.rarity)} :: ${rarityFeature(item.rarity)}`;
+                main.appendChild(rarityNode);
+
                 const button = document.createElement("button");
                 button.type = "button";
                 button.className = "gear-btn";
                 button.textContent = t("btn_equip");
-                button.onclick = () => equipItem(item.id);
+                button.onclick = e => {
+                    e.stopPropagation();
+                    equipItem(item.id);
+                };
 
                 row.appendChild(main);
                 row.appendChild(button);
+                row.onclick = craftOpen ? () => selectCraftItem(item.id) : null;
+                applyItemTone(row, item, nameNode);
                 inventoryList.appendChild(row);
             }
+            renderCraftPanel();
         }
 
         function applySelfState(self) {
@@ -1909,6 +2397,7 @@
                 if (self.mapId) renderMe.mapId = self.mapId;
             }
             renderLoadout();
+            renderCraftPanel();
         }
 
         function tryAttackAt(clientX, clientY) {
@@ -1984,7 +2473,7 @@
                     return;
                 }
                 applySelfState(res.self);
-                addChatLine(`<span class="ct">${escHtml(t("sys_equip", { item: itemLabel(res.item) }))}</span>`, "sys");
+                addChatLine(`<span class="ct">${escHtml(t("sys_equip", { item: itemFullName(res.item) }))}</span>`, "sys");
             });
         }
 
@@ -2000,7 +2489,7 @@
                     return;
                 }
                 applySelfState(res.self);
-                addChatLine(`<span class="ct">${escHtml(t("sys_unequip", { item: itemLabel(res.item) }))}</span>`, "sys");
+                addChatLine(`<span class="ct">${escHtml(t("sys_unequip", { item: itemFullName(res.item) }))}</span>`, "sys");
             });
         }
 
@@ -2130,7 +2619,9 @@
             document.getElementById("hud").style.display = "flex";
             document.getElementById("logout-btn").style.display = "block";
             inventoryToggleBtn.style.display = "block";
+            craftToggleBtn.style.display = "block";
             toggleInventory(false);
+            toggleCraftPanel(false);
             document.getElementById("chat-wrap").style.display = "flex";
             controlsCard.style.display = "block";
             elUser.textContent = username;
@@ -2195,7 +2686,7 @@
             socket.on("died", ({ xpLost = 0, statPointsLost = 0, lostItem = null } = {}) => {
                 attackCooldown = false;
                 addChatLine(`<span class="ct">${escHtml(t("sys_respawned"))}</span>`, "sys");
-                addChatLine(`<span class="ct">${escHtml(t("sys_death_penalty", { xp: xpLost, points: statPointsLost, item: lostItem ? itemLabel(lostItem) : t("sys_death_penalty_no_item") }))}</span>`, "sys");
+                addChatLine(`<span class="ct">${escHtml(t("sys_death_penalty", { xp: xpLost, points: statPointsLost, item: lostItem ? itemFullName(lostItem) : t("sys_death_penalty_no_item") }))}</span>`, "sys");
             });
             socket.on("attackResult", ({ monsterId, dmg, crit }) => {
                 const m = monsterMap[monsterId];
@@ -2207,10 +2698,10 @@
                 if (killerId === myId) addChatLine(`<span class="ct">${escHtml(t("sys_target_down", { xp }))}</span>`, "sys");
             });
             socket.on("lootDropped", ({ item }) => {
-                addChatLine(`<span class="ct">${escHtml(t("sys_loot_drop", { item: itemLabel(item) }))}</span>`, "sys");
+                addChatLine(`<span class="ct">${escHtml(t("sys_loot_drop", { item: itemFullName(item) }))}</span>`, "sys");
             });
             socket.on("lootPicked", ({ item }) => {
-                addChatLine(`<span class="ct">${escHtml(t("sys_loot_pick", { item: itemLabel(item) }))}</span>`, "sys");
+                addChatLine(`<span class="ct">${escHtml(t("sys_loot_pick", { item: itemFullName(item) }))}</span>`, "sys");
             });
             socket.on("levelUp", ({ id, level, name, gained, statPoints }) => {
                 if (id === myId) {
@@ -2247,6 +2738,8 @@
             renderMonsters = {};
             dmgNums.length = 0;
             inventoryOpen = false;
+            craftOpen = false;
+            craftSelection = [null, null];
             lastLoadoutSignature = "";
             if (socket) {
                 socket.disconnect();
@@ -2255,7 +2748,9 @@
             document.getElementById("hud").style.display = "none";
             document.getElementById("logout-btn").style.display = "none";
             inventoryToggleBtn.style.display = "none";
+            craftToggleBtn.style.display = "none";
             inventoryPanel.style.display = "none";
+            craftPanel.style.display = "none";
             document.getElementById("chat-wrap").style.display = "none";
             controlsCard.style.display = "none";
             document.getElementById("auth-screen").style.display = "flex";
@@ -2530,7 +3025,7 @@
                 ctx.restore();
 
                 if (me && Math.hypot(me.x - loot.x, me.y - loot.y) < 110) {
-                    drawPill(itemLabel(loot.item), sx, sy - 18, {
+                    drawPill(itemFullName(loot.item), sx, sy - 18, {
                         font: "700 10px Consolas, monospace",
                         bg: "rgba(255,255,255,.92)",
                     });

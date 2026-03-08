@@ -35,6 +35,7 @@ const DEFAULT_MAP_ID = 'field';
 const MONO_MAP_ID = 'mono';
 const PORTAL_RADIUS = 42;
 const PORTAL_COOLDOWN_MS = 1200;
+const MAX_RARITY = 10;
 
 const SAVE_DIR = path.join(__dirname, 'data');
 const SAVE_FILE = path.join(SAVE_DIR, 'profiles.json');
@@ -103,6 +104,50 @@ const ITEM_DEFS = Object.freeze({
     color: '#d97706',
     bonuses: { luk: 1, wis: 1 },
   },
+});
+const RARITY_DEFS = Object.freeze({
+  1: { key: 1, color: '#9ca3af', bonusScale: 0, craftChance: 0.92 },
+  2: { key: 2, color: '#f8fafc', bonusScale: 1, craftChance: 0.86 },
+  3: { key: 3, color: '#22c55e', bonusScale: 2, craftChance: 0.78 },
+  4: { key: 4, color: '#3b82f6', bonusScale: 3, craftChance: 0.68 },
+  5: { key: 5, color: '#a855f7', bonusScale: 4, craftChance: 0.58 },
+  6: { key: 6, color: '#f97316', bonusScale: 5, craftChance: 0.48 },
+  7: { key: 7, color: '#ef4444', bonusScale: 6, craftChance: 0.38 },
+  8: { key: 8, color: '#14b8a6', bonusScale: 7, craftChance: 0.28 },
+  9: { key: 9, color: '#facc15', bonusScale: 8, craftChance: 0.18 },
+  10: { key: 10, color: '#111111', bonusScale: 10, craftChance: 0 },
+});
+const MONSTER_RARITY_TABLES = Object.freeze({
+  low: [
+    { rarity: 1, weight: 0.42 },
+    { rarity: 2, weight: 0.38 },
+    { rarity: 3, weight: 0.15 },
+    { rarity: 4, weight: 0.05 },
+  ],
+  mid: [
+    { rarity: 1, weight: 0.28 },
+    { rarity: 2, weight: 0.36 },
+    { rarity: 3, weight: 0.22 },
+    { rarity: 4, weight: 0.1 },
+    { rarity: 5, weight: 0.04 },
+  ],
+  high: [
+    { rarity: 1, weight: 0.18 },
+    { rarity: 2, weight: 0.32 },
+    { rarity: 3, weight: 0.25 },
+    { rarity: 4, weight: 0.15 },
+    { rarity: 5, weight: 0.08 },
+    { rarity: 6, weight: 0.02 },
+  ],
+  elite: [
+    { rarity: 1, weight: 0.08 },
+    { rarity: 2, weight: 0.26 },
+    { rarity: 3, weight: 0.28 },
+    { rarity: 4, weight: 0.18 },
+    { rarity: 5, weight: 0.11 },
+    { rarity: 6, weight: 0.07 },
+    { rarity: 7, weight: 0.02 },
+  ],
 });
 
 let monsterIdCounter = 0;
@@ -188,6 +233,26 @@ function nextItemId() {
   return `it_${itemSerial.toString(36)}`;
 }
 
+function normalizeRarity(raw) {
+  return clamp(Math.round(Number(raw) || 2), 1, MAX_RARITY);
+}
+
+function rarityDef(rarity) {
+  return RARITY_DEFS[normalizeRarity(rarity)] || RARITY_DEFS[2];
+}
+
+function rarityColor(rarity) {
+  return rarityDef(rarity).color;
+}
+
+function rarityBonusScale(rarity) {
+  return rarityDef(rarity).bonusScale;
+}
+
+function craftChanceForRarity(rarity) {
+  return rarityDef(rarity).craftChance;
+}
+
 function normalizeStats(raw = {}) {
   return {
     str: clamp(Number(raw.str) || 0, 0, 999),
@@ -218,20 +283,40 @@ function getItemDef(key) {
   return ITEM_DEFS[key] || null;
 }
 
-function makeItemInstance(key, scale = 1) {
-  const def = getItemDef(key);
-  if (!def) return null;
+function itemBonusesFor(def, rarity) {
   const bonuses = makeZeroStats();
+  const scale = rarityBonusScale(rarity);
   for (const stat of Object.keys(bonuses)) {
-    const base = def.bonuses[stat] || 0;
+    const base = def?.bonuses?.[stat] || 0;
     bonuses[stat] = Math.max(0, Math.round(base * scale));
   }
+  return bonuses;
+}
+
+function inferRarityFromBonuses(def, bonuses) {
+  if (!def || !bonuses || typeof bonuses !== 'object') return 2;
+  let inferredScale = 0;
+  for (const stat of Object.keys(def.bonuses)) {
+    const base = Number(def.bonuses[stat]) || 0;
+    if (base <= 0) continue;
+    const value = Number(bonuses[stat]) || 0;
+    inferredScale = Math.max(inferredScale, Math.round(value / base));
+  }
+  if (inferredScale <= 0) return 1;
+  return clamp(inferredScale + 1, 1, MAX_RARITY);
+}
+
+function makeItemInstance(key, rarity = 2) {
+  const def = getItemDef(key);
+  if (!def) return null;
+  const nextRarity = normalizeRarity(rarity);
   return {
     id: nextItemId(),
     key: def.key,
     slot: def.slot,
-    color: def.color,
-    bonuses,
+    color: rarityColor(nextRarity),
+    rarity: nextRarity,
+    bonuses: itemBonusesFor(def, nextRarity),
   };
 }
 
@@ -239,13 +324,14 @@ function normalizeItem(raw) {
   if (!raw || typeof raw !== 'object') return null;
   const def = getItemDef(raw.key);
   if (!def) return null;
-  const bonuses = normalizeStats(raw.bonuses || def.bonuses);
+  const rarity = normalizeRarity(raw.rarity || inferRarityFromBonuses(def, raw.bonuses));
   return {
     id: typeof raw.id === 'string' && raw.id ? raw.id : nextItemId(),
     key: def.key,
     slot: def.slot,
-    color: def.color,
-    bonuses,
+    color: rarityColor(rarity),
+    rarity,
+    bonuses: itemBonusesFor(def, rarity),
   };
 }
 
@@ -338,6 +424,22 @@ function lootDropChanceForMonster(monster) {
   if (monster.xp >= 35) return 0.35;
   if (monster.xp >= 18) return 0.24;
   return 0.14;
+}
+
+function rollWeighted(entries) {
+  let roll = Math.random();
+  for (const entry of entries) {
+    roll -= entry.weight;
+    if (roll <= 0) return entry.rarity;
+  }
+  return entries[entries.length - 1]?.rarity || 2;
+}
+
+function rollRarityForMonster(monster) {
+  if (monster.xp >= 60) return rollWeighted(MONSTER_RARITY_TABLES.elite);
+  if (monster.xp >= 35) return rollWeighted(MONSTER_RARITY_TABLES.high);
+  if (monster.xp >= 18) return rollWeighted(MONSTER_RARITY_TABLES.mid);
+  return rollWeighted(MONSTER_RARITY_TABLES.low);
 }
 
 function serializePlayerProfile(p) {
@@ -436,8 +538,17 @@ function addItemToInventory(p, item) {
 function rollItemForMonster(monster) {
   const itemKeys = Object.keys(ITEM_DEFS);
   const key = itemKeys[Math.floor(Math.random() * itemKeys.length)];
-  const scale = monster.xp >= 60 ? 1.4 : monster.xp >= 35 ? 1.25 : monster.xp >= 18 ? 1.1 : 1;
-  return makeItemInstance(key, scale);
+  return makeItemInstance(key, rollRarityForMonster(monster));
+}
+
+function canCraftItems(a, b) {
+  return !!(
+    a
+    && b
+    && a.id !== b.id
+    && a.key === b.key
+    && normalizeRarity(a.rarity) === normalizeRarity(b.rarity)
+  );
 }
 
 function removeRandomOwnedItem(p) {
@@ -918,6 +1029,51 @@ io.on('connection', socket => {
       ack({
         ok: true,
         item,
+        self: buildSelfState(p, playerLootsFor(p)),
+      });
+    }
+  });
+
+  socket.on('craftItems', ({ itemIds }, ack) => {
+    const p = players[socket.id];
+    if (!p) return ack && ack({ ok: false, error: 'not_joined' });
+    if (!Array.isArray(itemIds) || itemIds.length !== 2) return ack && ack({ ok: false, error: 'bad_recipe' });
+
+    const ids = itemIds.map(id => String(id));
+    if (ids[0] === ids[1]) return ack && ack({ ok: false, error: 'duplicate_item' });
+
+    const firstIndex = p.inventory.findIndex(item => String(item.id) === ids[0]);
+    const secondIndex = p.inventory.findIndex(item => String(item.id) === ids[1]);
+    if (firstIndex < 0 || secondIndex < 0) return ack && ack({ ok: false, error: 'item_missing' });
+
+    const firstItem = p.inventory[firstIndex];
+    const secondItem = p.inventory[secondIndex];
+    if (!canCraftItems(firstItem, secondItem)) return ack && ack({ ok: false, error: 'craft_mismatch' });
+    if (normalizeRarity(firstItem.rarity) >= MAX_RARITY) return ack && ack({ ok: false, error: 'max_rarity' });
+
+    const chance = craftChanceForRarity(firstItem.rarity);
+    const removalOrder = [firstIndex, secondIndex].sort((a, b) => b - a);
+    for (const index of removalOrder) {
+      p.inventory.splice(index, 1);
+    }
+
+    const success = Math.random() < chance;
+    let craftedItem = null;
+    if (success) {
+      craftedItem = makeItemInstance(firstItem.key, normalizeRarity(firstItem.rarity) + 1);
+      p.inventory.push(craftedItem);
+    }
+
+    emitSelfState(socket.id, p);
+    persistPlayerProfile(p);
+
+    if (ack) {
+      ack({
+        ok: true,
+        success,
+        chance,
+        item: craftedItem,
+        consumed: [firstItem, secondItem],
         self: buildSelfState(p, playerLootsFor(p)),
       });
     }
