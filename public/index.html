@@ -2166,7 +2166,7 @@
         };
 
         let authMode = "login",
-            currentLang = localStorage.getItem(LANG_KEY) === "en" ? "en" : "ko";
+            currentLang = localStorage.getItem(LANG_KEY) === "ko" ? "ko" : "en";
 
         const t = (key, vars = {}) => {
             const source = (I18N[currentLang] && I18N[currentLang][key]) || I18N.en[key] || key;
